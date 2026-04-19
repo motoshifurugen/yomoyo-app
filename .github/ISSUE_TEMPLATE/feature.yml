@@ -1,0 +1,34 @@
+name: 機能提案
+description: 新機能または既存機能の改善
+labels: ["type: 機能"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 概要
+      description: 何を実現したいか、一言で
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: なぜ必要か
+      description: ユーザーやプロダクトにとっての価値
+    validations:
+      required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: スコープ・完了条件
+      description: 何ができれば「完了」か
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 補足・懸念点
+    validations:
+      required: false

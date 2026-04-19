@@ -1,0 +1,35 @@
+name: 議論・意思決定
+description: 設計・方針・UX・技術選定などの議論
+labels: ["議論が必要"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: 問いと背景
+      description: 何を決めたいか、なぜ今議論が必要か
+    validations:
+      required: true
+
+  - type: textarea
+    id: options
+    attributes:
+      label: 選択肢・論点
+      description: 考えられるアプローチや対立する観点
+    validations:
+      required: false
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 制約・前提
+      description: 決定に影響する制約があれば
+    validations:
+      required: false
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 決定事項
+      description: 議論後、ここに結論を記録する
+    validations:
+      required: false

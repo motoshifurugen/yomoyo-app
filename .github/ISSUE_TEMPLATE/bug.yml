@@ -1,0 +1,37 @@
+name: バグ報告
+description: 不具合・予期しない動作の報告
+labels: ["type: バグ"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 何が起きたか
+      description: 実際に起きたことを簡潔に
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      placeholder: |
+        1. 〇〇を開く
+        2. 〇〇をタップ
+        3. クラッシュ / 表示がおかしい
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する動作
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: 環境
+      placeholder: "例: iPhone 15 / iOS 17.4 / アプリ v0.3"
+    validations:
+      required: false
