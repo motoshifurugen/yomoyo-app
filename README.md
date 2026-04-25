@@ -4,25 +4,57 @@ A warm reading app where one person's reading quietly inspires another to read.
 
 ## Concept
 
-Reading is softly social.
+One app, one role.
 
-When a friend starts or finishes a book, that simple fact can become the start of your own reading journey — "maybe I'll read that too." Yomoyo is a space where those quiet signals travel between people, without noise, without reviews, without competition.
+Yomoyo exists for one thing: the quiet spread of reading between people. When someone you follow finishes a book, that simple signal can become the start of your own reading — "maybe I'll read that too." No reviews required. No ranking. Just a gentle presence.
+
+The real world is the center. The app gently supports it.
+
+We want something people can use without being told how — intuitive before instructional, calm before clever. When an app over-organizes information, users spend energy deciding how to sort things rather than just reading. Yomoyo avoids that.
 
 ## What We Value
 
-- Warm, calm, gentle experience
-- Quiet propagation of reading activity between friends
+- Single focused role — no feature overload
+- Quiet, warm experience over engagement metrics
 - Lightweight actions — a single tap is enough
-- Emotional warmth over engagement metrics
-- The feeling of a quiet library, not a noisy social feed
+- Cognitive lightness — no sorting overhead, no organizational burden
+- The real-world act of reading as the center
+- Intuitive before instructional
+- Emotional warmth over social performance
 
 ## What We Avoid
 
+- Feature bloat and all-in-one creep
+- Over-organized systems that force users to sort or categorize
 - Noisy SNS patterns or aggressive engagement loops
 - Review-heavy or rating-heavy UX
 - Competitive reading metrics or streaks
 - Ads that interrupt emotionally important moments
-- Feature bloat and premature architecture
+- Premature architecture or doc sprawl
+
+## Notification Philosophy
+
+Notifications are intentionally limited.
+
+One event triggers a notification: someone you follow has **finished a book**.
+
+Not started. Not bookmarked. Finished.
+
+Notifications only come from people you actively follow. No algorithmic suggestions, no strangers.
+
+## Ad Policy
+
+Yomoyo is ad-supported. Ads must never break the emotional experience of reading.
+
+**Ads are never shown:**
+- During onboarding or first launch
+- On the login or signup screen
+- Immediately after logging a book start or finish
+- In any flow that carries emotional weight for the user
+
+**Ads may appear** in natural pause points: between feed items (not at the very top), in the settings screen, or in other low-sensitivity surfaces.
+
+Paid ad removal may be considered in a future version. For now, ads stay rare and tasteful.
 
 ## Tech Stack
 
@@ -50,21 +82,6 @@ Multilingual support is built in from the start, not added later.
 3. Small, focused PR
 4. Review → merge → close issue
 5. Significant decisions get a comment in the issue; no separate decision documents
-
-## Ad Policy
-
-Yomoyo is ad-supported. Ads must never break the emotional experience of reading.
-
-**Ads are never shown:**
-- During onboarding or first launch
-- On the login or signup screen
-- Immediately after logging a book start ("I started reading this")
-- Immediately after logging a book finish ("I finished this")
-- In any flow that carries emotional weight for the user
-
-**Ads may appear** in natural pause points: between feed items (not at the very top), in the settings screen, or in other low-sensitivity surfaces.
-
-Paid ad removal may be considered in a future version. For now, ads stay rare and tasteful.
 
 ## Next Focus
 
