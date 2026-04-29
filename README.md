@@ -61,6 +61,7 @@ Paid ad removal may be considered in a future version. For now, ads stay rare an
 | Layer | Choice |
 |-------|--------|
 | Mobile | React Native |
+| Backend / Auth | Firebase |
 | Target platforms | iOS + Android |
 | Target market | Global |
 | i18n | First-class concern from day one |
