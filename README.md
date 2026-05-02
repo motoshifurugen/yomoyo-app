@@ -88,13 +88,23 @@ Multilingual support is built in from the start, not added later.
 
 **前提ツール:** Node.js、pnpm、Xcode（iOS）
 
-### 1. 依存関係のインストール
+### 1. pnpmインストール
+```sh
+brew install pnpm
+```
+
+### 2. 依存関係のインストール
 
 ```sh
 pnpm install
 ```
 
-### 2. 環境変数と Firebase / Google Sign-In の設定
+依存関係でエラーが出る場合、以下で手動承認
+```sh
+pnpm approve-builds
+```
+
+### 3. 環境変数と Firebase / Google Sign-In の設定
 
 #### 2-1. 環境変数
 `.env.example` を `.env` にコピーし、必要な値を設定します。
@@ -106,17 +116,23 @@ cp .env.example .env
 最低限、以下を設定する。
 - `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`
 
+[Google Cloud(yomoyo)](https://console.cloud.google.com/welcome?project=yomoyo-d9c4a) > APIとサービス > 認証情報 > OAuth 2.0 クライアント ID のウェブアプリケーションタイプ
+
 #### 2-2. Firebase 設定ファイル
 Firebase Console から取得した以下のファイルを **プロジェクトルート** に配置します。（以下ファイルはGitで管理しないこと）
 
 - `google-services.json`
 - `GoogleService-Info.plist`
 
-### 3. iOS で起動する
+### 3. ビルドする
 
-実機を使う場合は、iPhone を Mac に接続し、必要に応じて「このコンピュータを信頼」を許可します。
+```sh
+pnpm ios
+```
 
-起動コマンド:
+### 5. iOS で起動する
+
+実機を使う場合は、iPhone を Mac に接続し、必要に応じて「このコンピュータを信頼」を許可してから実行
 
 ```sh
 pnpm run ios
