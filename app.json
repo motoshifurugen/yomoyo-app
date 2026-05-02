@@ -16,7 +16,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yomoyo.app",
       "usesAppleSignIn": true,
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "appleTeamId": "7V3MCCJ4SW"
     },
     "android": {
       "adaptiveIcon": {
