@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node ./scripts/run-expo-safe.cjs start --tunnel",
+    "start": "node ./scripts/run-expo-safe.cjs start --lan",
+    "start:tunnel": "node ./scripts/run-expo-safe.cjs start --tunnel",
     "start:lan": "node ./scripts/run-expo-safe.cjs start --lan",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -20,7 +21,7 @@
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-safe-area-context": "^5.4.0",
-    "react-native-screens": "^4.5.0"
+    "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
