@@ -124,13 +124,26 @@ Firebase Console から取得した以下のファイルを **プロジェクト
 - `google-services.json`
 - `GoogleService-Info.plist`
 
-### 3. ビルドする
+### 4. iPhone実機検証用設定
 
+socatをインストール
 ```sh
-pnpm ios
+brew install socat
 ```
 
-### 5. iOS で起動する
+```sh
+socat TCP-LISTEN:7431,bind=172.20.10.9,fork,reuseaddr TCP:127.0.0.1:7430
+```
+
+このターミナルは閉じない。
+
+### 5. ビルドする
+
+```sh
+pnpm run prebuild
+```
+
+### 6. iOS で起動する
 
 実機を使う場合は、iPhone を Mac に接続し、必要に応じて「このコンピュータを信頼」を許可してから実行
 
