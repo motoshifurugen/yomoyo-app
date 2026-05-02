@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "node ./scripts/run-expo-safe.cjs start --lan",
-    "start:tunnel": "node ./scripts/run-expo-safe.cjs start --tunnel",
-    "start:lan": "node ./scripts/run-expo-safe.cjs start --lan",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "prebuild": "expo prebuild",
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
     "test": "jest --watchAll=false",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.{ts,tsx}\""

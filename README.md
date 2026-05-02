@@ -84,9 +84,46 @@ Multilingual support is built in from the start, not added later.
 4. Review → merge → close issue
 5. Significant decisions get a comment in the issue; no separate decision documents
 
-## Next Focus
+## iOSアプリ起動・開発手順
 
-- App bootstrap and navigation shell
-- Authentication (social login)
-- Book search integration
-- Core reading activity logging (start / finish)
+**前提ツール:** Node.js、pnpm、Xcode（iOS）
+
+### 1. 依存関係のインストール
+
+```sh
+pnpm install
+```
+
+### 2. 環境変数と Firebase / Google Sign-In の設定
+
+#### 2-1. 環境変数
+`.env.example` を `.env` にコピーし、必要な値を設定します。
+
+```sh
+cp .env.example .env
+```
+
+最低限、以下を設定する。
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`
+
+#### 2-2. Firebase 設定ファイル
+Firebase Console から取得した以下のファイルを **プロジェクトルート** に配置します。（以下ファイルはGitで管理しないこと）
+
+- `google-services.json`
+- `GoogleService-Info.plist`
+
+### 3. iOS で起動する
+
+実機を使う場合は、iPhone を Mac に接続し、必要に応じて「このコンピュータを信頼」を許可します。
+
+起動コマンド:
+
+```sh
+pnpm run ios
+```
+
+※ 2回目以降、ネイティブに依存しない機能のみの変更時は以下で十分
+
+```sh
+pnpm run start
+```
