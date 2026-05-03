@@ -21,8 +21,9 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   logo: {
-    width: 200,
-    aspectRatio: 1,
+    width: 220,
+    height: 96,
+    alignSelf: 'center',
     marginBottom: 16,
   },
   subtitle: {
