@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Platform, StyleProp, ViewStyle } from 'react-native';
 import GlassSurface from './GlassSurface';
-import { yomoyoGlass } from '@/constants/yomoyoTheme';
+import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 
 type Props = {
   children: React.ReactNode;
@@ -21,6 +21,7 @@ export default function GlassCard({ children, style }: Props) {
 const styles = StyleSheet.create({
   shadow: {
     borderRadius: 24,
+    backgroundColor: yomoyoColors.surface,
     ...Platform.select({
       ios: {
         shadowColor: yomoyoGlass.shadow,

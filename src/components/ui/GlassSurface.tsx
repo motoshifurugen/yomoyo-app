@@ -1,7 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Platform, StyleProp, ViewStyle } from 'react-native';
+import { View, StyleSheet, Platform, NativeModules, StyleProp, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { yomoyoGlass } from '@/constants/yomoyoTheme';
+
+// True only when the expo-blur native module is compiled into the current build.
+// Expo Go does not include it, so this will be false there.
+const BLUR_NATIVE_AVAILABLE =
+  Platform.OS === 'ios' && Boolean(NativeModules.ExpoBlurViewManager);
 
 type Props = {
   children: React.ReactNode;
@@ -17,7 +22,7 @@ export default function GlassSurface({ children, borderRadius = 24, style }: Pro
     overflow: 'hidden' as const,
   };
 
-  if (Platform.OS === 'ios') {
+  if (BLUR_NATIVE_AVAILABLE) {
     return (
       <BlurView intensity={60} tint="light" style={[glassStyle, style]}>
         {children}
@@ -26,7 +31,7 @@ export default function GlassSurface({ children, borderRadius = 24, style }: Pro
   }
 
   return (
-    <View style={[styles.fallback, glassStyle, style]}>
+    <View testID="glass-surface-fallback" style={[styles.fallback, glassStyle, style]}>
       {children}
     </View>
   );
@@ -34,6 +39,6 @@ export default function GlassSurface({ children, borderRadius = 24, style }: Pro
 
 const styles = StyleSheet.create({
   fallback: {
-    backgroundColor: yomoyoGlass.strongBackground,
+    backgroundColor: yomoyoGlass.background,
   },
 });

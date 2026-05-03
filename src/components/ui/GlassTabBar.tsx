@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
   shadow: {
     flex: 1,
     borderRadius: 30,
+    backgroundColor: yomoyoColors.surface,
     ...Platform.select({
       ios: {
         shadowColor: yomoyoGlass.shadow,

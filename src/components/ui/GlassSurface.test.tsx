@@ -26,4 +26,25 @@ describe('GlassSurface', () => {
     );
     expect(screen.getByText('Pill shape')).toBeTruthy();
   });
+
+  it('uses the translucent fallback when native blur is unavailable', () => {
+    // In the test environment, NativeModules.ExpoBlurViewManager is undefined,
+    // so the blur-unavailable path should be taken.
+    render(
+      <GlassSurface>
+        <Text>fallback</Text>
+      </GlassSurface>
+    );
+    expect(screen.getByTestId('glass-surface-fallback')).toBeTruthy();
+  });
+
+  it('renders children in the fallback view', () => {
+    render(
+      <GlassSurface>
+        <Text>inside fallback</Text>
+      </GlassSurface>
+    );
+    expect(screen.getByText('inside fallback')).toBeTruthy();
+    expect(screen.getByTestId('glass-surface-fallback')).toBeTruthy();
+  });
 });
