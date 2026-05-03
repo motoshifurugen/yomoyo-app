@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Platform, StyleSheet } from 'react-native';
 import {
   AppleButton,
-  AppleButtonType,
-  AppleButtonStyle,
-  AppleError,
+  appleAuth,
 } from '@invertase/react-native-apple-authentication';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
@@ -29,7 +27,7 @@ export default function LoginScreen() {
     try {
       await signInWithApple();
     } catch (e) {
-      if (e && typeof e === 'object' && 'code' in e && (e as any).code === AppleError.CANCELED) return;
+      if (e && typeof e === 'object' && 'code' in e && (e as any).code === appleAuth.Error.CANCELED) return;
       setSignInError('Sign-in failed. Please try again.');
     }
   };
@@ -46,8 +44,8 @@ export default function LoginScreen() {
         {Platform.OS === 'ios' && (
           <AppleButton
             testID="apple-signin-button"
-            buttonType={AppleButtonType.CONTINUE}
-            buttonStyle={AppleButtonStyle.BLACK}
+            buttonType={AppleButton.Type.CONTINUE}
+            buttonStyle={AppleButton.Style.BLACK}
             cornerRadius={10}
             style={styles.appleButton}
             onPress={handleAppleSignIn}

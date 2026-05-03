@@ -5,9 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   AppleButton,
-  AppleButtonType,
-  AppleButtonStyle,
-  AppleError,
+  appleAuth,
 } from '@invertase/react-native-apple-authentication';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
@@ -39,7 +37,7 @@ export default function OnboardingWelcomeScreen() {
       await signInWithApple();
       navigation.navigate('OnboardingNotification');
     } catch (e) {
-      if (e && typeof e === 'object' && 'code' in e && (e as any).code === AppleError.CANCELED) return;
+      if (e && typeof e === 'object' && 'code' in e && (e as any).code === appleAuth.Error.CANCELED) return;
       setError(t('onboarding.signInError'));
     }
   };
@@ -56,8 +54,8 @@ export default function OnboardingWelcomeScreen() {
         {Platform.OS === 'ios' && (
           <AppleButton
             testID="apple-signin-button"
-            buttonType={AppleButtonType.CONTINUE}
-            buttonStyle={AppleButtonStyle.BLACK}
+            buttonType={AppleButton.Type.CONTINUE}
+            buttonStyle={AppleButton.Style.BLACK}
             cornerRadius={10}
             style={styles.appleButton}
             onPress={handleAppleSignIn}
