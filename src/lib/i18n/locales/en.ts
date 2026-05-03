@@ -5,7 +5,16 @@ const en = {
     settings: 'Settings',
   },
   feed: {
-    goToBookDetail: 'Go to Book Detail',
+    searchBooks: 'Search books',
+  },
+  bookSearch: {
+    placeholder: 'Search by title or author',
+    button: 'Search',
+    noResults: 'No results found',
+    unknownAuthor: 'Unknown author',
+  },
+  bookDetail: {
+    unknownAuthor: 'Unknown author',
   },
   settings: {
     languageTitle: 'Language',

@@ -23,19 +23,19 @@ describe('FeedScreen', () => {
     expect(screen.getByText('tabs.feed')).toBeTruthy();
   });
 
-  it('shows a button with the go to book detail key', () => {
+  it('shows a search books button', () => {
     render(<FeedScreen />);
-    expect(screen.getByText('feed.goToBookDetail')).toBeTruthy();
+    expect(screen.getByText('feed.searchBooks')).toBeTruthy();
   });
 
-  it('navigates to BookDetail when the button is pressed', () => {
+  it('navigates to BookSearch when the button is pressed', () => {
     render(<FeedScreen />);
-    fireEvent.press(screen.getByText('feed.goToBookDetail'));
-    expect(mockNavigate).toHaveBeenCalledWith('BookDetail');
+    fireEvent.press(screen.getByText('feed.searchBooks'));
+    expect(mockNavigate).toHaveBeenCalledWith('BookSearch');
   });
 
-  it('the Book Detail button has an accessible button role', () => {
+  it('the search books button has an accessible button role', () => {
     render(<FeedScreen />);
-    expect(screen.getByRole('button', { name: 'feed.goToBookDetail' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'feed.searchBooks' })).toBeTruthy();
   });
 });
