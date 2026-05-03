@@ -8,3 +8,8 @@ export type MainTabParamList = {
   Friends: undefined;
   Settings: undefined;
 };
+
+export type OnboardingStackParamList = {
+  OnboardingWelcome: undefined;
+  OnboardingNotification: undefined;
+};
