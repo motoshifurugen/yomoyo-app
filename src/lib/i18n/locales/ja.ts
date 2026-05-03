@@ -2,6 +2,7 @@ const ja = {
   tabs: {
     feed: 'フィード',
     friends: 'フレンド',
+    shelf: '本棚',
     settings: '設定',
   },
   feed: {
@@ -26,6 +27,12 @@ const ja = {
     unknownAuthor: '著者不明',
     startReading: '読み始める',
     reading: '読書中',
+  },
+  shelf: {
+    currentlyReading: '読書中',
+    finished: '読了',
+    emptyCurrentlyReading: '読書中の本はまだありません',
+    emptyFinished: '読了した本はまだありません',
   },
   settings: {
     languageTitle: '言語',

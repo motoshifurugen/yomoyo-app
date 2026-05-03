@@ -2,6 +2,7 @@ const en = {
   tabs: {
     feed: 'Feed',
     friends: 'Friends',
+    shelf: 'My Shelf',
     settings: 'Settings',
   },
   feed: {
@@ -26,6 +27,12 @@ const en = {
     unknownAuthor: 'Unknown author',
     startReading: 'Start Reading',
     reading: 'Reading',
+  },
+  shelf: {
+    currentlyReading: 'Currently Reading',
+    finished: 'Finished',
+    emptyCurrentlyReading: 'No books currently reading',
+    emptyFinished: 'No finished books yet',
   },
   settings: {
     languageTitle: 'Language',
