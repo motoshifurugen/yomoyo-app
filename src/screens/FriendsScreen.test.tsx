@@ -11,8 +11,13 @@ describe('FriendsScreen', () => {
     render(<FriendsScreen />);
   });
 
-  it('renders the friends title key', () => {
+  it('renders the empty state title key', () => {
     render(<FriendsScreen />);
-    expect(screen.getByText('tabs.friends')).toBeTruthy();
+    expect(screen.getByText('friends.emptyTitle')).toBeTruthy();
+  });
+
+  it('renders the empty state body key', () => {
+    render(<FriendsScreen />);
+    expect(screen.getByText('friends.emptyBody')).toBeTruthy();
   });
 });

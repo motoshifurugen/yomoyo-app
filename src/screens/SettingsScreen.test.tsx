@@ -23,11 +23,6 @@ describe('SettingsScreen', () => {
     render(<SettingsScreen />);
   });
 
-  it('renders the settings title key', () => {
-    render(<SettingsScreen />);
-    expect(screen.getByText('tabs.settings')).toBeTruthy();
-  });
-
   it('renders the language section title key', () => {
     render(<SettingsScreen />);
     expect(screen.getByText('settings.languageTitle')).toBeTruthy();

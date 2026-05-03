@@ -6,6 +6,12 @@ const en = {
   },
   feed: {
     searchBooks: 'Search books',
+    emptyTitle: 'Your reading feed is quiet',
+    emptyBody: 'When friends finish books, their notes will appear here.',
+  },
+  friends: {
+    emptyTitle: 'Find your reading people',
+    emptyBody: 'Follow friends to see the books they finish.',
   },
   bookSearch: {
     placeholder: 'Search by title or author',

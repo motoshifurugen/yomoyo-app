@@ -8,6 +8,7 @@ export const yomoyoColors = {
   muted: '#8A989C',
   error: '#d32f2f',
   googleButtonBorder: '#E2DED6',
+  selectedBackground: '#EAF6F6',
 } as const;
 
 export const yomoyoTypography = {
@@ -23,6 +24,10 @@ export const yomoyoTypography = {
   subtitleSize: 18,
   subtitleWeight: '400' as const,
   errorSize: 14,
+  screenTitleSize: 24,
+  screenBodySize: 16,
+  screenBodyLineHeight: 24,
+  headerTitleSize: 18,
 } as const;
 
 export const yomoyoSpacing = {

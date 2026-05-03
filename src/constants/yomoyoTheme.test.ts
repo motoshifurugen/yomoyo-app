@@ -36,6 +36,10 @@ describe('yomoyoColors', () => {
   it('has the correct googleButtonBorder color', () => {
     expect(yomoyoColors.googleButtonBorder).toBe('#E2DED6');
   });
+
+  it('has the correct selectedBackground color', () => {
+    expect(yomoyoColors.selectedBackground).toBe('#EAF6F6');
+  });
 });
 
 describe('yomoyoTypography', () => {
@@ -77,6 +81,22 @@ describe('yomoyoTypography', () => {
 
   it('has correct error font size', () => {
     expect(yomoyoTypography.errorSize).toBe(14);
+  });
+
+  it('has correct screen title font size', () => {
+    expect(yomoyoTypography.screenTitleSize).toBe(24);
+  });
+
+  it('has correct screen body font size', () => {
+    expect(yomoyoTypography.screenBodySize).toBe(16);
+  });
+
+  it('has correct screen body line height', () => {
+    expect(yomoyoTypography.screenBodyLineHeight).toBe(24);
+  });
+
+  it('has correct header title font size', () => {
+    expect(yomoyoTypography.headerTitleSize).toBe(18);
   });
 });
 

@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
+import ScreenContainer from '@/components/layout/ScreenContainer';
+import { yomoyoColors } from '@/constants/yomoyoTheme';
 
 type Language = 'ja' | 'en';
 
@@ -10,46 +12,78 @@ export default function SettingsScreen() {
   const currentLanguage = i18n.language as Language;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t('tabs.settings')}</Text>
-      <Text style={styles.sectionTitle}>{t('settings.languageTitle')}</Text>
-      <View style={styles.row}>
-        <TouchableOpacity
-          style={[styles.langButton, currentLanguage === 'ja' && styles.langButtonActive]}
-          onPress={() => setLanguage('ja')}
-          accessibilityRole="button"
-        >
-          <Text style={[styles.langText, currentLanguage === 'ja' && styles.langTextActive]}>
-            日本語
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.langButton, currentLanguage === 'en' && styles.langButtonActive]}
-          onPress={() => setLanguage('en')}
-          accessibilityRole="button"
-        >
-          <Text style={[styles.langText, currentLanguage === 'en' && styles.langTextActive]}>
-            English
-          </Text>
-        </TouchableOpacity>
+    <ScreenContainer>
+      <View style={styles.content}>
+        <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <TouchableOpacity
+              style={[styles.langOption, currentLanguage === 'ja' && styles.langOptionActive]}
+              onPress={() => setLanguage('ja')}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.langText, currentLanguage === 'ja' && styles.langTextActive]}>
+                日本語
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.langOption, currentLanguage === 'en' && styles.langOptionActive]}
+              onPress={() => setLanguage('en')}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.langText, currentLanguage === 'en' && styles.langTextActive]}>
+                English
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: '600', marginBottom: 32 },
-  sectionTitle: { fontSize: 14, color: '#888', marginBottom: 12 },
-  row: { flexDirection: 'row', gap: 12 },
-  langButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
+  content: {
+    paddingTop: 32,
   },
-  langButtonActive: { borderColor: '#4285F4', backgroundColor: '#EBF1FF' },
-  langText: { fontSize: 16, color: '#333' },
-  langTextActive: { color: '#4285F4', fontWeight: '600' },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: yomoyoColors.secondaryText,
+    marginBottom: 12,
+  },
+  card: {
+    backgroundColor: yomoyoColors.surface,
+    borderWidth: 1,
+    borderColor: yomoyoColors.border,
+    borderRadius: 18,
+    padding: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  langOption: {
+    flex: 1,
+    height: 52,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: yomoyoColors.border,
+    backgroundColor: yomoyoColors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  langOptionActive: {
+    borderColor: yomoyoColors.primary,
+    backgroundColor: yomoyoColors.selectedBackground,
+  },
+  langText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: yomoyoColors.text,
+  },
+  langTextActive: {
+    color: yomoyoColors.primary,
+    fontWeight: '600',
+  },
 });

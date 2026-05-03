@@ -18,9 +18,14 @@ describe('FeedScreen', () => {
     mockNavigate.mockClear();
   });
 
-  it('renders the feed title key', () => {
+  it('renders the empty state title key', () => {
     render(<FeedScreen />);
-    expect(screen.getByText('tabs.feed')).toBeTruthy();
+    expect(screen.getByText('feed.emptyTitle')).toBeTruthy();
+  });
+
+  it('renders the empty state body key', () => {
+    render(<FeedScreen />);
+    expect(screen.getByText('feed.emptyBody')).toBeTruthy();
   });
 
   it('shows a search books button', () => {
