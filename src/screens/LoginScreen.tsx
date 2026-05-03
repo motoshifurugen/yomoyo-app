@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import { View, Text, Platform, StyleSheet } from 'react-native';
+import {
+  AppleButton,
+  AppleButtonType,
+  AppleButtonStyle,
+  AppleError,
+} from '@invertase/react-native-apple-authentication';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
+import AuthLogoBlock from '@/components/auth/AuthLogoBlock';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export default function LoginScreen() {
   const [signInError, setSignInError] = useState<string | null>(null);
@@ -11,9 +19,7 @@ export default function LoginScreen() {
     try {
       await signInWithGoogle();
     } catch (e) {
-      if (e instanceof Error && e.message.includes('cancelled')) {
-        return;
-      }
+      if (e instanceof Error && e.message.includes('cancelled')) return;
       setSignInError('Sign-in failed. Please try again.');
     }
   };
@@ -22,26 +28,32 @@ export default function LoginScreen() {
     setSignInError(null);
     try {
       await signInWithApple();
-    } catch {
+    } catch (e) {
+      if (e && typeof e === 'object' && 'code' in e && (e as any).code === AppleError.CANCELED) return;
       setSignInError('Sign-in failed. Please try again.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Yomoyo</Text>
+      <AuthLogoBlock />
 
       {signInError ? <Text style={styles.error}>{signInError}</Text> : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleGoogleSignIn}>
-        <Text style={styles.buttonText}>Sign in with Google</Text>
-      </TouchableOpacity>
+      <View style={styles.buttons}>
+        <GoogleSignInButton onPress={handleGoogleSignIn} />
 
-      {Platform.OS === 'ios' && (
-        <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={handleAppleSignIn}>
-          <Text style={[styles.buttonText, styles.appleButtonText]}>Sign in with Apple</Text>
-        </TouchableOpacity>
-      )}
+        {Platform.OS === 'ios' && (
+          <AppleButton
+            testID="apple-signin-button"
+            buttonType={AppleButtonType.CONTINUE}
+            buttonStyle={AppleButtonStyle.BLACK}
+            cornerRadius={10}
+            style={styles.appleButton}
+            onPress={handleAppleSignIn}
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -51,13 +63,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 48,
+    padding: 32,
+    backgroundColor: '#F3FAF9',
   },
   error: {
     color: '#d32f2f',
@@ -65,23 +72,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
-  button: {
+  buttons: {
     width: '100%',
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: '#4285F4',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   appleButton: {
-    backgroundColor: '#000',
-  },
-  appleButtonText: {
-    color: '#fff',
+    width: '100%',
+    height: 54,
   },
 });
