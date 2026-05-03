@@ -4,10 +4,15 @@ import { yomoyoColors } from '@/constants/yomoyoTheme';
 
 type Props = {
   children: React.ReactNode;
+  bottomInset?: number;
 };
 
-export default function ScreenContainer({ children }: Props) {
-  return <View style={styles.container}>{children}</View>;
+export default function ScreenContainer({ children, bottomInset = 0 }: Props) {
+  return (
+    <View style={[styles.container, bottomInset > 0 && { paddingBottom: bottomInset }]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

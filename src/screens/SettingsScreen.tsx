@@ -3,7 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import ScreenContainer from '@/components/layout/ScreenContainer';
-import { yomoyoColors } from '@/constants/yomoyoTheme';
+import GlassCard from '@/components/ui/GlassCard';
+import { GLASS_TAB_BAR_INSET } from '@/components/ui/GlassTabBar';
+import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 
 type Language = 'ja' | 'en';
 
@@ -12,10 +14,10 @@ export default function SettingsScreen() {
   const currentLanguage = i18n.language as Language;
 
   return (
-    <ScreenContainer>
+    <ScreenContainer bottomInset={GLASS_TAB_BAR_INSET}>
       <View style={styles.content}>
         <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
-        <View style={styles.card}>
+        <GlassCard>
           <View style={styles.row}>
             <TouchableOpacity
               style={[styles.langOption, currentLanguage === 'ja' && styles.langOptionActive]}
@@ -36,7 +38,7 @@ export default function SettingsScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </GlassCard>
       </View>
     </ScreenContainer>
   );
@@ -52,13 +54,6 @@ const styles = StyleSheet.create({
     color: yomoyoColors.secondaryText,
     marginBottom: 12,
   },
-  card: {
-    backgroundColor: yomoyoColors.surface,
-    borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    borderRadius: 18,
-    padding: 20,
-  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -66,16 +61,16 @@ const styles = StyleSheet.create({
   langOption: {
     flex: 1,
     height: 52,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    backgroundColor: yomoyoColors.surface,
+    borderColor: yomoyoGlass.border,
+    backgroundColor: yomoyoGlass.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   langOptionActive: {
     borderColor: yomoyoColors.primary,
-    backgroundColor: yomoyoColors.selectedBackground,
+    backgroundColor: yomoyoGlass.tealTint,
   },
   langText: {
     fontSize: 16,

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
+import { GLASS_TAB_BAR_INSET } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 
 export default function FeedScreen() {
@@ -10,7 +11,7 @@ export default function FeedScreen() {
   const { t } = useTranslation();
 
   return (
-    <ScreenContainer>
+    <ScreenContainer bottomInset={GLASS_TAB_BAR_INSET}>
       <View style={styles.center}>
         <Text style={styles.title}>{t('feed.emptyTitle')}</Text>
         <Text style={styles.body}>{t('feed.emptyBody')}</Text>

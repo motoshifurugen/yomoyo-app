@@ -30,6 +30,14 @@ export const yomoyoTypography = {
   headerTitleSize: 18,
 } as const;
 
+export const yomoyoGlass = {
+  background: 'rgba(255, 255, 255, 0.72)',
+  strongBackground: 'rgba(255, 255, 255, 0.86)',
+  border: 'rgba(216, 225, 228, 0.72)',
+  shadow: 'rgba(17, 24, 39, 0.08)',
+  tealTint: 'rgba(5, 115, 115, 0.10)',
+} as const;
+
 export const yomoyoSpacing = {
   horizontalPadding: 32,
   buttonHeight: 56,

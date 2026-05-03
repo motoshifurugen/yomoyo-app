@@ -1,0 +1,74 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react-native';
+import GlassTabBar from './GlassTabBar';
+
+jest.mock('expo-blur', () => {
+  const { View } = require('react-native');
+  return { BlurView: View };
+});
+
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: () => null,
+}));
+
+const mockDispatch = jest.fn();
+const mockEmit = jest.fn().mockReturnValue({ defaultPrevented: false });
+
+const mockProps = {
+  state: {
+    routes: [
+      { key: 'Feed-key', name: 'Feed' },
+      { key: 'Friends-key', name: 'Friends' },
+      { key: 'Settings-key', name: 'Settings' },
+    ],
+    index: 0,
+  },
+  descriptors: {
+    'Feed-key': { options: { title: 'Feed' } },
+    'Friends-key': { options: { title: 'Friends' } },
+    'Settings-key': { options: { title: 'Settings' } },
+  },
+  navigation: {
+    emit: mockEmit,
+    dispatch: mockDispatch,
+  },
+  insets: { bottom: 34, top: 0, left: 0, right: 0 },
+};
+
+describe('GlassTabBar', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockEmit.mockReturnValue({ defaultPrevented: false });
+  });
+
+  it('renders all tab labels', () => {
+    render(<GlassTabBar {...(mockProps as any)} />);
+    expect(screen.getByText('Feed')).toBeTruthy();
+    expect(screen.getByText('Friends')).toBeTruthy();
+    expect(screen.getByText('Settings')).toBeTruthy();
+  });
+
+  it('dispatches navigation when an inactive tab is pressed', () => {
+    render(<GlassTabBar {...(mockProps as any)} />);
+    fireEvent.press(screen.getByText('Friends'));
+    expect(mockDispatch).toHaveBeenCalled();
+  });
+
+  it('does not dispatch navigation when the active tab is pressed', () => {
+    render(<GlassTabBar {...(mockProps as any)} />);
+    fireEvent.press(screen.getByText('Feed'));
+    expect(mockDispatch).not.toHaveBeenCalled();
+  });
+
+  it('marks the active tab as selected', () => {
+    render(<GlassTabBar {...(mockProps as any)} />);
+    const feedTab = screen.getByRole('button', { name: 'Feed' });
+    expect(feedTab.props.accessibilityState.selected).toBe(true);
+  });
+
+  it('marks inactive tabs as not selected', () => {
+    render(<GlassTabBar {...(mockProps as any)} />);
+    const friendsTab = screen.getByRole('button', { name: 'Friends' });
+    expect(friendsTab.props.accessibilityState.selected).toBe(false);
+  });
+});

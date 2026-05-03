@@ -1,4 +1,4 @@
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from './yomoyoTheme';
+import { yomoyoColors, yomoyoTypography, yomoyoSpacing, yomoyoGlass } from './yomoyoTheme';
 
 describe('yomoyoColors', () => {
   it('has the correct background color', () => {
@@ -97,6 +97,28 @@ describe('yomoyoTypography', () => {
 
   it('has correct header title font size', () => {
     expect(yomoyoTypography.headerTitleSize).toBe(18);
+  });
+});
+
+describe('yomoyoGlass', () => {
+  it('has the correct background', () => {
+    expect(yomoyoGlass.background).toBe('rgba(255, 255, 255, 0.72)');
+  });
+
+  it('has the correct strongBackground', () => {
+    expect(yomoyoGlass.strongBackground).toBe('rgba(255, 255, 255, 0.86)');
+  });
+
+  it('has the correct border', () => {
+    expect(yomoyoGlass.border).toBe('rgba(216, 225, 228, 0.72)');
+  });
+
+  it('has the correct shadow', () => {
+    expect(yomoyoGlass.shadow).toBe('rgba(17, 24, 39, 0.08)');
+  });
+
+  it('has the correct tealTint', () => {
+    expect(yomoyoGlass.tealTint).toBe('rgba(5, 115, 115, 0.10)');
   });
 });
 

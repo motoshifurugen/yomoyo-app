@@ -12,4 +12,13 @@ describe('ScreenContainer', () => {
     );
     expect(screen.getByText('Hello')).toBeTruthy();
   });
+
+  it('renders with bottomInset without crashing', () => {
+    render(
+      <ScreenContainer bottomInset={92}>
+        <Text>With inset</Text>
+      </ScreenContainer>
+    );
+    expect(screen.getByText('With inset')).toBeTruthy();
+  });
 });
