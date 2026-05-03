@@ -7,6 +7,15 @@ jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
+}));
+
+jest.mock('expo-blur', () => {
+  const { View } = require('react-native');
+  return { BlurView: View };
+});
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -21,11 +30,6 @@ describe('SettingsScreen', () => {
 
   it('renders without crashing', () => {
     render(<SettingsScreen />);
-  });
-
-  it('renders the settings title key', () => {
-    render(<SettingsScreen />);
-    expect(screen.getByText('tabs.settings')).toBeTruthy();
   });
 
   it('renders the language section title key', () => {

@@ -5,7 +5,13 @@ const ja = {
     settings: '設定',
   },
   feed: {
-    searchBooks: '本を検索',
+    searchBooks: '本を探す',
+    emptyTitle: '読書フィードは、まだ静かです',
+    emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
+  },
+  friends: {
+    emptyTitle: '読書仲間を見つけよう',
+    emptyBody: '友だちをフォローすると、読み終えた本がここに届きます。',
   },
   bookSearch: {
     placeholder: 'タイトルや著者で検索',
