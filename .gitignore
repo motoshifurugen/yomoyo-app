@@ -8,3 +8,5 @@ android/
 *.log
 google-services.json
 GoogleService-Info.plist
+.DS_Store
+.pnpm-store/
