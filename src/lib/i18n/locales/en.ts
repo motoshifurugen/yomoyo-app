@@ -7,6 +7,9 @@ const en = {
   feed: {
     goToBookDetail: 'Go to Book Detail',
   },
+  settings: {
+    languageTitle: 'Language',
+  },
 } as const;
 
 export default en;

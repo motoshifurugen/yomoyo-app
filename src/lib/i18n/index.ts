@@ -1,7 +1,10 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import en from './locales/en';
 import ja from './locales/ja';
+
+export const LANGUAGE_STORAGE_KEY = 'yomoyo_language';
 
 export function detectLanguage(
   locales: Array<{ languageCode: string | null }>
@@ -17,6 +20,19 @@ function getDeviceLocales(): Array<{ languageCode: string | null }> {
   } catch {
     return [{ languageCode: 'en' }];
   }
+}
+
+export async function setLanguage(lang: 'ja' | 'en'): Promise<void> {
+  await Promise.all([
+    i18n.changeLanguage(lang),
+    AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lang),
+  ]);
+}
+
+export async function loadSavedLanguage(): Promise<'ja' | 'en' | null> {
+  const saved = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (saved === 'ja' || saved === 'en') return saved;
+  return null;
 }
 
 const language = detectLanguage(getDeviceLocales());

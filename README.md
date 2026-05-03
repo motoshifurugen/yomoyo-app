@@ -68,6 +68,12 @@ Paid ad removal may be considered in a future version. For now, ads stay rare an
 
 Multilingual support is built in from the start, not added later.
 
+### Localization rule
+
+All user-facing strings must be provided in both Japanese and English.
+Do not add new UI text in only one language.
+When adding or updating a screen or component, update both `src/lib/i18n/locales/en.ts` and `src/lib/i18n/locales/ja.ts`.
+
 ## Development Approach
 
 - 2-person team
