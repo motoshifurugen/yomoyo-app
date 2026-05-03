@@ -25,6 +25,7 @@
     "expo-dev-client": "~6.0.21",
     "expo-notifications": "^55.0.22",
     "expo-status-bar": "~3.0.9",
+    "expo-video": "~2.0.5",
     "i18next": "^26.0.8",
     "react": "19.1.0",
     "react-i18next": "^17.0.6",
@@ -56,7 +57,8 @@
     "watchman": false,
     "moduleNameMapper": {
       "@react-native-async-storage/async-storage": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.js",
-      "expo-notifications": "<rootDir>/__mocks__/expo-notifications.js"
+      "expo-notifications": "<rootDir>/__mocks__/expo-notifications.js",
+      "expo-video": "<rootDir>/__mocks__/expo-video.js"
     }
   }
 }

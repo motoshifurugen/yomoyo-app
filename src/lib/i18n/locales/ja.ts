@@ -25,7 +25,7 @@ const ja = {
     signInWithGoogle: 'Googleでサインイン',
     signInWithApple: 'Appleでサインイン',
     signInError: 'サインインに失敗しました。もう一度お試しください。',
-    notificationHeading: 'ひとつの静かなお知らせ',
+    notificationHeading: '小さな知らせが届きます',
     notificationBody: 'フォローしている人が本を読み終えたときだけ。',
     allowButton: '通知を許可する',
     skipLink: '後で',

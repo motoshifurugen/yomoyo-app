@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Platform, StyleSheet } from 'react-native';
+import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 import {
   AppleButton,
   appleAuth,
@@ -61,12 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 32,
-    backgroundColor: '#F4F8FA',
+    padding: yomoyoSpacing.horizontalPadding,
+    backgroundColor: yomoyoColors.background,
   },
   error: {
-    color: '#d32f2f',
-    fontSize: 14,
+    color: yomoyoColors.error,
+    fontSize: yomoyoTypography.errorSize,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -75,6 +76,6 @@ const styles = StyleSheet.create({
   },
   appleButton: {
     width: '100%',
-    height: 56,
+    height: yomoyoSpacing.buttonHeight,
   },
 });

@@ -3,8 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 import OnboardingNotificationScreen from './OnboardingNotificationScreen';
 import * as Notifications from 'expo-notifications';
 import { markOnboardingDone } from '@/lib/onboarding';
+import { useVideoPlayer } from 'expo-video';
 
 jest.mock('expo-notifications');
+jest.mock('expo-video');
 
 jest.mock('@/lib/onboarding', () => ({
   markOnboardingDone: jest.fn().mockResolvedValue(undefined),
@@ -69,5 +71,51 @@ describe('OnboardingNotificationScreen', () => {
     fireEvent.press(screen.getByText('onboarding.skipLink'));
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
     expect(Notifications.requestPermissionsAsync).not.toHaveBeenCalled();
+  });
+
+  it('still completes onboarding if requestPermissionsAsync throws', async () => {
+    (Notifications.requestPermissionsAsync as jest.Mock).mockRejectedValueOnce(
+      new Error('permission error')
+    );
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('still completes onboarding if markOnboardingDone throws during allow', async () => {
+    (markOnboardingDone as jest.Mock).mockRejectedValueOnce(
+      new Error('storage error')
+    );
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('still completes onboarding if markOnboardingDone throws during skip', async () => {
+    (markOnboardingDone as jest.Mock).mockRejectedValueOnce(
+      new Error('storage error')
+    );
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.skipLink'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('renders a video element', () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    expect(screen.getByTestId('notification-video')).toBeTruthy();
+  });
+
+  it('creates a video player with autoplay, loop, and mute', () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    expect(useVideoPlayer).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.any(Function)
+    );
+    const setup = (useVideoPlayer as jest.Mock).mock.calls[0][1];
+    const mockPlayer = { loop: false, muted: false, play: jest.fn() };
+    setup(mockPlayer);
+    expect(mockPlayer.loop).toBe(true);
+    expect(mockPlayer.muted).toBe(true);
+    expect(mockPlayer.play).toHaveBeenCalled();
   });
 });

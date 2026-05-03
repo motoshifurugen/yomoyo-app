@@ -25,7 +25,7 @@ const en = {
     signInWithGoogle: 'Sign in with Google',
     signInWithApple: 'Sign in with Apple',
     signInError: 'Sign-in failed. Please try again.',
-    notificationHeading: 'One quiet update',
+    notificationHeading: 'A little note arrives',
     notificationBody: 'Only when someone you follow finishes a book.',
     allowButton: 'Allow notifications',
     skipLink: 'Maybe later',
