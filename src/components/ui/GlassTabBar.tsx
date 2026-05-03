@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { CommonActions } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import GlassSurface from './GlassSurface';
 import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
@@ -14,9 +15,18 @@ const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> 
   Settings: { active: 'settings', inactive: 'settings-outline' },
 };
 
+const FALLBACK_ICONS: { active: IoniconName; inactive: IoniconName } = {
+  active: 'ellipse',
+  inactive: 'ellipse-outline',
+};
+
 export const GLASS_TAB_BAR_HEIGHT = 64;
 export const GLASS_TAB_BAR_BOTTOM_OFFSET = 12;
-export const GLASS_TAB_BAR_INSET = 92;
+
+export function useGlassTabBarInset(): number {
+  const insets = useSafeAreaInsets();
+  return GLASS_TAB_BAR_HEIGHT + GLASS_TAB_BAR_BOTTOM_OFFSET + insets.bottom;
+}
 
 export default function GlassTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
   const bottomOffset = (insets?.bottom ?? 0) + GLASS_TAB_BAR_BOTTOM_OFFSET;
@@ -27,9 +37,9 @@ export default function GlassTabBar({ state, descriptors, navigation, insets }: 
         <GlassSurface borderRadius={30} style={styles.pill}>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
-            const options = descriptors[route.key].options as { title?: string };
+            const options = descriptors[route.key].options;
             const label = options.title ?? route.name;
-            const icons = TAB_ICONS[route.name];
+            const icons = TAB_ICONS[route.name] ?? FALLBACK_ICONS;
             const iconName = focused ? icons.active : icons.inactive;
             const color = focused ? yomoyoColors.primary : yomoyoColors.muted;
 
@@ -49,7 +59,8 @@ export default function GlassTabBar({ state, descriptors, navigation, insets }: 
                 key={route.key}
                 style={styles.tab}
                 onPress={onPress}
-                accessibilityRole="button"
+                accessibilityRole="tab"
+                accessibilityLabel={label}
                 accessibilityState={{ selected: focused }}
               >
                 <Ionicons name={iconName} size={22} color={color} />

@@ -6,6 +6,10 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
+}));
+
 describe('FriendsScreen', () => {
   it('renders without crashing', () => {
     render(<FriendsScreen />);

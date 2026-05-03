@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
-import { GLASS_TAB_BAR_INSET } from '@/components/ui/GlassTabBar';
+import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import type { RootStackParamList } from '@/navigation/types';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function FeedScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
+  const tabBarInset = useGlassTabBarInset();
 
   return (
-    <ScreenContainer bottomInset={GLASS_TAB_BAR_INSET}>
+    <ScreenContainer bottomInset={tabBarInset}>
       <View style={styles.center}>
         <Text style={styles.title}>{t('feed.emptyTitle')}</Text>
         <Text style={styles.body}>{t('feed.emptyBody')}</Text>

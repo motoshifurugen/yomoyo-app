@@ -4,17 +4,18 @@ import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import GlassCard from '@/components/ui/GlassCard';
-import { GLASS_TAB_BAR_INSET } from '@/components/ui/GlassTabBar';
+import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 
 type Language = 'ja' | 'en';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const currentLanguage = i18n.language as Language;
+  const currentLanguage = (i18n.language.split('-')[0] ?? 'en') as Language;
+  const tabBarInset = useGlassTabBarInset();
 
   return (
-    <ScreenContainer bottomInset={GLASS_TAB_BAR_INSET}>
+    <ScreenContainer bottomInset={tabBarInset}>
       <View style={styles.content}>
         <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
         <GlassCard>

@@ -11,6 +11,10 @@ jest.mock('@expo/vector-icons', () => ({
   Ionicons: () => null,
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ bottom: 34, top: 0, left: 0, right: 0 }),
+}));
+
 const mockDispatch = jest.fn();
 const mockEmit = jest.fn().mockReturnValue({ defaultPrevented: false });
 
@@ -62,13 +66,28 @@ describe('GlassTabBar', () => {
 
   it('marks the active tab as selected', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    const feedTab = screen.getByRole('button', { name: 'Feed' });
+    const feedTab = screen.getByRole('tab', { name: 'Feed' });
     expect(feedTab.props.accessibilityState.selected).toBe(true);
   });
 
   it('marks inactive tabs as not selected', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    const friendsTab = screen.getByRole('button', { name: 'Friends' });
+    const friendsTab = screen.getByRole('tab', { name: 'Friends' });
     expect(friendsTab.props.accessibilityState.selected).toBe(false);
+  });
+
+  it('renders without crashing for an unknown route name', () => {
+    const propsWithUnknownRoute = {
+      ...mockProps,
+      state: {
+        routes: [{ key: 'Unknown-key', name: 'Unknown' }],
+        index: 0,
+      },
+      descriptors: {
+        'Unknown-key': { options: { title: 'Unknown' } },
+      },
+    };
+    expect(() => render(<GlassTabBar {...(propsWithUnknownRoute as any)} />)).not.toThrow();
+    expect(screen.getByText('Unknown')).toBeTruthy();
   });
 });
