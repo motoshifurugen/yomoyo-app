@@ -18,16 +18,17 @@ export default function AuthLogoBlock() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 56,
+    marginBottom: 52,
   },
   logo: {
-    width: 260,
-    height: 110,
+    width: 320,
+    height: 140,
     alignSelf: 'center',
-    marginBottom: 36,
+    marginBottom: 28,
   },
   subtitle: {
-    fontSize: 22,
+    fontSize: 18,
+    fontWeight: '400',
     color: '#5F6F6F',
     textAlign: 'center',
     letterSpacing: 0.2,

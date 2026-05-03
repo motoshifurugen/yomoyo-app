@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    backgroundColor: '#FAF8F3',
+    backgroundColor: '#F4F8FA',
   },
   error: {
     color: '#d32f2f',

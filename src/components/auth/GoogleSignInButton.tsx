@@ -39,9 +39,9 @@ const styles = StyleSheet.create({
     height: 24,
   },
   label: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    lineHeight: 24,
+    lineHeight: 22,
     color: '#111827',
   },
 });
