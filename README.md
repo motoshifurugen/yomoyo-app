@@ -162,3 +162,38 @@ pnpm run ios
 ```sh
 pnpm run start
 ```
+
+## トラブル・シューティング
+
+カフェ・ホテル・ネットカフェなどの公共Wi-Fiでは、同じWi-Fiに接続していても端末同士の通信がブロックされている場合がある。
+その場合、MacとiPhoneが同じWi-Fiに接続されていても、--host lan で開発ビルドアプリに接続できないことがあります。
+
+推奨対応：iPhoneのテザリングを使う
+
+1. Expoが起動中の場合は停止する
+    Expoを起動しているターミナルで Ctrl + C を押す。
+2. iPhoneのテザリングをONにする
+3. MacをiPhoneのテザリングWi-Fiに接続する
+4. MacのIPアドレスを確認する
+    ipconfig getifaddr en0
+    期待例：172.20.10.x
+5. ExpoをLANモードで起動する
+    npx expo start --dev-client --host lan --clear
+6. iPhoneのSafariでMetroに接続できるか確認する
+    http://<Mac IP>:8081
+    例：
+    http://172.20.10.9:8081
+    JSONが表示されれば接続OK。
+7. iPhoneでYomoyoのDevelopment Buildアプリを開く
+8. Enter URL manually をタップする
+9. Safariで確認したものと同じMetro URLを入力する
+    http://<Mac IP>:8081
+    例：
+    http://172.20.10.9:8081
+
+注意
+
+* テザリングに切り替えた後は、公共Wi-Fi側のIPを使わない。
+* ネットワークを切り替えた後は、Expoを再起動する。
+* アプリが古いIPに接続しようとする場合は、Development Buildアプリを完全終了してから、新しいURLを手入力する。
+* --host tunnel はngrokに依存するため、ネットワーク環境によって失敗することがある。
