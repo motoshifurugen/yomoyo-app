@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
+import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 
 export default function AuthLogoBlock() {
   return (
@@ -27,9 +28,9 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#5F6F6F',
+    fontSize: yomoyoTypography.subtitleSize,
+    fontWeight: yomoyoTypography.subtitleWeight,
+    color: yomoyoColors.secondaryText,
     textAlign: 'center',
     letterSpacing: 0.2,
   },

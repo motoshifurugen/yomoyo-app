@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
+import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
 interface Props {
   onPress: () => void;
@@ -22,11 +23,11 @@ export default function GoogleSignInButton({ onPress }: Props) {
 const styles = StyleSheet.create({
   button: {
     width: '100%',
-    height: 56,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
+    height: yomoyoSpacing.buttonHeight,
+    backgroundColor: yomoyoColors.surface,
+    borderRadius: yomoyoSpacing.buttonRadius,
     borderWidth: 1,
-    borderColor: '#E2DED6',
+    borderColor: yomoyoColors.googleButtonBorder,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -39,9 +40,9 @@ const styles = StyleSheet.create({
     height: 24,
   },
   label: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: yomoyoTypography.buttonSize,
+    fontWeight: yomoyoTypography.buttonWeight,
     lineHeight: 22,
-    color: '#111827',
+    color: yomoyoColors.text,
   },
 });
