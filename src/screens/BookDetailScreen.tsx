@@ -1,9 +1,19 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/types';
+import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useAuth } from '@/hooks/useAuth';
+import { startReading } from '@/lib/books/readingActivity';
 
 type RouteType = RouteProp<RootStackParamList, 'BookDetail'>;
 
@@ -11,6 +21,22 @@ export default function BookDetailScreen() {
   const { t } = useTranslation();
   const route = useRoute<RouteType>();
   const { book } = route.params;
+  const { user } = useAuth();
+  const [hasStarted, setHasStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleStartReading = async () => {
+    if (!user || isLoading || hasStarted) return;
+    setIsLoading(true);
+    try {
+      await startReading(user.uid, book);
+      setHasStarted(true);
+    } catch {
+      // Write failed — button returns to idle so the user can retry
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -25,13 +51,60 @@ export default function BookDetailScreen() {
       <Text style={styles.author}>
         {book.authors.length > 0 ? book.authors.join(', ') : t('bookDetail.unknownAuthor')}
       </Text>
+      <TouchableOpacity
+        style={[styles.button, (hasStarted || isLoading) && styles.buttonDone]}
+        onPress={handleStartReading}
+        disabled={hasStarted || isLoading}
+        accessibilityRole="button"
+      >
+        <Text style={styles.buttonText}>
+          {hasStarted ? t('bookDetail.reading') : t('bookDetail.startReading')}
+        </Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', padding: 24, backgroundColor: '#fff', flexGrow: 1 },
-  cover: { width: 120, height: 180, borderRadius: 6, marginBottom: 20, backgroundColor: '#eee' },
-  title: { fontSize: 22, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
-  author: { fontSize: 16, color: '#666', textAlign: 'center' },
+  container: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: yomoyoColors.background,
+    flexGrow: 1,
+  },
+  cover: {
+    width: 120,
+    height: 180,
+    borderRadius: 6,
+    marginBottom: 20,
+    backgroundColor: yomoyoColors.border,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: yomoyoTypography.buttonWeight,
+    textAlign: 'center',
+    marginBottom: 8,
+    color: yomoyoColors.text,
+  },
+  author: {
+    fontSize: yomoyoTypography.screenBodySize,
+    color: yomoyoColors.secondaryText,
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  button: {
+    backgroundColor: yomoyoColors.primary,
+    height: 52,
+    borderRadius: 14,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  buttonDone: { backgroundColor: yomoyoColors.muted },
+  buttonText: {
+    color: yomoyoColors.surface,
+    fontSize: yomoyoTypography.screenBodySize,
+    fontWeight: yomoyoTypography.buttonWeight,
+  },
 });

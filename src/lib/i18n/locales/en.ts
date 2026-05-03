@@ -8,6 +8,7 @@ const en = {
     searchBooks: 'Search books',
     emptyTitle: 'Your reading feed is quiet',
     emptyBody: 'When friends finish books, their notes will appear here.',
+    startedReading: 'Started reading',
   },
   friends: {
     emptyTitle: 'Find your reading people',
@@ -21,6 +22,8 @@ const en = {
   },
   bookDetail: {
     unknownAuthor: 'Unknown author',
+    startReading: 'Start Reading',
+    reading: 'Reading',
   },
   settings: {
     languageTitle: 'Language',

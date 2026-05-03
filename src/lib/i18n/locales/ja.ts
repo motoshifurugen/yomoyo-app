@@ -8,6 +8,7 @@ const ja = {
     searchBooks: '本を探す',
     emptyTitle: '読書フィードは、まだ静かです',
     emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
+    startedReading: '読み始めました',
   },
   friends: {
     emptyTitle: '読書仲間を見つけよう',
@@ -21,6 +22,8 @@ const ja = {
   },
   bookDetail: {
     unknownAuthor: '著者不明',
+    startReading: '読み始める',
+    reading: '読書中',
   },
   settings: {
     languageTitle: '言語',
