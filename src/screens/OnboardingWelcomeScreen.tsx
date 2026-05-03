@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import { View, Text, Platform, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  AppleButton,
+  appleAuth,
+} from '@invertase/react-native-apple-authentication';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
+import AuthLogoBlock from '@/components/auth/AuthLogoBlock';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import type { OnboardingStackParamList } from '@/navigation/types';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'OnboardingWelcome'>;
@@ -30,24 +36,32 @@ export default function OnboardingWelcomeScreen() {
     try {
       await signInWithApple();
       navigation.navigate('OnboardingNotification');
-    } catch {
+    } catch (e) {
+      if (e && typeof e === 'object' && 'code' in e && (e as any).code === appleAuth.Error.CANCELED) return;
       setError(t('onboarding.signInError'));
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>{t('onboarding.heading')}</Text>
-      <Text style={styles.concept}>{t('onboarding.concept')}</Text>
+      <AuthLogoBlock />
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleGoogleSignIn} accessibilityRole="button">
-        <Text style={styles.buttonText}>{t('onboarding.signInWithGoogle')}</Text>
-      </TouchableOpacity>
-      {Platform.OS === 'ios' && (
-        <TouchableOpacity style={[styles.button, styles.appleButton]} onPress={handleAppleSignIn} accessibilityRole="button">
-          <Text style={[styles.buttonText]}>{t('onboarding.signInWithApple')}</Text>
-        </TouchableOpacity>
-      )}
+
+      <View style={styles.buttons}>
+        <GoogleSignInButton onPress={handleGoogleSignIn} />
+
+        {Platform.OS === 'ios' && (
+          <AppleButton
+            testID="apple-signin-button"
+            buttonType={AppleButton.Type.CONTINUE}
+            buttonStyle={AppleButton.Style.BLACK}
+            cornerRadius={14}
+            style={styles.appleButton}
+            onPress={handleAppleSignIn}
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -58,19 +72,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    backgroundColor: '#fff',
+    backgroundColor: '#F4F8FA',
   },
-  heading: { fontSize: 36, fontWeight: '700', marginBottom: 16 },
-  concept: { fontSize: 16, color: '#555', textAlign: 'center', marginBottom: 48, lineHeight: 24 },
-  error: { color: '#d32f2f', fontSize: 14, marginBottom: 16, textAlign: 'center' },
-  button: {
+  error: {
+    color: '#d32f2f',
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  buttons: {
     width: '100%',
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: '#4285F4',
-    alignItems: 'center',
-    marginBottom: 12,
   },
-  appleButton: { backgroundColor: '#000' },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  appleButton: {
+    width: '100%',
+    height: 56,
+  },
 });
