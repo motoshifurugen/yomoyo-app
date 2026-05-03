@@ -46,7 +46,7 @@ export default function LoginScreen() {
             testID="apple-signin-button"
             buttonType={AppleButton.Type.CONTINUE}
             buttonStyle={AppleButton.Style.BLACK}
-            cornerRadius={10}
+            cornerRadius={14}
             style={styles.appleButton}
             onPress={handleAppleSignIn}
           />
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    backgroundColor: '#F3FAF9',
+    backgroundColor: '#FAF8F3',
   },
   error: {
     color: '#d32f2f',
@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
   },
   appleButton: {
     width: '100%',
-    height: 54,
+    height: 56,
   },
 });

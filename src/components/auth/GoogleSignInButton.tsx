@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Image, Text, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
 
 interface Props {
   onPress: () => void;
@@ -8,15 +8,13 @@ interface Props {
 export default function GoogleSignInButton({ onPress }: Props) {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress} accessibilityRole="button">
-      <View style={styles.inner}>
-        <Image
-          testID="google-icon"
-          source={require('../../../assets/images/google_g_logo.png')}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.label}>Continue with Google</Text>
-      </View>
+      <Image
+        testID="google-icon"
+        source={require('../../../assets/images/google_g_logo.png')}
+        style={styles.icon}
+        resizeMode="contain"
+      />
+      <Text style={styles.label}>Continue with Google</Text>
     </TouchableOpacity>
   );
 }
@@ -24,27 +22,26 @@ export default function GoogleSignInButton({ onPress }: Props) {
 const styles = StyleSheet.create({
   button: {
     width: '100%',
-    height: 54,
+    height: 56,
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#D7E7E5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  inner: {
+    borderColor: '#E2DED6',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    justifyContent: 'center',
+    gap: 12,
+    paddingHorizontal: 20,
+    marginBottom: 14,
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
   },
   label: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '600',
+    lineHeight: 24,
     color: '#111827',
   },
 });
