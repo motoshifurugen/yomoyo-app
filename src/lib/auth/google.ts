@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import { getAuth, signInWithCredential, GoogleAuthProvider } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 GoogleSignin.configure({
@@ -17,6 +17,6 @@ export async function signInWithGoogle(): Promise<void> {
     throw new Error('Google sign-in failed: no id token');
   }
 
-  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-  await auth().signInWithCredential(googleCredential);
+  const credential = GoogleAuthProvider.credential(idToken);
+  await signInWithCredential(getAuth(), credential);
 }

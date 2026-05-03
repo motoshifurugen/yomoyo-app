@@ -1,12 +1,21 @@
-const mockAuthInstance = {
-  onAuthStateChanged: jest.fn(),
-  signOut: jest.fn(() => Promise.resolve()),
-  signInWithCredential: jest.fn(() => Promise.resolve()),
+const mockGetAuth = jest.fn(() => ({}));
+const mockOnAuthStateChanged = jest.fn(() => jest.fn());
+const mockSignInWithCredential = jest.fn(() => Promise.resolve({ user: {} }));
+const mockSignOut = jest.fn(() => Promise.resolve());
+
+const GoogleAuthProvider = {
+  credential: jest.fn(() => ({ providerId: 'google.com' })),
 };
 
-const auth = jest.fn(() => mockAuthInstance);
-auth.GoogleAuthProvider = { credential: jest.fn(() => ({ type: 'google' })) };
-auth.AppleAuthProvider = { credential: jest.fn(() => ({ type: 'apple' })) };
+const AppleAuthProvider = {
+  credential: jest.fn(() => ({ providerId: 'apple.com' })),
+};
 
-module.exports = auth;
-module.exports.default = auth;
+module.exports = {
+  getAuth: mockGetAuth,
+  onAuthStateChanged: mockOnAuthStateChanged,
+  signInWithCredential: mockSignInWithCredential,
+  signOut: mockSignOut,
+  GoogleAuthProvider,
+  AppleAuthProvider,
+};

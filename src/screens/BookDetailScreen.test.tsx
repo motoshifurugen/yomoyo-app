@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import BookDetailScreen from './BookDetailScreen';
 import { useRoute } from '@react-navigation/native';
 
@@ -19,6 +19,17 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
+}));
+
+jest.mock('@/lib/books/readingActivity', () => ({
+  startReading: jest.fn(() => Promise.resolve()),
+}));
+
+import { startReading } from '@/lib/books/readingActivity';
+const mockStartReading = startReading as jest.Mock;
+
 describe('BookDetailScreen', () => {
   beforeEach(() => {
     jest.mocked(useRoute).mockReturnValue({
@@ -26,6 +37,7 @@ describe('BookDetailScreen', () => {
       key: 'BookDetail',
       name: 'BookDetail',
     });
+    mockStartReading.mockClear();
   });
 
   it('renders the book title', () => {
@@ -61,5 +73,35 @@ describe('BookDetailScreen', () => {
     });
     render(<BookDetailScreen />);
     expect(screen.getByText('bookDetail.unknownAuthor')).toBeTruthy();
+  });
+
+  it('renders the Start Reading button', () => {
+    render(<BookDetailScreen />);
+    expect(screen.getByText('bookDetail.startReading')).toBeTruthy();
+  });
+
+  it('calls startReading with user uid and book when button is pressed', async () => {
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    await waitFor(() => {
+      expect(mockStartReading).toHaveBeenCalledWith('user1', mockBook);
+    });
+  });
+
+  it('shows Reading label after successfully pressing the button', async () => {
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    await waitFor(() => {
+      expect(screen.getByText('bookDetail.reading')).toBeTruthy();
+    });
+  });
+
+  it('returns to Start Reading label so the user can retry on failure', async () => {
+    mockStartReading.mockRejectedValueOnce(new Error('network error'));
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    await waitFor(() => {
+      expect(screen.getByText('bookDetail.startReading')).toBeTruthy();
+    });
   });
 });

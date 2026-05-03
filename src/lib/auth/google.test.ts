@@ -1,11 +1,9 @@
-import auth from '@react-native-firebase/auth';
+import { signInWithCredential, GoogleAuthProvider } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { signInWithGoogle } from '@/lib/auth/google';
 
 jest.mock('@react-native-firebase/auth');
 jest.mock('@react-native-google-signin/google-signin');
-
-const mockAuth = auth as jest.MockedFunction<typeof auth>;
 
 describe('signInWithGoogle', () => {
   beforeEach(() => {
@@ -19,14 +17,14 @@ describe('signInWithGoogle', () => {
       data: { idToken: mockIdToken },
     });
     const mockCredential = { providerId: 'google.com' };
-    (mockAuth as unknown as { GoogleAuthProvider: { credential: jest.Mock } }).GoogleAuthProvider.credential.mockReturnValue(mockCredential);
-    mockAuth().signInWithCredential.mockResolvedValue({ user: {} });
+    jest.mocked(GoogleAuthProvider.credential).mockReturnValue(mockCredential as any);
+    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
 
     await signInWithGoogle();
 
     expect(GoogleSignin.signIn).toHaveBeenCalled();
-    expect((auth as any).GoogleAuthProvider.credential).toHaveBeenCalledWith(mockIdToken);
-    expect(mockAuth().signInWithCredential).toHaveBeenCalledWith(mockCredential);
+    expect(jest.mocked(GoogleAuthProvider.credential)).toHaveBeenCalledWith(mockIdToken);
+    expect(jest.mocked(signInWithCredential)).toHaveBeenCalledWith(expect.anything(), mockCredential);
   });
 
   it('throws when the user cancels sign-in', async () => {

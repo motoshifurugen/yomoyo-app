@@ -1,3 +1,2 @@
-import auth from '@react-native-firebase/auth';
-
-export { auth };
+export { getAuth } from '@react-native-firebase/auth';
+export { getFirestore } from '@react-native-firebase/firestore';

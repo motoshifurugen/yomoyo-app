@@ -1,11 +1,9 @@
-import auth from '@react-native-firebase/auth';
+import { signInWithCredential, AppleAuthProvider } from '@react-native-firebase/auth';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { signInWithApple } from '@/lib/auth/apple';
 
 jest.mock('@react-native-firebase/auth');
 jest.mock('@invertase/react-native-apple-authentication');
-
-const mockAuth = auth as jest.MockedFunction<typeof auth>;
 
 describe('signInWithApple', () => {
   beforeEach(() => {
@@ -20,8 +18,8 @@ describe('signInWithApple', () => {
       nonce: mockNonce,
     });
     const mockCredential = { providerId: 'apple.com' };
-    (auth as any).AppleAuthProvider.credential.mockReturnValue(mockCredential);
-    mockAuth().signInWithCredential.mockResolvedValue({ user: {} });
+    jest.mocked(AppleAuthProvider.credential).mockReturnValue(mockCredential as any);
+    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
 
     await signInWithApple();
 
@@ -29,8 +27,8 @@ describe('signInWithApple', () => {
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
-    expect((auth as any).AppleAuthProvider.credential).toHaveBeenCalledWith(mockToken, mockNonce);
-    expect(mockAuth().signInWithCredential).toHaveBeenCalledWith(mockCredential);
+    expect(jest.mocked(AppleAuthProvider.credential)).toHaveBeenCalledWith(mockToken, mockNonce);
+    expect(jest.mocked(signInWithCredential)).toHaveBeenCalledWith(expect.anything(), mockCredential);
   });
 
   it('throws when identity token is missing', async () => {

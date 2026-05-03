@@ -8,6 +8,7 @@ const ja = {
     searchBooks: '本を探す',
     emptyTitle: '読書フィードは、まだ静かです',
     emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
+    startedReading: '読み始めました',
   },
   friends: {
     emptyTitle: '読書仲間を見つけよう',
@@ -18,9 +19,13 @@ const ja = {
     button: '検索',
     noResults: '結果が見つかりませんでした',
     unknownAuthor: '著者不明',
+    searchError: '検索に失敗しました。もう一度お試しください。',
+    rateLimitError: '検索回数が多すぎます。少し待ってからお試しください。',
   },
   bookDetail: {
     unknownAuthor: '著者不明',
+    startReading: '読み始める',
+    reading: '読書中',
   },
   settings: {
     languageTitle: '言語',

@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import { signOut as firebaseSignOut } from '@react-native-firebase/auth';
 import { signOut } from '@/lib/auth';
 
 jest.mock('@react-native-firebase/auth');
@@ -8,11 +8,11 @@ describe('signOut', () => {
     jest.clearAllMocks();
   });
 
-  it('calls Firebase auth signOut', async () => {
-    (auth as jest.Mock)().signOut.mockResolvedValue(undefined);
+  it('calls Firebase signOut', async () => {
+    jest.mocked(firebaseSignOut).mockResolvedValue(undefined);
 
     await signOut();
 
-    expect((auth as jest.Mock)().signOut).toHaveBeenCalledTimes(1);
+    expect(jest.mocked(firebaseSignOut)).toHaveBeenCalledTimes(1);
   });
 });

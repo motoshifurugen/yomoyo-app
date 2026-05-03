@@ -119,4 +119,24 @@ describe('searchBooks', () => {
     expect(url).toContain('q=');
     expect(decodeURIComponent(url.replace(/\+/g, ' '))).toContain('hello world');
   });
+
+  it('appends key param when EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY is set', async () => {
+    const original = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
+    process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY = 'test-api-key-123';
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    await searchBooks('gatsby');
+    const url = spy.mock.calls[0][0] as string;
+    expect(url).toContain('key=test-api-key-123');
+    process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY = original;
+  });
+
+  it('omits the key param when EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY is not set', async () => {
+    const original = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
+    delete process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    await searchBooks('gatsby');
+    const url = spy.mock.calls[0][0] as string;
+    expect(url).not.toContain('key=');
+    process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY = original;
+  });
 });
