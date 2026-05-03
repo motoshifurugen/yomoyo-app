@@ -1,19 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 export default function FeedScreen() {
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Feed</Text>
+      <Text style={styles.title}>{t('tabs.feed')}</Text>
       <TouchableOpacity
         style={styles.button}
         accessibilityRole="button"
         onPress={() => navigation.navigate('BookDetail')}
       >
-        <Text style={styles.buttonText}>Go to Book Detail</Text>
+        <Text style={styles.buttonText}>{t('feed.goToBookDetail')}</Text>
       </TouchableOpacity>
     </View>
   );
