@@ -13,9 +13,9 @@ export default function FeedScreen() {
       <TouchableOpacity
         style={styles.button}
         accessibilityRole="button"
-        onPress={() => navigation.navigate('BookDetail')}
+        onPress={() => navigation.navigate('BookSearch')}
       >
-        <Text style={styles.buttonText}>{t('feed.goToBookDetail')}</Text>
+        <Text style={styles.buttonText}>{t('feed.searchBooks')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -1,6 +1,9 @@
+import type { Book } from '@/lib/books/searchBooks';
+
 export type RootStackParamList = {
   MainTabs: undefined;
-  BookDetail: undefined;
+  BookSearch: undefined;
+  BookDetail: { book: Book };
 };
 
 export type MainTabParamList = {

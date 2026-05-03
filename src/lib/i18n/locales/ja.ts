@@ -5,7 +5,16 @@ const ja = {
     settings: '設定',
   },
   feed: {
-    goToBookDetail: '本の詳細へ',
+    searchBooks: '本を検索',
+  },
+  bookSearch: {
+    placeholder: 'タイトルや著者で検索',
+    button: '検索',
+    noResults: '結果が見つかりませんでした',
+    unknownAuthor: '著者不明',
+  },
+  bookDetail: {
+    unknownAuthor: '著者不明',
   },
   settings: {
     languageTitle: '言語',
