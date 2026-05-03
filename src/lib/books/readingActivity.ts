@@ -1,4 +1,14 @@
-import firestore from '@react-native-firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 import type { Book } from './searchBooks';
 
 // Minimal Firestore Timestamp shape needed for reading activity
@@ -15,19 +25,17 @@ export type ReadingActivity = {
 };
 
 export async function startReading(userId: string, book: Book): Promise<void> {
+  const db = getFirestore();
   // Deterministic doc ID prevents duplicate records for the same user+book
-  const docId = `${userId}_${book.id}`;
-  await firestore()
-    .collection('readingActivities')
-    .doc(docId)
-    .set({
-      userId,
-      bookId: book.id,
-      title: book.title,
-      authors: book.authors,
-      thumbnail: book.thumbnail,
-      startedAt: firestore.FieldValue.serverTimestamp(),
-    });
+  const docRef = doc(db, 'readingActivities', `${userId}_${book.id}`);
+  await setDoc(docRef, {
+    userId,
+    bookId: book.id,
+    title: book.title,
+    authors: book.authors,
+    thumbnail: book.thumbnail,
+    startedAt: serverTimestamp(),
+  });
 }
 
 export function subscribeToReadingActivities(
@@ -35,20 +43,23 @@ export function subscribeToReadingActivities(
   onUpdate: (activities: ReadingActivity[]) => void,
   onError?: (error: Error) => void,
 ): () => void {
-  return firestore()
-    .collection('readingActivities')
-    .where('userId', '==', userId)
-    .orderBy('startedAt', 'desc')
-    .onSnapshot(
-      (snapshot) => {
-        const items: ReadingActivity[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Omit<ReadingActivity, 'id'>),
-        }));
-        onUpdate(items);
-      },
-      (error) => {
-        if (onError) onError(error);
-      },
-    );
+  const db = getFirestore();
+  const q = query(
+    collection(db, 'readingActivities'),
+    where('userId', '==', userId),
+    orderBy('startedAt', 'desc'),
+  );
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const items: ReadingActivity[] = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<ReadingActivity, 'id'>),
+      }));
+      onUpdate(items);
+    },
+    (error) => {
+      if (onError) onError(error);
+    },
+  );
 }

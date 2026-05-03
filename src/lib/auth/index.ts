@@ -1,7 +1,7 @@
-import auth from '@react-native-firebase/auth';
+import { getAuth, signOut as firebaseSignOut } from '@react-native-firebase/auth';
 
 export async function signOut(): Promise<void> {
-  await auth().signOut();
+  await firebaseSignOut(getAuth());
 }
 
 export { signInWithGoogle } from './google';

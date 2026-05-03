@@ -1,4 +1,4 @@
-import auth from '@react-native-firebase/auth';
+import { getAuth, signInWithCredential, AppleAuthProvider } from '@react-native-firebase/auth';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 
 // iOS only — Apple Sign-In requires Apple Developer entitlement to run.
@@ -13,6 +13,6 @@ export async function signInWithApple(): Promise<void> {
     throw new Error('Apple sign-in failed: no identity token');
   }
 
-  const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
-  await auth().signInWithCredential(appleCredential);
+  const credential = AppleAuthProvider.credential(identityToken, nonce);
+  await signInWithCredential(getAuth(), credential);
 }

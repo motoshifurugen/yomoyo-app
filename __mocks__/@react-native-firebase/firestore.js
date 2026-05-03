@@ -1,28 +1,34 @@
-const mockSet = jest.fn(() => Promise.resolve());
-const mockDoc = jest.fn(() => ({ set: mockSet }));
+const mockGetFirestore = jest.fn(() => ({}));
+const mockCollection = jest.fn(() => ({ type: 'collRef' }));
+const mockDoc = jest.fn(() => ({ type: 'docRef' }));
+const mockSetDoc = jest.fn(() => Promise.resolve());
+const mockWhere = jest.fn(() => ({ type: 'whereConstraint' }));
+const mockOrderBy = jest.fn(() => ({ type: 'orderByConstraint' }));
+const mockQuery = jest.fn((...args) => args[0]);
 const mockUnsubscribe = jest.fn();
 const mockOnSnapshot = jest.fn(() => mockUnsubscribe);
-const mockOrderBy = jest.fn(() => ({ onSnapshot: mockOnSnapshot }));
-const mockWhere = jest.fn(() => ({ orderBy: mockOrderBy }));
-const mockCollection = jest.fn(() => ({
+const mockServerTimestamp = jest.fn(() => ({ _isServerTimestamp: true }));
+
+module.exports = {
+  getFirestore: mockGetFirestore,
+  collection: mockCollection,
   doc: mockDoc,
+  setDoc: mockSetDoc,
   where: mockWhere,
-}));
-
-const firestore = jest.fn(() => ({ collection: mockCollection }));
-firestore.FieldValue = {
-  serverTimestamp: jest.fn(() => ({ _isServerTimestamp: true })),
+  orderBy: mockOrderBy,
+  query: mockQuery,
+  onSnapshot: mockOnSnapshot,
+  serverTimestamp: mockServerTimestamp,
+  __mocks: {
+    mockGetFirestore,
+    mockCollection,
+    mockDoc,
+    mockSetDoc,
+    mockWhere,
+    mockOrderBy,
+    mockQuery,
+    mockUnsubscribe,
+    mockOnSnapshot,
+    mockServerTimestamp,
+  },
 };
-
-firestore.__mocks = {
-  mockSet,
-  mockDoc,
-  mockUnsubscribe,
-  mockOnSnapshot,
-  mockOrderBy,
-  mockWhere,
-  mockCollection,
-};
-
-module.exports = firestore;
-module.exports.default = firestore;

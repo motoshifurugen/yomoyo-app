@@ -19,6 +19,8 @@ const en = {
     button: 'Search',
     noResults: 'No results found',
     unknownAuthor: 'Unknown author',
+    searchError: 'Search failed. Please try again.',
+    rateLimitError: 'Too many searches. Please wait a moment.',
   },
   bookDetail: {
     unknownAuthor: 'Unknown author',

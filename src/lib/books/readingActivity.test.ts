@@ -3,9 +3,16 @@ import type { Book } from './searchBooks';
 
 jest.mock('@react-native-firebase/firestore');
 
-import firestore from '@react-native-firebase/firestore';
-
-const { mockSet, mockDoc, mockOnSnapshot } = (firestore as any).__mocks;
+import {
+  collection,
+  doc,
+  setDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 
 const book: Book = {
   id: 'book123',
@@ -19,34 +26,42 @@ beforeEach(() => {
 });
 
 describe('startReading', () => {
-  it('writes to the readingActivities collection', async () => {
+  it('writes to the readingActivities path', async () => {
     await startReading('user1', book);
-    const db = (firestore as jest.Mock)();
-    expect(db.collection).toHaveBeenCalledWith('readingActivities');
+    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', expect.any(String));
   });
 
   it('uses a deterministic doc ID derived from userId and bookId', async () => {
     await startReading('user1', book);
-    expect(mockDoc).toHaveBeenCalledWith('user1_book123');
+    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
   });
 
   it('stores userId, bookId, title, authors, thumbnail, and startedAt', async () => {
     await startReading('user1', book);
-    expect(mockSet).toHaveBeenCalledWith({
-      userId: 'user1',
-      bookId: 'book123',
-      title: 'The Great Gatsby',
-      authors: ['F. Scott Fitzgerald'],
-      thumbnail: 'https://example.com/cover.jpg',
-      startedAt: expect.anything(),
-    });
+    expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
+      expect.anything(),
+      {
+        userId: 'user1',
+        bookId: 'book123',
+        title: 'The Great Gatsby',
+        authors: ['F. Scott Fitzgerald'],
+        thumbnail: 'https://example.com/cover.jpg',
+        startedAt: expect.anything(),
+      },
+    );
   });
 
   it('stores null thumbnail when book has no cover', async () => {
     await startReading('user1', { ...book, thumbnail: null });
-    expect(mockSet).toHaveBeenCalledWith(
+    expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
+      expect.anything(),
       expect.objectContaining({ thumbnail: null }),
     );
+  });
+
+  it('uses serverTimestamp for startedAt', async () => {
+    await startReading('user1', book);
+    expect(jest.mocked(serverTimestamp)).toHaveBeenCalled();
   });
 
   it('resolves without error', async () => {
@@ -57,22 +72,17 @@ describe('startReading', () => {
 describe('subscribeToReadingActivities', () => {
   it('queries the readingActivities collection filtered by userId', () => {
     subscribeToReadingActivities('user1', jest.fn());
-    const db = (firestore as jest.Mock)();
-    expect(db.collection).toHaveBeenCalledWith('readingActivities');
-    const collRef = db.collection('readingActivities');
-    expect(collRef.where).toHaveBeenCalledWith('userId', '==', 'user1');
+    expect(jest.mocked(collection)).toHaveBeenCalledWith(expect.anything(), 'readingActivities');
+    expect(jest.mocked(where)).toHaveBeenCalledWith('userId', '==', 'user1');
   });
 
   it('orders results by startedAt descending', () => {
     subscribeToReadingActivities('user1', jest.fn());
-    const db = (firestore as jest.Mock)();
-    const collRef = db.collection('readingActivities');
-    const query = collRef.where('userId', '==', 'user1');
-    expect(query.orderBy).toHaveBeenCalledWith('startedAt', 'desc');
+    expect(jest.mocked(orderBy)).toHaveBeenCalledWith('startedAt', 'desc');
   });
 
   it('calls onUpdate with mapped activities when snapshot arrives', () => {
-    mockOnSnapshot.mockImplementationOnce((onNext: Function) => {
+    jest.mocked(onSnapshot).mockImplementationOnce((_q, onNext: any) => {
       onNext({
         docs: [
           {
@@ -108,7 +118,7 @@ describe('subscribeToReadingActivities', () => {
   });
 
   it('calls onUpdate with empty array when no docs', () => {
-    mockOnSnapshot.mockImplementationOnce((onNext: Function) => {
+    jest.mocked(onSnapshot).mockImplementationOnce((_q, onNext: any) => {
       onNext({ docs: [] });
       return jest.fn();
     });
@@ -121,7 +131,7 @@ describe('subscribeToReadingActivities', () => {
 
   it('calls onError when the snapshot listener errors', () => {
     const testError = new Error('permission denied');
-    mockOnSnapshot.mockImplementationOnce((_onNext: Function, onError: Function) => {
+    jest.mocked(onSnapshot).mockImplementationOnce((_q, _onNext: any, onError: any) => {
       onError(testError);
       return jest.fn();
     });
@@ -136,7 +146,7 @@ describe('subscribeToReadingActivities', () => {
 
   it('does not throw when onError is not provided and listener errors', () => {
     const testError = new Error('permission denied');
-    mockOnSnapshot.mockImplementationOnce((_onNext: Function, onError: Function) => {
+    jest.mocked(onSnapshot).mockImplementationOnce((_q, _onNext: any, onError: any) => {
       onError(testError);
       return jest.fn();
     });

@@ -19,6 +19,8 @@ const ja = {
     button: '検索',
     noResults: '結果が見つかりませんでした',
     unknownAuthor: '著者不明',
+    searchError: '検索に失敗しました。もう一度お試しください。',
+    rateLimitError: '検索回数が多すぎます。少し待ってからお試しください。',
   },
   bookDetail: {
     unknownAuthor: '著者不明',

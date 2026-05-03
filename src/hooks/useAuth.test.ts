@@ -1,10 +1,8 @@
 import { renderHook, act } from '@testing-library/react-native';
-import auth from '@react-native-firebase/auth';
+import { onAuthStateChanged } from '@react-native-firebase/auth';
 import { useAuth } from '@/hooks/useAuth';
 
 jest.mock('@react-native-firebase/auth');
-
-const mockAuth = auth as jest.MockedFunction<typeof auth>;
 
 describe('useAuth', () => {
   beforeEach(() => {
@@ -12,7 +10,7 @@ describe('useAuth', () => {
   });
 
   it('starts with loading=true and user=null before state resolves', () => {
-    mockAuth().onAuthStateChanged.mockReturnValue(jest.fn());
+    jest.mocked(onAuthStateChanged).mockReturnValue(jest.fn());
 
     const { result } = renderHook(() => useAuth());
 
@@ -21,8 +19,8 @@ describe('useAuth', () => {
   });
 
   it('sets loading=false and user=null when signed out', async () => {
-    mockAuth().onAuthStateChanged.mockImplementation((cb: (user: null) => void) => {
-      cb(null);
+    jest.mocked(onAuthStateChanged).mockImplementation((_auth, cb) => {
+      (cb as Function)(null);
       return jest.fn();
     });
 
@@ -35,8 +33,8 @@ describe('useAuth', () => {
 
   it('sets loading=false and returns user when signed in', async () => {
     const mockUser = { uid: 'abc123', email: 'user@example.com' };
-    mockAuth().onAuthStateChanged.mockImplementation((cb: (user: typeof mockUser) => void) => {
-      cb(mockUser);
+    jest.mocked(onAuthStateChanged).mockImplementation((_auth, cb) => {
+      (cb as Function)(mockUser);
       return jest.fn();
     });
 
@@ -49,7 +47,7 @@ describe('useAuth', () => {
 
   it('unsubscribes from auth state on unmount', () => {
     const unsubscribe = jest.fn();
-    mockAuth().onAuthStateChanged.mockReturnValue(unsubscribe);
+    jest.mocked(onAuthStateChanged).mockReturnValue(unsubscribe);
 
     const { unmount } = renderHook(() => useAuth());
     unmount();

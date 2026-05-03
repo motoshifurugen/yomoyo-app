@@ -14,8 +14,13 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { searchBooks, type Book } from '@/lib/books/searchBooks';
 import type { RootStackParamList } from '@/navigation/types';
+import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+function is429Error(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('429');
+}
 
 export default function BookSearchScreen() {
   const { t } = useTranslation();
@@ -23,16 +28,18 @@ export default function BookSearchScreen() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Book[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState<'rateLimit' | 'generic' | null>(null);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
+    setSearchError(null);
     try {
       const books = await searchBooks(query.trim());
       setResults(books);
     } catch (error: unknown) {
-      console.error('Book search failed:', error);
-      setResults([]);
+      setSearchError(is429Error(error) ? 'rateLimit' : 'generic');
+      setResults(null);
     } finally {
       setLoading(false);
     }
@@ -41,6 +48,10 @@ export default function BookSearchScreen() {
   const handleSelect = (book: Book) => {
     navigation.navigate('BookDetail', { book });
   };
+
+  const errorKey = searchError === 'rateLimit'
+    ? 'bookSearch.rateLimitError'
+    : 'bookSearch.searchError';
 
   return (
     <View style={styles.container}>
@@ -65,7 +76,11 @@ export default function BookSearchScreen() {
 
       {loading && <ActivityIndicator style={styles.loading} />}
 
-      {!loading && results !== null && results.length === 0 && (
+      {!loading && searchError && (
+        <Text style={styles.errorText}>{t(errorKey)}</Text>
+      )}
+
+      {!loading && !searchError && results !== null && results.length === 0 && (
         <Text style={styles.noResults}>{t('bookSearch.noResults')}</Text>
       )}
 
@@ -93,30 +108,55 @@ export default function BookSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: yomoyoColors.background },
   searchRow: { flexDirection: 'row', padding: 16, gap: 8 },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: yomoyoColors.border,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 16,
+    fontSize: yomoyoTypography.screenBodySize,
   },
   button: {
-    backgroundColor: '#4285F4',
+    backgroundColor: yomoyoColors.primary,
     borderRadius: 8,
     paddingHorizontal: 16,
     justifyContent: 'center',
   },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  buttonText: {
+    color: yomoyoColors.surface,
+    fontSize: yomoyoTypography.screenBodySize,
+    fontWeight: yomoyoTypography.buttonWeight,
+  },
   loading: { marginTop: 24 },
-  noResults: { textAlign: 'center', marginTop: 40, color: '#888', fontSize: 16 },
-  resultItem: { flexDirection: 'row', padding: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  thumbnail: { width: 50, height: 72, borderRadius: 4, backgroundColor: '#eee' },
-  thumbnailPlaceholder: { width: 50, height: 72, borderRadius: 4, backgroundColor: '#ddd' },
+  errorText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: yomoyoColors.error,
+    fontSize: yomoyoTypography.screenBodySize,
+  },
+  noResults: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: yomoyoColors.muted,
+    fontSize: yomoyoTypography.screenBodySize,
+  },
+  resultItem: {
+    flexDirection: 'row',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: yomoyoColors.border,
+  },
+  thumbnail: { width: 50, height: 72, borderRadius: 4, backgroundColor: yomoyoColors.border },
+  thumbnailPlaceholder: { width: 50, height: 72, borderRadius: 4, backgroundColor: yomoyoColors.border },
   bookInfo: { flex: 1, marginLeft: 12, justifyContent: 'center' },
-  bookTitle: { fontSize: 15, fontWeight: '600', marginBottom: 4 },
-  bookAuthor: { fontSize: 13, color: '#666' },
+  bookTitle: {
+    fontSize: 15,
+    fontWeight: yomoyoTypography.buttonWeight,
+    marginBottom: 4,
+    color: yomoyoColors.text,
+  },
+  bookAuthor: { fontSize: 13, color: yomoyoColors.secondaryText },
 });
