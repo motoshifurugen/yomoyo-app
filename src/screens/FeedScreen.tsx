@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: yomoyoTypography.screenTitleSize,
-    fontWeight: '700',
+    fontWeight: yomoyoTypography.titleWeight,
     color: yomoyoColors.text,
     textAlign: 'center',
     marginBottom: 12,
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     color: yomoyoColors.secondaryText,
     textAlign: 'center',
     marginBottom: 32,
-    paddingHorizontal: 8,
   },
   button: {
     backgroundColor: yomoyoColors.primary,
@@ -57,7 +56,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: yomoyoColors.surface,
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: yomoyoTypography.secondaryActionSize,
+    fontWeight: yomoyoTypography.buttonWeight,
   },
 });

@@ -7,7 +7,7 @@ import FeedScreen from '@/screens/FeedScreen';
 import FriendsScreen from '@/screens/FriendsScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import { MainTabParamList } from './types';
-import { yomoyoColors } from '@/constants/yomoyoTheme';
+import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -31,8 +31,8 @@ export default function MainTabNavigator() {
         headerShadowVisible: false,
         headerTintColor: yomoyoColors.text,
         headerTitleStyle: {
-          fontSize: 18,
-          fontWeight: '700' as const,
+          fontSize: yomoyoTypography.headerTitleSize,
+          fontWeight: yomoyoTypography.titleWeight,
         },
         headerTitleAlign: 'center',
         tabBarStyle: {
@@ -43,15 +43,12 @@ export default function MainTabNavigator() {
         tabBarActiveTintColor: yomoyoColors.primary,
         tabBarInactiveTintColor: yomoyoColors.muted,
         tabBarLabel: ({ focused, color, children }) => (
-          <Text style={{ fontSize: 12, fontWeight: focused ? '600' : '500', color }}>
+          <Text style={{ fontSize: 12, fontWeight: (focused ? '600' : '500') as '600' | '500', color }}>
             {children}
           </Text>
         ),
         tabBarIcon: ({ focused, color, size }) => {
-          const icons = TAB_ICONS[route.name] ?? {
-            active: 'help-circle',
-            inactive: 'help-circle-outline',
-          };
+          const icons = TAB_ICONS[route.name];
           const iconName = focused ? icons.active : icons.inactive;
           return <Ionicons name={iconName} size={size} color={color} />;
         },

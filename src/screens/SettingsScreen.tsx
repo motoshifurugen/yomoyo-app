@@ -19,7 +19,7 @@ export default function SettingsScreen() {
           <View style={styles.row}>
             <TouchableOpacity
               style={[styles.langOption, currentLanguage === 'ja' && styles.langOptionActive]}
-              onPress={() => setLanguage('ja')}
+              onPress={() => { void setLanguage('ja'); }}
               accessibilityRole="button"
             >
               <Text style={[styles.langText, currentLanguage === 'ja' && styles.langTextActive]}>
@@ -28,7 +28,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.langOption, currentLanguage === 'en' && styles.langOptionActive]}
-              onPress={() => setLanguage('en')}
+              onPress={() => { void setLanguage('en'); }}
               accessibilityRole="button"
             >
               <Text style={[styles.langText, currentLanguage === 'en' && styles.langTextActive]}>

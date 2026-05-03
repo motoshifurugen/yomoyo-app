@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: yomoyoTypography.screenTitleSize,
-    fontWeight: '700',
+    fontWeight: yomoyoTypography.titleWeight,
     color: yomoyoColors.text,
     textAlign: 'center',
     marginBottom: 12,
@@ -35,6 +35,5 @@ const styles = StyleSheet.create({
     lineHeight: yomoyoTypography.screenBodyLineHeight,
     color: yomoyoColors.secondaryText,
     textAlign: 'center',
-    paddingHorizontal: 8,
   },
 });
