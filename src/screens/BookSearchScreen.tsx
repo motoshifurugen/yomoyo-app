@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -30,8 +30,11 @@ export default function BookSearchScreen() {
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<'rateLimit' | 'generic' | null>(null);
 
+  const isSearchingRef = useRef(false);
+
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!query.trim() || isSearchingRef.current) return;
+    isSearchingRef.current = true;
     setLoading(true);
     setSearchError(null);
     try {
@@ -41,6 +44,7 @@ export default function BookSearchScreen() {
       setSearchError(is429Error(error) ? 'rateLimit' : 'generic');
       setResults(null);
     } finally {
+      isSearchingRef.current = false;
       setLoading(false);
     }
   };
@@ -65,8 +69,9 @@ export default function BookSearchScreen() {
           onSubmitEditing={handleSearch}
         />
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleSearch}
+          disabled={loading}
           accessibilityRole="button"
           accessibilityLabel={t('bookSearch.button')}
         >
@@ -124,6 +129,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     justifyContent: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   buttonText: {
     color: yomoyoColors.surface,
