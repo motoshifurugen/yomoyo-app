@@ -1,10 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { getLocales } from 'expo-localization';
 import en from './locales/en';
 import ja from './locales/ja';
 
-// Pure function — exported for unit testing.
 export function detectLanguage(
   locales: Array<{ languageCode: string | null }>
 ): 'ja' | 'en' {
@@ -12,7 +10,16 @@ export function detectLanguage(
   return lang === 'ja' ? 'ja' : 'en';
 }
 
-const language = detectLanguage(getLocales());
+function getDeviceLocales(): Array<{ languageCode: string | null }> {
+  try {
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    return [{ languageCode: locale.split('-')[0] ?? null }];
+  } catch {
+    return [{ languageCode: 'en' }];
+  }
+}
+
+const language = detectLanguage(getDeviceLocales());
 
 i18n.use(initReactI18next).init({
   resources: {
