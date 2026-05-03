@@ -2,6 +2,7 @@ const mockGetFirestore = jest.fn(() => ({}));
 const mockCollection = jest.fn(() => ({ type: 'collRef' }));
 const mockDoc = jest.fn(() => ({ type: 'docRef' }));
 const mockSetDoc = jest.fn(() => Promise.resolve());
+const mockUpdateDoc = jest.fn(() => Promise.resolve());
 const mockWhere = jest.fn(() => ({ type: 'whereConstraint' }));
 const mockOrderBy = jest.fn(() => ({ type: 'orderByConstraint' }));
 const mockQuery = jest.fn((...args) => args[0]);
@@ -14,6 +15,7 @@ module.exports = {
   collection: mockCollection,
   doc: mockDoc,
   setDoc: mockSetDoc,
+  updateDoc: mockUpdateDoc,
   where: mockWhere,
   orderBy: mockOrderBy,
   query: mockQuery,
@@ -24,6 +26,7 @@ module.exports = {
     mockCollection,
     mockDoc,
     mockSetDoc,
+    mockUpdateDoc,
     mockWhere,
     mockOrderBy,
     mockQuery,

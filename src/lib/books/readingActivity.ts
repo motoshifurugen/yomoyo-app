@@ -3,6 +3,7 @@ import {
   collection,
   doc,
   setDoc,
+  updateDoc,
   query,
   where,
   orderBy,
@@ -22,6 +23,8 @@ export type ReadingActivity = {
   authors: string[];
   thumbnail: string | null;
   startedAt: FirestoreTimestamp | null;
+  status?: 'reading' | 'finished';
+  finishedAt?: FirestoreTimestamp | null;
 };
 
 export async function startReading(userId: string, book: Book): Promise<void> {
@@ -35,6 +38,16 @@ export async function startReading(userId: string, book: Book): Promise<void> {
     authors: book.authors,
     thumbnail: book.thumbnail,
     startedAt: serverTimestamp(),
+    status: 'reading',
+  });
+}
+
+export async function markAsFinished(userId: string, bookId: string): Promise<void> {
+  const db = getFirestore();
+  const docRef = doc(db, 'readingActivities', `${userId}_${bookId}`);
+  await updateDoc(docRef, {
+    status: 'finished',
+    finishedAt: serverTimestamp(),
   });
 }
 

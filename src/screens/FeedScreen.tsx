@@ -37,7 +37,9 @@ export default function FeedScreen() {
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Text style={styles.cardLabel}>{t('feed.startedReading')}</Text>
+              <Text style={styles.cardLabel}>
+                {item.status === 'finished' ? t('feed.finishedReading') : t('feed.startedReading')}
+              </Text>
               <Text style={styles.cardTitle}>{item.title}</Text>
             </View>
           )}

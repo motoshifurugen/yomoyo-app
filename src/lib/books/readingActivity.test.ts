@@ -1,4 +1,4 @@
-import { startReading, subscribeToReadingActivities } from './readingActivity';
+import { startReading, markAsFinished, subscribeToReadingActivities } from './readingActivity';
 import type { Book } from './searchBooks';
 
 jest.mock('@react-native-firebase/firestore');
@@ -7,6 +7,7 @@ import {
   collection,
   doc,
   setDoc,
+  updateDoc,
   query,
   where,
   orderBy,
@@ -36,7 +37,7 @@ describe('startReading', () => {
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
   });
 
-  it('stores userId, bookId, title, authors, thumbnail, and startedAt', async () => {
+  it('stores userId, bookId, title, authors, thumbnail, startedAt, and status', async () => {
     await startReading('user1', book);
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
@@ -47,6 +48,7 @@ describe('startReading', () => {
         authors: ['F. Scott Fitzgerald'],
         thumbnail: 'https://example.com/cover.jpg',
         startedAt: expect.anything(),
+        status: 'reading',
       },
     );
   });
@@ -66,6 +68,32 @@ describe('startReading', () => {
 
   it('resolves without error', async () => {
     await expect(startReading('user1', book)).resolves.toBeUndefined();
+  });
+});
+
+describe('markAsFinished', () => {
+  it('writes to the correct doc path using userId and bookId', async () => {
+    await markAsFinished('user1', 'book123');
+    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
+  });
+
+  it('calls updateDoc (not setDoc)', async () => {
+    await markAsFinished('user1', 'book123');
+    expect(jest.mocked(updateDoc)).toHaveBeenCalled();
+    expect(jest.mocked(setDoc)).not.toHaveBeenCalled();
+  });
+
+  it('sets status to finished and finishedAt to serverTimestamp', async () => {
+    await markAsFinished('user1', 'book123');
+    expect(jest.mocked(updateDoc)).toHaveBeenCalledWith(
+      expect.anything(),
+      { status: 'finished', finishedAt: expect.anything() },
+    );
+    expect(jest.mocked(serverTimestamp)).toHaveBeenCalled();
+  });
+
+  it('resolves without error', async () => {
+    await expect(markAsFinished('user1', 'book123')).resolves.toBeUndefined();
   });
 });
 

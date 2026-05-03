@@ -10,6 +10,7 @@ const ja = {
     emptyTitle: '読書フィードは、まだ静かです',
     emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
     startedReading: '読み始めました',
+    finishedReading: '読み終えました',
   },
   friends: {
     emptyTitle: '読書仲間を見つけよう',
@@ -33,6 +34,7 @@ const ja = {
     finished: '読了',
     emptyCurrentlyReading: '読書中の本はまだありません',
     emptyFinished: '読了した本はまだありません',
+    markAsFinished: '読了にする',
   },
   settings: {
     languageTitle: '言語',
