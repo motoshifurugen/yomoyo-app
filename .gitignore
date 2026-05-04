@@ -10,3 +10,4 @@ google-services.json
 GoogleService-Info.plist
 .DS_Store
 .pnpm-store/
+scripts/service-account.json
