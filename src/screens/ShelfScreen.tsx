@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
-import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
+import { subscribeToReadingActivities, markAsFinished } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 
 export default function ShelfScreen() {
@@ -21,14 +21,17 @@ export default function ShelfScreen() {
     return unsubscribe;
   }, [user?.uid]);
 
+  const currentlyReading = activities.filter((a) => a.status !== 'finished');
+  const finished = activities.filter((a) => a.status === 'finished');
+
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.sectionHeader}>{t('shelf.currentlyReading')}</Text>
-        {activities.length === 0 ? (
+        {currentlyReading.length === 0 ? (
           <Text style={styles.emptyText}>{t('shelf.emptyCurrentlyReading')}</Text>
         ) : (
-          activities.map((item) => (
+          currentlyReading.map((item) => (
             <View key={item.id} style={styles.card}>
               {item.thumbnail ? (
                 <Image
@@ -45,13 +48,47 @@ export default function ShelfScreen() {
                 {item.startedAt && (
                   <Text style={styles.date}>{item.startedAt.toDate().toLocaleDateString()}</Text>
                 )}
+                <TouchableOpacity
+                  onPress={() => {
+                    markAsFinished(item.userId, item.bookId).catch((err) => {
+                      console.error('Failed to mark as finished:', err);
+                    });
+                  }}
+                  accessibilityRole="button"
+                  style={styles.finishButton}
+                >
+                  <Text style={styles.finishButtonText}>{t('shelf.markAsFinished')}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           ))
         )}
 
         <Text style={[styles.sectionHeader, styles.sectionHeaderSpaced]}>{t('shelf.finished')}</Text>
-        <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
+        {finished.length === 0 ? (
+          <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
+        ) : (
+          finished.map((item) => (
+            <View key={item.id} style={styles.card}>
+              {item.thumbnail ? (
+                <Image
+                  source={{ uri: item.thumbnail }}
+                  style={styles.thumbnail}
+                  accessibilityLabel={item.title}
+                />
+              ) : (
+                <View style={[styles.thumbnail, styles.thumbnailPlaceholder]} />
+              )}
+              <View style={styles.cardInfo}>
+                <Text style={styles.bookTitle}>{item.title}</Text>
+                <Text style={styles.author}>{item.authors.join(', ')}</Text>
+                {item.finishedAt && (
+                  <Text style={styles.date}>{item.finishedAt.toDate().toLocaleDateString()}</Text>
+                )}
+              </View>
+            </View>
+          ))
+        )}
       </ScrollView>
     </ScreenContainer>
   );
@@ -115,5 +152,14 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 13,
     color: yomoyoColors.muted,
+  },
+  finishButton: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
+  },
+  finishButtonText: {
+    fontSize: 13,
+    color: yomoyoColors.primary,
+    fontWeight: yomoyoTypography.buttonWeight,
   },
 });

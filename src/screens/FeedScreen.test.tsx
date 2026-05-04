@@ -132,4 +132,65 @@ describe('FeedScreen', () => {
 
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
+
+  it('shows finishedReading label for activities with status finished', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([
+        {
+          id: 'act1',
+          userId: 'user1',
+          bookId: 'book123',
+          title: 'Dune',
+          authors: ['Frank Herbert'],
+          thumbnail: null,
+          status: 'finished',
+        },
+      ]);
+      return jest.fn();
+    });
+
+    render(<FeedScreen />);
+    expect(screen.getByText('feed.finishedReading')).toBeTruthy();
+    expect(screen.queryByText('feed.startedReading')).toBeNull();
+  });
+
+  it('shows startedReading label for activities with status reading', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([
+        {
+          id: 'act1',
+          userId: 'user1',
+          bookId: 'book123',
+          title: 'Dune',
+          authors: ['Frank Herbert'],
+          thumbnail: null,
+          status: 'reading',
+        },
+      ]);
+      return jest.fn();
+    });
+
+    render(<FeedScreen />);
+    expect(screen.getByText('feed.startedReading')).toBeTruthy();
+    expect(screen.queryByText('feed.finishedReading')).toBeNull();
+  });
+
+  it('shows startedReading label when status is absent', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([
+        {
+          id: 'act1',
+          userId: 'user1',
+          bookId: 'book123',
+          title: 'Dune',
+          authors: ['Frank Herbert'],
+          thumbnail: null,
+        },
+      ]);
+      return jest.fn();
+    });
+
+    render(<FeedScreen />);
+    expect(screen.getByText('feed.startedReading')).toBeTruthy();
+  });
 });

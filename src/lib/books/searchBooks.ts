@@ -43,6 +43,9 @@ function mapVolume(item: GoogleBooksVolume): Book {
 export async function searchBooks(query: string): Promise<Book[]> {
   const params = new URLSearchParams({ q: query });
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
+  if (__DEV__) {
+    console.log('[Books] API key:', apiKey ? `${apiKey.slice(0, 4)}...` : 'NOT SET');
+  }
   if (apiKey) params.append('key', apiKey);
 
   const response = await fetch(`${BASE_URL}?${params}`);

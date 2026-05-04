@@ -16,7 +16,7 @@
     "@react-native-async-storage/async-storage": "^3.0.2",
     "@react-native-firebase/app": "^24.0.0",
     "@react-native-firebase/auth": "^24.0.0",
-    "@react-native-firebase/firestore": "^24.0.0",
+    "firebase": "^10.14.1",
     "@react-native-google-signin/google-signin": "^16.1.2",
     "@react-navigation/bottom-tabs": "^7.15.11",
     "@react-navigation/native": "^7.1.6",
@@ -59,6 +59,8 @@
     "preset": "jest-expo",
     "watchman": false,
     "moduleNameMapper": {
+      "^firebase/firestore$": "<rootDir>/__mocks__/firebase/firestore.js",
+      "^firebase/app$": "<rootDir>/__mocks__/firebase/app.js",
       "@react-native-async-storage/async-storage": "<rootDir>/__mocks__/@react-native-async-storage/async-storage.js",
       "expo-notifications": "<rootDir>/__mocks__/expo-notifications.js",
       "expo-video": "<rootDir>/__mocks__/expo-video.js",
