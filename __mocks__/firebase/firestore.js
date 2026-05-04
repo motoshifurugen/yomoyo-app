@@ -21,17 +21,4 @@ module.exports = {
   query: mockQuery,
   onSnapshot: mockOnSnapshot,
   serverTimestamp: mockServerTimestamp,
-  __mocks: {
-    mockGetFirestore,
-    mockCollection,
-    mockDoc,
-    mockSetDoc,
-    mockUpdateDoc,
-    mockWhere,
-    mockOrderBy,
-    mockQuery,
-    mockUnsubscribe,
-    mockOnSnapshot,
-    mockServerTimestamp,
-  },
 };

@@ -1,8 +1,6 @@
 import { startReading, markAsFinished, subscribeToReadingActivities } from './readingActivity';
 import type { Book } from './searchBooks';
 
-jest.mock('@react-native-firebase/firestore');
-
 import {
   collection,
   doc,
@@ -13,7 +11,7 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-} from '@react-native-firebase/firestore';
+} from 'firebase/firestore';
 
 const book: Book = {
   id: 'book123',

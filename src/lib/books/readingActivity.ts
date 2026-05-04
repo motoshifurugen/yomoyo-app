@@ -9,7 +9,7 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp,
-} from '@react-native-firebase/firestore';
+} from 'firebase/firestore';
 import type { Book } from './searchBooks';
 
 // Minimal Firestore Timestamp shape needed for reading activity
