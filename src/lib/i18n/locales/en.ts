@@ -9,7 +9,6 @@ const en = {
     searchBooks: 'Search books',
     emptyTitle: 'Your reading feed is quiet',
     emptyBody: 'When friends finish books, their notes will appear here.',
-    startedReading: 'Started reading',
     finishedReading: 'Finished reading',
   },
   friends: {
@@ -26,13 +25,9 @@ const en = {
   },
   bookDetail: {
     unknownAuthor: 'Unknown author',
-    startReading: 'Start Reading',
-    reading: 'Reading',
   },
   shelf: {
-    currentlyReading: 'Currently Reading',
     finished: 'Finished',
-    emptyCurrentlyReading: 'No books currently reading',
     emptyFinished: 'No finished books yet',
     markAsFinished: 'Mark as Finished',
   },

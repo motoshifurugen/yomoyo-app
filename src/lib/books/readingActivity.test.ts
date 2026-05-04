@@ -1,11 +1,10 @@
-import { startReading, markAsFinished, subscribeToReadingActivities } from './readingActivity';
+import { markAsFinished, subscribeToReadingActivities } from './readingActivity';
 import type { Book } from './searchBooks';
 
 import {
   collection,
   doc,
   setDoc,
-  updateDoc,
   query,
   where,
   orderBy,
@@ -24,19 +23,24 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe('startReading', () => {
+describe('markAsFinished', () => {
   it('writes to the readingActivities path', async () => {
-    await startReading('user1', book);
+    await markAsFinished('user1', book);
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', expect.any(String));
   });
 
   it('uses a deterministic doc ID derived from userId and bookId', async () => {
-    await startReading('user1', book);
+    await markAsFinished('user1', book);
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
   });
 
-  it('stores userId, bookId, title, authors, thumbnail, startedAt, and status', async () => {
-    await startReading('user1', book);
+  it('calls setDoc (not updateDoc)', async () => {
+    await markAsFinished('user1', book);
+    expect(jest.mocked(setDoc)).toHaveBeenCalled();
+  });
+
+  it('stores userId, bookId, title, authors, thumbnail, finishedAt, and status finished', async () => {
+    await markAsFinished('user1', book);
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
       {
@@ -45,53 +49,27 @@ describe('startReading', () => {
         title: 'The Great Gatsby',
         authors: ['F. Scott Fitzgerald'],
         thumbnail: 'https://example.com/cover.jpg',
-        startedAt: expect.anything(),
-        status: 'reading',
+        finishedAt: expect.anything(),
+        status: 'finished',
       },
     );
   });
 
   it('stores null thumbnail when book has no cover', async () => {
-    await startReading('user1', { ...book, thumbnail: null });
+    await markAsFinished('user1', { ...book, thumbnail: null });
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ thumbnail: null }),
     );
   });
 
-  it('uses serverTimestamp for startedAt', async () => {
-    await startReading('user1', book);
+  it('uses serverTimestamp for finishedAt', async () => {
+    await markAsFinished('user1', book);
     expect(jest.mocked(serverTimestamp)).toHaveBeenCalled();
   });
 
   it('resolves without error', async () => {
-    await expect(startReading('user1', book)).resolves.toBeUndefined();
-  });
-});
-
-describe('markAsFinished', () => {
-  it('writes to the correct doc path using userId and bookId', async () => {
-    await markAsFinished('user1', 'book123');
-    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
-  });
-
-  it('calls updateDoc (not setDoc)', async () => {
-    await markAsFinished('user1', 'book123');
-    expect(jest.mocked(updateDoc)).toHaveBeenCalled();
-    expect(jest.mocked(setDoc)).not.toHaveBeenCalled();
-  });
-
-  it('sets status to finished and finishedAt to serverTimestamp', async () => {
-    await markAsFinished('user1', 'book123');
-    expect(jest.mocked(updateDoc)).toHaveBeenCalledWith(
-      expect.anything(),
-      { status: 'finished', finishedAt: expect.anything() },
-    );
-    expect(jest.mocked(serverTimestamp)).toHaveBeenCalled();
-  });
-
-  it('resolves without error', async () => {
-    await expect(markAsFinished('user1', 'book123')).resolves.toBeUndefined();
+    await expect(markAsFinished('user1', book)).resolves.toBeUndefined();
   });
 });
 
@@ -102,9 +80,14 @@ describe('subscribeToReadingActivities', () => {
     expect(jest.mocked(where)).toHaveBeenCalledWith('userId', '==', 'user1');
   });
 
-  it('orders results by startedAt descending', () => {
+  it('filters to only finished activities', () => {
     subscribeToReadingActivities('user1', jest.fn());
-    expect(jest.mocked(orderBy)).toHaveBeenCalledWith('startedAt', 'desc');
+    expect(jest.mocked(where)).toHaveBeenCalledWith('status', '==', 'finished');
+  });
+
+  it('orders results by finishedAt descending', () => {
+    subscribeToReadingActivities('user1', jest.fn());
+    expect(jest.mocked(orderBy)).toHaveBeenCalledWith('finishedAt', 'desc');
   });
 
   it('calls onUpdate with mapped activities when snapshot arrives', () => {
@@ -119,7 +102,8 @@ describe('subscribeToReadingActivities', () => {
               title: 'The Great Gatsby',
               authors: ['F. Scott Fitzgerald'],
               thumbnail: 'https://example.com/cover.jpg',
-              startedAt: null,
+              status: 'finished',
+              finishedAt: null,
             }),
           },
         ],
@@ -138,7 +122,8 @@ describe('subscribeToReadingActivities', () => {
         title: 'The Great Gatsby',
         authors: ['F. Scott Fitzgerald'],
         thumbnail: 'https://example.com/cover.jpg',
-        startedAt: null,
+        status: 'finished',
+        finishedAt: null,
       },
     ]);
   });

@@ -9,7 +9,6 @@ const ja = {
     searchBooks: '本を探す',
     emptyTitle: '読書フィードは、まだ静かです',
     emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
-    startedReading: '読み始めました',
     finishedReading: '読み終えました',
   },
   friends: {
@@ -26,13 +25,9 @@ const ja = {
   },
   bookDetail: {
     unknownAuthor: '著者不明',
-    startReading: '読み始める',
-    reading: '読書中',
   },
   shelf: {
-    currentlyReading: '読書中',
     finished: '読了',
-    emptyCurrentlyReading: '読書中の本はまだありません',
     emptyFinished: '読了した本はまだありません',
     markAsFinished: '読了にする',
   },
