@@ -37,6 +37,7 @@ const en = {
   shelf: {
     finished: 'Finished',
     emptyFinished: 'No finished books yet',
+    addBook: 'Record a finished book',
     markAsFinished: 'Mark as Finished',
   },
   settings: {

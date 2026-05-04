@@ -37,6 +37,7 @@ const ja = {
   shelf: {
     finished: '読了',
     emptyFinished: '読了した本はまだありません',
+    addBook: '読み終えた本を記録する',
     markAsFinished: '読了にする',
   },
   settings: {
