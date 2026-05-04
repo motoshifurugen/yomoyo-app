@@ -22,14 +22,14 @@ const mockProps = {
   state: {
     routes: [
       { key: 'Feed-key', name: 'Feed' },
-      { key: 'Friends-key', name: 'Friends' },
+      { key: 'Shelf-key', name: 'Shelf' },
       { key: 'Settings-key', name: 'Settings' },
     ],
     index: 0,
   },
   descriptors: {
     'Feed-key': { options: { title: 'Feed' } },
-    'Friends-key': { options: { title: 'Friends' } },
+    'Shelf-key': { options: { title: 'Shelf' } },
     'Settings-key': { options: { title: 'Settings' } },
   },
   navigation: {
@@ -48,13 +48,13 @@ describe('GlassTabBar', () => {
   it('renders all tab labels', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
     expect(screen.getByText('Feed')).toBeTruthy();
-    expect(screen.getByText('Friends')).toBeTruthy();
+    expect(screen.getByText('Shelf')).toBeTruthy();
     expect(screen.getByText('Settings')).toBeTruthy();
   });
 
   it('dispatches navigation when an inactive tab is pressed', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    fireEvent.press(screen.getByText('Friends'));
+    fireEvent.press(screen.getByText('Shelf'));
     expect(mockDispatch).toHaveBeenCalled();
   });
 
@@ -72,8 +72,8 @@ describe('GlassTabBar', () => {
 
   it('marks inactive tabs as not selected', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    const friendsTab = screen.getByRole('tab', { name: 'Friends' });
-    expect(friendsTab.props.accessibilityState.selected).toBe(false);
+    const shelfTab = screen.getByRole('tab', { name: 'Shelf' });
+    expect(shelfTab.props.accessibilityState.selected).toBe(false);
   });
 
   it('renders without crashing for an unknown route name', () => {

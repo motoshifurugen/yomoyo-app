@@ -1,133 +1,256 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
-import type { QueryDocumentSnapshot } from 'firebase/firestore';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
-import type { RootStackParamList } from '@/navigation/types';
-import { useAuth } from '@/hooks/useAuth';
-import { getFollowingUids } from '@/lib/users/follows';
-import { getFriendsFeed } from '@/lib/books/friendsFeed';
+import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
+import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import { useFeedState } from './FeedScreen.hooks';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+type TimelineCardProps = {
+  item: ReadingActivity;
+  isFollowing: boolean;
+  isSelf: boolean;
+  showAction: boolean;
+  onFollow: (uid: string) => void;
+  onUnfollow: (uid: string) => void;
+};
+
+const TimelineCard = React.memo(function TimelineCard({
+  item,
+  isFollowing,
+  isSelf,
+  showAction,
+  onFollow,
+  onUnfollow,
+}: TimelineCardProps) {
+  const { t } = useTranslation();
+  const avatarKey = item.displayAvatar as AnimalKey | undefined;
+  const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
+  return (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        {avatarSource && (
+          <Image
+            source={avatarSource}
+            style={styles.avatar}
+            accessibilityLabel={item.displayLabel ?? undefined}
+          />
+        )}
+        <View style={styles.cardMeta}>
+          <Text style={styles.cardUser}>{item.displayLabel ?? '—'}</Text>
+          <Text style={styles.cardLabel}>{t('feed.finishedReading')}</Text>
+        </View>
+        {showAction && !isSelf && (
+          <TouchableOpacity
+            testID={isFollowing ? `unfollow-${item.userId}` : `follow-${item.userId}`}
+            style={[styles.actionButton, isFollowing && styles.receivingButton]}
+            onPress={() => (isFollowing ? onUnfollow(item.userId) : onFollow(item.userId))}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.actionButtonText, isFollowing && styles.receivingButtonText]}>
+              {isFollowing ? t('friends.following') : t('friends.follow')}
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <Text style={styles.cardTitle}>{item.title}</Text>
+    </View>
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Screen
+// ---------------------------------------------------------------------------
 
 export default function FeedScreen() {
-  const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const tabBarInset = useGlassTabBarInset();
-  const { user } = useAuth();
-
-  const [followingUids, setFollowingUids] = useState<string[]>([]);
-  const [items, setItems] = useState<ReadingActivity[]>([]);
-  const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  useEffect(() => {
-    if (!user?.uid) return;
-    getFollowingUids(user.uid)
-      .then((uids) => {
-        setFollowingUids(uids);
-        if (uids.length === 0) return null;
-        return getFriendsFeed(uids, null);
-      })
-      .then((page) => {
-        if (!page) return;
-        setItems(page.items);
-        setLastDoc(page.lastDoc);
-      })
-      .catch(() => {
-        // Network or permission error — feed stays empty
-      });
-  }, [user?.uid]);
-
-  const handleLoadMore = useCallback(() => {
-    if (isLoadingMore || !lastDoc || followingUids.length === 0) return;
-    setIsLoadingMore(true);
-    getFriendsFeed(followingUids, lastDoc)
-      .then((page) => {
-        setItems((prev) => [...prev, ...page.items]);
-        setLastDoc(page.lastDoc);
-      })
-      .catch(() => {
-        // Network error — user can retry by scrolling again
-      })
-      .finally(() => {
-        setIsLoadingMore(false);
-      });
-  }, [isLoadingMore, lastDoc, followingUids]);
+  const {
+    activeTab,
+    handleTabChange,
+    timelineItems,
+    isLoadingTimeline,
+    isLoadingMore,
+    timelineError,
+    handleLoadMoreTimeline,
+    followingUids,
+    handleFollow,
+    handleUnfollow,
+    updatesItems,
+    isLoadingUpdates,
+    updatesError,
+    isLoadingUpdatesMore,
+    handleLoadMoreUpdates,
+    currentUid,
+  } = useFeedState();
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
-      {items.length > 0 ? (
+      <View style={styles.toggleBar} testID="toggle-bar" accessibilityRole="tablist">
+        <TouchableOpacity
+          testID="tab-timeline"
+          style={[styles.toggleButton, activeTab === 'timeline' && styles.toggleButtonActive]}
+          onPress={() => handleTabChange('timeline')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'timeline' }}
+        >
+          <Text style={[styles.toggleText, activeTab === 'timeline' && styles.toggleTextActive]}>
+            {t('friends.timelineTab')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          testID="tab-updates"
+          style={[styles.toggleButton, activeTab === 'updates' && styles.toggleButtonActive]}
+          onPress={() => handleTabChange('updates')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'updates' }}
+        >
+          <Text style={[styles.toggleText, activeTab === 'updates' && styles.toggleTextActive]}>
+            {t('friends.updatesTab')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {activeTab === 'timeline' ? (
+        isLoadingTimeline ? (
+          <View style={styles.center}>
+            <ActivityIndicator color={yomoyoColors.primary} />
+          </View>
+        ) : timelineError ? (
+          <View style={styles.center}>
+            <Text style={styles.emptyBody}>{t('friends.loadErrorBody')}</Text>
+          </View>
+        ) : timelineItems.length === 0 ? (
+          <View style={styles.center}>
+            <Text style={styles.emptyTitle}>{t('friends.timelineEmptyTitle')}</Text>
+            <Text style={styles.emptyBody}>{t('friends.timelineEmptyBody')}</Text>
+          </View>
+        ) : (
+          <FlatList
+            testID="timeline-list"
+            data={timelineItems}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+            onEndReached={handleLoadMoreTimeline}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.loader} /> : null}
+            renderItem={({ item }) => (
+              <TimelineCard
+                item={item}
+                isFollowing={followingUids.has(item.userId)}
+                isSelf={item.userId === currentUid}
+                showAction={true}
+                onFollow={handleFollow}
+                onUnfollow={handleUnfollow}
+              />
+            )}
+          />
+        )
+      ) : isLoadingUpdates ? (
+        <View style={styles.center}>
+          <ActivityIndicator color={yomoyoColors.primary} />
+        </View>
+      ) : updatesError ? (
+        <View style={styles.center}>
+          <Text style={styles.emptyBody}>{t('friends.loadErrorBody')}</Text>
+        </View>
+      ) : updatesItems.length === 0 ? (
+        <View style={styles.center}>
+          <Text style={styles.emptyTitle}>{t('friends.updatesEmptyTitle')}</Text>
+          <Text style={styles.emptyBody}>{t('friends.updatesEmptyBody')}</Text>
+        </View>
+      ) : (
         <FlatList
-          testID="friends-feed-list"
-          data={items}
+          testID="updates-list"
+          data={updatesItems}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
-          onEndReached={handleLoadMore}
+          onEndReached={handleLoadMoreUpdates}
           onEndReachedThreshold={0.3}
-          ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.loader} /> : null}
+          ListFooterComponent={
+            isLoadingUpdatesMore ? <ActivityIndicator style={styles.loader} /> : null
+          }
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.cardUser}>{item.displayLabel ?? 'Someone'}</Text>
-              <Text style={styles.cardLabel}>{t('feed.finishedReading')}</Text>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-            </View>
+            <TimelineCard
+              item={item}
+              isFollowing={true}
+              isSelf={item.userId === currentUid}
+              showAction={false}
+              onFollow={handleFollow}
+              onUnfollow={handleUnfollow}
+            />
           )}
         />
-      ) : (
-        <View style={styles.center}>
-          <Text style={styles.title}>{t('feed.emptyTitle')}</Text>
-          <Text style={styles.body}>{t('feed.emptyBody')}</Text>
-          <TouchableOpacity
-            style={styles.button}
-            accessibilityRole="button"
-            onPress={() => navigation.navigate('BookSearch')}
-          >
-            <Text style={styles.buttonText}>{t('feed.searchBooks')}</Text>
-          </TouchableOpacity>
-        </View>
       )}
     </ScreenContainer>
   );
 }
 
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
+
 const styles = StyleSheet.create({
+  toggleBar: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    backgroundColor: yomoyoColors.border,
+    borderRadius: 10,
+    padding: 3,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  toggleButtonActive: {
+    backgroundColor: yomoyoColors.surface,
+  },
+  toggleText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: yomoyoColors.secondaryText,
+  },
+  toggleTextActive: {
+    color: yomoyoColors.text,
+    fontWeight: '600',
+  },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 32,
   },
-  title: {
+  emptyTitle: {
     fontSize: yomoyoTypography.screenTitleSize,
     fontWeight: yomoyoTypography.titleWeight,
     color: yomoyoColors.text,
     textAlign: 'center',
     marginBottom: 12,
   },
-  body: {
+  emptyBody: {
     fontSize: yomoyoTypography.screenBodySize,
     lineHeight: yomoyoTypography.screenBodyLineHeight,
     color: yomoyoColors.secondaryText,
     textAlign: 'center',
-    marginBottom: 32,
-  },
-  button: {
-    backgroundColor: yomoyoColors.primary,
-    height: 52,
-    borderRadius: 14,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.buttonWeight,
   },
   list: { padding: 16 },
   loader: { marginVertical: 16 },
@@ -142,20 +265,52 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 10,
+  },
+  cardMeta: {
+    flex: 1,
+  },
   cardUser: {
     fontSize: yomoyoTypography.screenBodySize,
     fontWeight: yomoyoTypography.buttonWeight,
     color: yomoyoColors.text,
-    marginBottom: 2,
   },
   cardLabel: {
     fontSize: 12,
     color: yomoyoColors.muted,
-    marginBottom: 4,
+    marginTop: 2,
   },
   cardTitle: {
     fontSize: yomoyoTypography.screenBodySize,
     fontWeight: yomoyoTypography.buttonWeight,
     color: yomoyoColors.text,
+  },
+  actionButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: yomoyoColors.primary,
+  },
+  receivingButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: yomoyoColors.border,
+  },
+  actionButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: yomoyoColors.surface,
+  },
+  receivingButtonText: {
+    color: yomoyoColors.muted,
   },
 });

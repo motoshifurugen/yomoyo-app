@@ -8,12 +8,20 @@ const ja = {
   feed: {
     searchBooks: '本を探す',
     emptyTitle: '読書フィードは、まだ静かです',
-    emptyBody: '友だちが本を読み終えると、ここにお便りが届きます。',
+    emptyBody: 'タイムラインで読書記録を見つけてみましょう。',
     finishedReading: '読み終えました',
   },
   friends: {
-    emptyTitle: '読書仲間を見つけよう',
-    emptyBody: '友だちをフォローすると、読み終えた本がここに届きます。',
+    timelineTab: 'みんなの記録',
+    updatesTab: 'おたより',
+    timelineEmptyTitle: 'まだ読書記録がありません',
+    timelineEmptyBody: '他のリーダーの読書記録がここに表示されます。',
+    updatesEmptyTitle: 'まだおたよりはありません',
+    updatesEmptyBody: 'タイムラインで他のリーダーを探しましょう。',
+    follow: 'おたよりを受け取る',
+    following: '受け取り中',
+    unfollow: '受け取りをやめる',
+    loadErrorBody: '読み込みに失敗しました。もう一度お試しください。',
   },
   bookSearch: {
     placeholder: 'タイトルや著者で検索',

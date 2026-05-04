@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import RootNavigator from '@/navigation/RootNavigator';
 import * as useAuthModule from '@/hooks/useAuth';
@@ -65,11 +65,13 @@ describe('RootNavigator', () => {
     expect(await screen.findByText('AppNavigator')).toBeTruthy();
   });
 
-  it('shows nothing while auth state is loading', () => {
+  it('shows nothing while auth state is loading', async () => {
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: true });
     renderWithNav();
-    expect(screen.queryByText('LoginScreen')).toBeNull();
-    expect(screen.queryByText('AppNavigator')).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByText('LoginScreen')).toBeNull();
+      expect(screen.queryByText('AppNavigator')).toBeNull();
+    });
   });
 
   it('shows OnboardingNavigator on first launch', async () => {

@@ -2,7 +2,6 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import FeedScreen from '@/screens/FeedScreen';
-import FriendsScreen from '@/screens/FriendsScreen';
 import ShelfScreen from '@/screens/ShelfScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 import { MainTabParamList } from './types';
@@ -31,7 +30,6 @@ export default function MainTabNavigator() {
       }}
     >
       <Tab.Screen name="Feed" component={FeedScreen} options={{ title: t('tabs.feed') }} />
-      <Tab.Screen name="Friends" component={FriendsScreen} options={{ title: t('tabs.friends') }} />
       <Tab.Screen name="Shelf" component={ShelfScreen} options={{ title: t('tabs.shelf') }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('tabs.settings') }} />
     </Tab.Navigator>

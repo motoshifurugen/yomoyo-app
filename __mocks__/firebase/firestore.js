@@ -15,6 +15,7 @@ const mockServerTimestamp = jest.fn(() => ({ _isServerTimestamp: true }));
 const mockGetDoc = jest.fn(() =>
   Promise.resolve({ exists: () => false, data: () => undefined }),
 );
+const mockDeleteDoc = jest.fn(() => Promise.resolve());
 
 module.exports = {
   getFirestore: mockGetFirestore,
@@ -22,6 +23,7 @@ module.exports = {
   doc: mockDoc,
   setDoc: mockSetDoc,
   updateDoc: mockUpdateDoc,
+  deleteDoc: mockDeleteDoc,
   getDocs: mockGetDocs,
   where: mockWhere,
   orderBy: mockOrderBy,

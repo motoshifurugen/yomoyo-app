@@ -8,12 +8,20 @@ const en = {
   feed: {
     searchBooks: 'Search books',
     emptyTitle: 'Your reading feed is quiet',
-    emptyBody: 'When friends finish books, their notes will appear here.',
+    emptyBody: 'Visit the Timeline to find readers and receive their updates here.',
     finishedReading: 'Finished reading',
   },
   friends: {
-    emptyTitle: 'Find your reading people',
-    emptyBody: 'Follow friends to see the books they finish.',
+    timelineTab: 'Timeline',
+    updatesTab: 'Updates',
+    timelineEmptyTitle: 'No reading activity yet',
+    timelineEmptyBody: 'Reading activity from other readers will appear here.',
+    updatesEmptyTitle: 'No updates yet',
+    updatesEmptyBody: 'Visit the Timeline to discover other readers.',
+    follow: 'Receive updates',
+    following: 'Receiving updates',
+    unfollow: 'Stop receiving',
+    loadErrorBody: 'Something went wrong. Please try again.',
   },
   bookSearch: {
     placeholder: 'Search by title or author',
