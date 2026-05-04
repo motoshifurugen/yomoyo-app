@@ -19,28 +19,33 @@ const book: Book = {
   thumbnail: 'https://example.com/cover.jpg',
 };
 
+const presenter = {
+  displayLabel: 'Alice',
+  displayAvatar: 'https://example.com/avatar.jpg',
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
 describe('markAsFinished', () => {
   it('writes to the readingActivities path', async () => {
-    await markAsFinished('user1', book);
+    await markAsFinished('user1', book, presenter);
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', expect.any(String));
   });
 
   it('uses a deterministic doc ID derived from userId and bookId', async () => {
-    await markAsFinished('user1', book);
+    await markAsFinished('user1', book, presenter);
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'readingActivities', 'user1_book123');
   });
 
   it('calls setDoc (not updateDoc)', async () => {
-    await markAsFinished('user1', book);
+    await markAsFinished('user1', book, presenter);
     expect(jest.mocked(setDoc)).toHaveBeenCalled();
   });
 
-  it('stores userId, bookId, title, authors, thumbnail, finishedAt, and status finished', async () => {
-    await markAsFinished('user1', book);
+  it('stores all book fields, presenter fields, finishedAt, and status', async () => {
+    await markAsFinished('user1', book, presenter);
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
       {
@@ -51,25 +56,35 @@ describe('markAsFinished', () => {
         thumbnail: 'https://example.com/cover.jpg',
         finishedAt: expect.anything(),
         status: 'finished',
+        displayLabel: 'Alice',
+        displayAvatar: 'https://example.com/avatar.jpg',
       },
     );
   });
 
   it('stores null thumbnail when book has no cover', async () => {
-    await markAsFinished('user1', { ...book, thumbnail: null });
+    await markAsFinished('user1', { ...book, thumbnail: null }, presenter);
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ thumbnail: null }),
     );
   });
 
+  it('stores null displayAvatar when presenter has no avatar', async () => {
+    await markAsFinished('user1', book, { displayLabel: 'Alice', displayAvatar: null });
+    expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ displayAvatar: null }),
+    );
+  });
+
   it('uses serverTimestamp for finishedAt', async () => {
-    await markAsFinished('user1', book);
+    await markAsFinished('user1', book, presenter);
     expect(jest.mocked(serverTimestamp)).toHaveBeenCalled();
   });
 
   it('resolves without error', async () => {
-    await expect(markAsFinished('user1', book)).resolves.toBeUndefined();
+    await expect(markAsFinished('user1', book, presenter)).resolves.toBeUndefined();
   });
 });
 
@@ -104,6 +119,8 @@ describe('subscribeToReadingActivities', () => {
               thumbnail: 'https://example.com/cover.jpg',
               status: 'finished',
               finishedAt: null,
+              displayLabel: 'Alice',
+              displayAvatar: null,
             }),
           },
         ],
@@ -124,6 +141,8 @@ describe('subscribeToReadingActivities', () => {
         thumbnail: 'https://example.com/cover.jpg',
         status: 'finished',
         finishedAt: null,
+        displayLabel: 'Alice',
+        displayAvatar: null,
       },
     ]);
   });

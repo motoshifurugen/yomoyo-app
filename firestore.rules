@@ -2,10 +2,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /readingActivities/{docId} {
-      // Only the owning user can read or write their own activities
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Any authenticated user can read activities (needed for the friends feed)
+      allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
       allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    match /follows/{docId} {
+      // Any authenticated user can read follows (needed to resolve the following list)
+      allow read: if request.auth != null;
+      // Only the follower can manage their own follow records
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.followerId;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.followerId;
     }
   }
 }
