@@ -12,6 +12,9 @@ const mockQuery = jest.fn((...args) => args[0]);
 const mockUnsubscribe = jest.fn();
 const mockOnSnapshot = jest.fn(() => mockUnsubscribe);
 const mockServerTimestamp = jest.fn(() => ({ _isServerTimestamp: true }));
+const mockGetDoc = jest.fn(() =>
+  Promise.resolve({ exists: () => false, data: () => undefined }),
+);
 
 module.exports = {
   getFirestore: mockGetFirestore,
@@ -27,4 +30,5 @@ module.exports = {
   query: mockQuery,
   onSnapshot: mockOnSnapshot,
   serverTimestamp: mockServerTimestamp,
+  getDoc: mockGetDoc,
 };

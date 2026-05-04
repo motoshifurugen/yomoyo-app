@@ -25,7 +25,7 @@ export default function OnboardingWelcomeScreen() {
     setError(null);
     try {
       await signInWithGoogle();
-      navigation.navigate('OnboardingNotification');
+      navigation.navigate('OnboardingAvatar');
     } catch (e) {
       if (e instanceof Error && e.message.includes('cancelled')) return;
       setError(t('onboarding.signInError'));
@@ -36,7 +36,7 @@ export default function OnboardingWelcomeScreen() {
     setError(null);
     try {
       await signInWithApple();
-      navigation.navigate('OnboardingNotification');
+      navigation.navigate('OnboardingAvatar');
     } catch (e) {
       if (e && typeof e === 'object' && 'code' in e && (e as any).code === appleAuth.Error.CANCELED) return;
       setError(t('onboarding.signInError'));

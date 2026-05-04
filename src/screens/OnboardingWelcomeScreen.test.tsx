@@ -72,7 +72,7 @@ describe('OnboardingWelcomeScreen', () => {
     render(<OnboardingWelcomeScreen />);
     fireEvent.press(screen.getByText('Continue with Google'));
     await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification')
+      expect(mockNavigate).toHaveBeenCalledWith('OnboardingAvatar')
     );
   });
 
@@ -88,7 +88,7 @@ describe('OnboardingWelcomeScreen', () => {
     render(<OnboardingWelcomeScreen />);
     fireEvent.press(screen.getByTestId('apple-signin-button'));
     await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification')
+      expect(mockNavigate).toHaveBeenCalledWith('OnboardingAvatar')
     );
   });
 
