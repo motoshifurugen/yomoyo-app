@@ -35,13 +35,14 @@ Patches in `plugins/` survive regeneration; hand edits do not.
   and `CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES` for those targets
 
 ### `useFrameworks: "static"` policy
-Currently set in `expo-build-properties` (`app.json`). Kept because it is required for
-RNFBApp/RNFBAuth static linking. Evaluate removing it after confirming no other native
-module depends on it. If it is removed, `plugins/withFirebaseStaticFramework.js` and
-the `$RNFirebaseAsStaticFramework` global can also be removed.
+**Must remain.** Evaluated for removal in Phase 2 after Firestore migration (2025-05).
+The blocker is Google's own Firebase iOS SDK: `FirebaseAuth` contains Swift code and
+cannot be integrated as a static library without `use_frameworks!`. This is a constraint
+of Google's SDK, not our code. Removing it fails at `pod install` before any build.
 
-Do not add new native pods that require static framework workarounds without explicit
-approval.
+Do not attempt to remove `useFrameworks: "static"` again unless Google ships a
+Swift-free or XCFramework-based `FirebaseAuth` that works without it.
+Do not add new native pods that require additional static framework workarounds.
 
 ---
 
