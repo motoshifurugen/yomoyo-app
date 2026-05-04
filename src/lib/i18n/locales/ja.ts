@@ -12,7 +12,7 @@ const ja = {
     finishedReading: '読み終えました',
   },
   friends: {
-    timelineTab: 'タイムライン',
+    timelineTab: 'みんなの記録',
     updatesTab: 'おたより',
     timelineEmptyTitle: 'まだ読書記録がありません',
     timelineEmptyBody: '他のリーダーの読書記録がここに表示されます。',
@@ -21,6 +21,7 @@ const ja = {
     follow: 'おたよりを受け取る',
     following: '受け取り中',
     unfollow: '受け取りをやめる',
+    loadErrorBody: '読み込みに失敗しました。もう一度お試しください。',
   },
   bookSearch: {
     placeholder: 'タイトルや著者で検索',

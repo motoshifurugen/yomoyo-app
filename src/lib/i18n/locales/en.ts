@@ -21,6 +21,7 @@ const en = {
     follow: 'Receive updates',
     following: 'Receiving updates',
     unfollow: 'Stop receiving',
+    loadErrorBody: 'Something went wrong. Please try again.',
   },
   bookSearch: {
     placeholder: 'Search by title or author',
