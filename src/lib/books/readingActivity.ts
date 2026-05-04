@@ -22,9 +22,16 @@ export type ReadingActivity = {
   thumbnail: string | null;
   status: 'finished';
   finishedAt: FirestoreTimestamp | null;
+  displayLabel?: string;
+  displayAvatar?: string | null;
 };
 
-export async function markAsFinished(userId: string, book: Book): Promise<void> {
+export type Presenter = {
+  displayLabel: string;
+  displayAvatar: string | null;
+};
+
+export async function markAsFinished(userId: string, book: Book, presenter: Presenter): Promise<void> {
   const db = getFirestore();
   const docRef = doc(db, 'readingActivities', `${userId}_${book.id}`);
   await setDoc(docRef, {
@@ -35,6 +42,8 @@ export async function markAsFinished(userId: string, book: Book): Promise<void> 
     thumbnail: book.thumbnail,
     finishedAt: serverTimestamp(),
     status: 'finished',
+    displayLabel: presenter.displayLabel,
+    displayAvatar: presenter.displayAvatar,
   });
 }
 

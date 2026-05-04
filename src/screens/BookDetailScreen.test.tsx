@@ -20,7 +20,15 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/hooks/useAuth', () => ({
-  useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
+  useAuth: () => ({
+    user: {
+      uid: 'user1',
+      displayName: 'Alice',
+      photoURL: 'https://example.com/avatar.jpg',
+      email: 'alice@example.com',
+    },
+    loading: false,
+  }),
 }));
 
 jest.mock('@/lib/books/readingActivity', () => ({
@@ -80,11 +88,36 @@ describe('BookDetailScreen', () => {
     expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
   });
 
-  it('calls markAsFinished with user uid and book when button is pressed', async () => {
+  it('calls markAsFinished with userId, book, and presenter when button is pressed', async () => {
     render(<BookDetailScreen />);
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
-      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook);
+      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
+        displayLabel: 'Alice',
+        displayAvatar: 'https://example.com/avatar.jpg',
+      });
+    });
+  });
+
+  it('uses email prefix as displayLabel fallback when displayName is null', async () => {
+    jest.mock('@/hooks/useAuth', () => ({
+      useAuth: () => ({
+        user: {
+          uid: 'user1',
+          displayName: null,
+          photoURL: null,
+          email: 'alice@example.com',
+        },
+        loading: false,
+      }),
+    }));
+
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
+    await waitFor(() => {
+      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, expect.objectContaining({
+        displayLabel: expect.any(String),
+      }));
     });
   });
 

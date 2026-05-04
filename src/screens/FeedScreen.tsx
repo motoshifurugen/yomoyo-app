@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import type { QueryDocumentSnapshot } from 'firebase/firestore';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import type { RootStackParamList } from '@/navigation/types';
 import { useAuth } from '@/hooks/useAuth';
-import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
+import { getFollowingUids } from '@/lib/users/follows';
+import { getFriendsFeed } from '@/lib/books/friendsFeed';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
@@ -18,28 +20,61 @@ export default function FeedScreen() {
   const { t } = useTranslation();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
-  const [activities, setActivities] = useState<ReadingActivity[]>([]);
 
-  const uid = user?.uid ?? null;
+  const [followingUids, setFollowingUids] = useState<string[]>([]);
+  const [items, setItems] = useState<ReadingActivity[]>([]);
+  const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
-    if (!uid) return;
-    const unsubscribe = subscribeToReadingActivities(uid, setActivities);
-    return unsubscribe;
-  }, [uid]);
+    if (!user?.uid) return;
+    getFollowingUids(user.uid)
+      .then((uids) => {
+        setFollowingUids(uids);
+        if (uids.length === 0) return null;
+        return getFriendsFeed(uids, null);
+      })
+      .then((page) => {
+        if (!page) return;
+        setItems(page.items);
+        setLastDoc(page.lastDoc);
+      })
+      .catch(() => {
+        // Network or permission error — feed stays empty
+      });
+  }, [user?.uid]);
+
+  const handleLoadMore = useCallback(() => {
+    if (isLoadingMore || !lastDoc || followingUids.length === 0) return;
+    setIsLoadingMore(true);
+    getFriendsFeed(followingUids, lastDoc)
+      .then((page) => {
+        setItems((prev) => [...prev, ...page.items]);
+        setLastDoc(page.lastDoc);
+      })
+      .catch(() => {
+        // Network error — user can retry by scrolling again
+      })
+      .finally(() => {
+        setIsLoadingMore(false);
+      });
+  }, [isLoadingMore, lastDoc, followingUids]);
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
-      {activities.length > 0 ? (
+      {items.length > 0 ? (
         <FlatList
-          data={activities}
+          testID="friends-feed-list"
+          data={items}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.loader} /> : null}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Text style={styles.cardLabel}>
-                {t('feed.finishedReading')}
-              </Text>
+              <Text style={styles.cardUser}>{item.displayLabel ?? 'Someone'}</Text>
+              <Text style={styles.cardLabel}>{t('feed.finishedReading')}</Text>
               <Text style={styles.cardTitle}>{item.title}</Text>
             </View>
           )}
@@ -95,6 +130,7 @@ const styles = StyleSheet.create({
     fontWeight: yomoyoTypography.buttonWeight,
   },
   list: { padding: 16 },
+  loader: { marginVertical: 16 },
   card: {
     backgroundColor: yomoyoColors.surface,
     borderRadius: 12,
@@ -105,6 +141,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
+  },
+  cardUser: {
+    fontSize: yomoyoTypography.screenBodySize,
+    fontWeight: yomoyoTypography.buttonWeight,
+    color: yomoyoColors.text,
+    marginBottom: 2,
   },
   cardLabel: {
     fontSize: 12,

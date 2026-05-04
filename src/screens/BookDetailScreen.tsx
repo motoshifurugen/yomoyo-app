@@ -14,6 +14,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
 import { markAsFinished } from '@/lib/books/readingActivity';
+import type { Presenter } from '@/lib/books/readingActivity';
 
 type RouteType = RouteProp<RootStackParamList, 'BookDetail'>;
 
@@ -29,7 +30,11 @@ export default function BookDetailScreen() {
     if (!user || isLoading || hasFinished) return;
     setIsLoading(true);
     try {
-      await markAsFinished(user.uid, book);
+      const presenter: Presenter = {
+        displayLabel: user.displayName ?? user.email?.split('@')[0] ?? 'Reader',
+        displayAvatar: user.photoURL ?? null,
+      };
+      await markAsFinished(user.uid, book, presenter);
       setHasFinished(true);
     } catch {
       // Write failed — button returns to idle so the user can retry
