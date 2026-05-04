@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { markOnboardingDone } from '@/lib/onboarding';
+import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
+import { useAuth } from '@/hooks/useAuth';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
 type Props = {
@@ -14,6 +16,7 @@ const videoSource = require('../../assets/videos/notification_loop.mp4');
 
 export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const player = useVideoPlayer(videoSource, (p) => {
     p.loop = true;
@@ -28,6 +31,11 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
       // permission request failure should not block onboarding completion
     }
     try {
+      if (user) await finalizeAvatarIdentity(user.uid);
+    } catch {
+      // finalization failure should not block onboarding completion
+    }
+    try {
       await markOnboardingDone();
     } catch {
       // storage failure should not block onboarding completion
@@ -36,6 +44,11 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
   };
 
   const handleSkip = async () => {
+    try {
+      if (user) await finalizeAvatarIdentity(user.uid);
+    } catch {
+      // finalization failure should not block onboarding completion
+    }
     try {
       await markOnboardingDone();
     } catch {

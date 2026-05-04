@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 import OnboardingNotificationScreen from './OnboardingNotificationScreen';
 import * as Notifications from 'expo-notifications';
 import { markOnboardingDone } from '@/lib/onboarding';
+import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { useVideoPlayer } from 'expo-video';
 
 jest.mock('expo-notifications');
@@ -10,6 +11,14 @@ jest.mock('expo-video');
 
 jest.mock('@/lib/onboarding', () => ({
   markOnboardingDone: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/users/avatarIdentity', () => ({
+  finalizeAvatarIdentity: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -63,6 +72,32 @@ describe('OnboardingNotificationScreen', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
     await waitFor(() => expect(markOnboardingDone).toHaveBeenCalled());
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('finalizes avatar identity when allow is pressed', async () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(finalizeAvatarIdentity).toHaveBeenCalledWith('user1'));
+  });
+
+  it('finalizes avatar identity when skip is pressed', async () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.skipLink'));
+    await waitFor(() => expect(finalizeAvatarIdentity).toHaveBeenCalledWith('user1'));
+  });
+
+  it('still completes onboarding if finalizeAvatarIdentity throws during allow', async () => {
+    (finalizeAvatarIdentity as jest.Mock).mockRejectedValueOnce(new Error('network error'));
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('still completes onboarding if finalizeAvatarIdentity throws during skip', async () => {
+    (finalizeAvatarIdentity as jest.Mock).mockRejectedValueOnce(new Error('network error'));
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.skipLink'));
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
   });
 

@@ -35,6 +35,20 @@ jest.mock('@/lib/books/readingActivity', () => ({
   markAsFinished: jest.fn(() => Promise.resolve()),
 }));
 
+jest.mock('@/lib/users/avatarIdentity', () => ({
+  getAvatarIdentity: jest.fn(() =>
+    Promise.resolve({
+      animalKey: 'fox',
+      adjective: 'Quiet',
+      displayLabel: 'Quiet Fox',
+      finalizedAt: null,
+    }),
+  ),
+}));
+
+import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
+const mockGetAvatarIdentity = getAvatarIdentity as jest.Mock;
+
 import { markAsFinished } from '@/lib/books/readingActivity';
 const mockMarkAsFinished = markAsFinished as jest.Mock;
 
@@ -46,6 +60,7 @@ describe('BookDetailScreen', () => {
       name: 'BookDetail',
     });
     mockMarkAsFinished.mockClear();
+    mockGetAvatarIdentity.mockClear();
   });
 
   it('renders the book title', () => {
@@ -88,7 +103,19 @@ describe('BookDetailScreen', () => {
     expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
   });
 
-  it('calls markAsFinished with userId, book, and presenter when button is pressed', async () => {
+  it('uses avatar identity displayLabel as presenter when avatar identity exists', async () => {
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
+    await waitFor(() => {
+      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
+        displayLabel: 'Quiet Fox',
+        displayAvatar: null,
+      });
+    });
+  });
+
+  it('falls back to Firebase Auth displayName when no avatar identity exists', async () => {
+    mockGetAvatarIdentity.mockResolvedValueOnce(null);
     render(<BookDetailScreen />);
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
@@ -96,28 +123,6 @@ describe('BookDetailScreen', () => {
         displayLabel: 'Alice',
         displayAvatar: 'https://example.com/avatar.jpg',
       });
-    });
-  });
-
-  it('uses email prefix as displayLabel fallback when displayName is null', async () => {
-    jest.mock('@/hooks/useAuth', () => ({
-      useAuth: () => ({
-        user: {
-          uid: 'user1',
-          displayName: null,
-          photoURL: null,
-          email: 'alice@example.com',
-        },
-        loading: false,
-      }),
-    }));
-
-    render(<BookDetailScreen />);
-    fireEvent.press(screen.getByText('shelf.markAsFinished'));
-    await waitFor(() => {
-      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, expect.objectContaining({
-        displayLabel: expect.any(String),
-      }));
     });
   });
 
