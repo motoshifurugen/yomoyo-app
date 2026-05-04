@@ -1,6 +1,13 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, fireEvent } from '@testing-library/react-native';
 import ShelfScreen from './ShelfScreen';
+
+const mockNavigate = jest.fn();
+const mockSetOptions = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
+}));
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
@@ -36,6 +43,8 @@ describe('ShelfScreen', () => {
   beforeEach(() => {
     mockSubscribe.mockClear();
     mockSubscribe.mockReturnValue(jest.fn());
+    mockNavigate.mockClear();
+    mockSetOptions.mockClear();
   });
 
   it('does not render the Currently Reading section', () => {
@@ -115,5 +124,32 @@ describe('ShelfScreen', () => {
     });
     render(<ShelfScreen />);
     expect(screen.queryByText('shelf.markAsFinished')).toBeNull();
+  });
+
+  it('shows an add-book CTA button in the empty state', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByText('shelf.addBook')).toBeTruthy();
+  });
+
+  it('navigates to BookSearch when the empty-state CTA is pressed', () => {
+    render(<ShelfScreen />);
+    fireEvent.press(screen.getByText('shelf.addBook'));
+    expect(mockNavigate).toHaveBeenCalledWith('BookSearch');
+  });
+
+  it('hides the empty-state CTA when finished activities exist', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([finishedActivity]);
+      return jest.fn();
+    });
+    render(<ShelfScreen />);
+    expect(screen.queryByText('shelf.addBook')).toBeNull();
+  });
+
+  it('registers a headerRight button via navigation.setOptions', () => {
+    render(<ShelfScreen />);
+    expect(mockSetOptions).toHaveBeenCalledWith(
+      expect.objectContaining({ headerRight: expect.any(Function) })
+    );
   });
 });

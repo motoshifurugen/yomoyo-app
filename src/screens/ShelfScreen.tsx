@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
@@ -7,9 +9,13 @@ import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import type { RootStackParamList } from '@/navigation/types';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function ShelfScreen() {
   const { t } = useTranslation();
+  const navigation = useNavigation<NavigationProp>();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
@@ -21,12 +27,36 @@ export default function ShelfScreen() {
     return unsubscribe;
   }, [user?.uid]);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('BookSearch')}
+          accessibilityRole="button"
+          accessibilityLabel={t('shelf.addBook')}
+          style={styles.headerButton}
+        >
+          <Text style={styles.headerButtonText}>+</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, t]);
+
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
         {activities.length === 0 ? (
-          <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
+          <>
+            <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate('BookSearch')}
+              accessibilityRole="button"
+            >
+              <Text style={styles.addButtonText}>{t('shelf.addBook')}</Text>
+            </TouchableOpacity>
+          </>
         ) : (
           activities.map((item) => (
             <View key={item.id} style={styles.card}>
@@ -109,5 +139,26 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 13,
     color: yomoyoColors.muted,
+  },
+  addButton: {
+    marginTop: 16,
+    backgroundColor: yomoyoColors.primary,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignSelf: 'flex-start',
+  },
+  addButtonText: {
+    color: yomoyoColors.surface,
+    fontSize: yomoyoTypography.screenBodySize,
+    fontWeight: yomoyoTypography.buttonWeight,
+  },
+  headerButton: {
+    paddingHorizontal: 8,
+  },
+  headerButtonText: {
+    fontSize: 24,
+    color: yomoyoColors.primary,
+    lineHeight: 28,
   },
 });
