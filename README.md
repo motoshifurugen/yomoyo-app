@@ -90,110 +90,83 @@ When adding or updating a screen or component, update both `src/lib/i18n/locales
 4. Review → merge → close issue
 5. Significant decisions get a comment in the issue; no separate decision documents
 
-## iOSアプリ起動・開発手順
+## Development Setup
 
-**前提ツール:** Node.js、pnpm、Xcode（iOS）
+**Prerequisites:** Node.js, pnpm, Xcode (for iOS)
 
-### 1. pnpmインストール
-```sh
-brew install pnpm
-```
-
-### 2. 依存関係のインストール
+### 1. Install dependencies
 
 ```sh
 pnpm install
 ```
 
-依存関係でエラーが出る場合、以下で手動承認
+If prompted to approve native build scripts:
+
 ```sh
 pnpm approve-builds
 ```
 
-### 3. 環境変数と Firebase / Google Sign-In の設定
-
-#### 2-1. 環境変数
-`.env.example` を `.env` にコピーし、必要な値を設定します。
+### 2. Configure environment
 
 ```sh
 cp .env.example .env
 ```
 
-最低限、以下を設定する。
-- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`
+Fill in all values. Key items:
 
-[Google Cloud(yomoyo)](https://console.cloud.google.com/welcome?project=yomoyo-d9c4a) > APIとサービス > 認証情報 > OAuth 2.0 クライアント ID のウェブアプリケーションタイプ
+- `IOS_BUNDLE_IDENTIFIER` / `ANDROID_PACKAGE_NAME` — use your own unique ID (e.g. `com.yourname.yomoyo`) to avoid collisions with other developers
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — Google Cloud Console → Credentials → OAuth 2.0 → Web application
+- `EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY` — Google Cloud Console → Credentials → API key
+- `EXPO_PUBLIC_FIREBASE_*` — Firebase Console → Project settings → Your apps → `GoogleService-Info.plist`
 
-#### 2-2. Firebase 設定ファイル
-Firebase Console から取得した以下のファイルを **プロジェクトルート** に配置します。（以下ファイルはGitで管理しないこと）
+### 3. Place Firebase config files
 
-- `google-services.json`
+Get these from the Firebase Console and place them at the project root (do not commit):
+
 - `GoogleService-Info.plist`
+- `google-services.json`
 
-### 4. iPhone実機検証用設定
-
-socatをインストール
-```sh
-brew install socat
-```
-
-```sh
-socat TCP-LISTEN:7431,bind=172.20.10.9,fork,reuseaddr TCP:127.0.0.1:7430
-```
-
-このターミナルは閉じない。
-
-### 5. ビルドする
+### 4. Build native project
 
 ```sh
 pnpm run prebuild
+cd ios && pod install && cd ..
 ```
 
-### 6. iOS で起動する
+### 5. Run on device
 
-実機を使う場合は、iPhone を Mac に接続し、必要に応じて「このコンピュータを信頼」を許可してから実行
+Connect your iOS device, then:
 
 ```sh
 pnpm run ios
 ```
 
-※ 2回目以降、ネイティブに依存しない機能のみの変更時は以下で十分
+---
+
+## Daily Development
+
+**JS-only changes** — no native rebuild needed:
 
 ```sh
 pnpm run start
 ```
 
-## トラブル・シューティング
+**After env-only changes** (`EXPO_PUBLIC_*` values) — clear Metro cache:
 
-カフェ・ホテル・ネットカフェなどの公共Wi-Fiでは、同じWi-Fiに接続していても端末同士の通信がブロックされている場合がある。
-その場合、MacとiPhoneが同じWi-Fiに接続されていても、--host lan で開発ビルドアプリに接続できないことがあります。
+```sh
+pnpm run start --clear
+```
 
-推奨対応：iPhoneのテザリングを使う
+**After native changes** (new packages with native modules, plugin config, or `.env` identifier changes):
 
-1. Expoが起動中の場合は停止する
-    Expoを起動しているターミナルで Ctrl + C を押す。
-2. iPhoneのテザリングをONにする
-3. MacをiPhoneのテザリングWi-Fiに接続する
-4. MacのIPアドレスを確認する
-    ipconfig getifaddr en0
-    期待例：172.20.10.x
-5. ExpoをLANモードで起動する
-    npx expo start --dev-client --host lan --clear
-6. iPhoneのSafariでMetroに接続できるか確認する
-    http://<Mac IP>:8081
-    例：
-    http://172.20.10.9:8081
-    JSONが表示されれば接続OK。
-7. iPhoneでYomoyoのDevelopment Buildアプリを開く
-8. Enter URL manually をタップする
-9. Safariで確認したものと同じMetro URLを入力する
-    http://<Mac IP>:8081
-    例：
-    http://172.20.10.9:8081
+```sh
+pnpm run prebuild
+cd ios && pod install && cd ..
+pnpm run ios
+```
 
-注意
+---
 
-* テザリングに切り替えた後は、公共Wi-Fi側のIPを使わない。
-* ネットワークを切り替えた後は、Expoを再起動する。
-* アプリが古いIPに接続しようとする場合は、Development Buildアプリを完全終了してから、新しいURLを手入力する。
-* --host tunnel はngrokに依存するため、ネットワーク環境によって失敗することがある。
+## Network Issues
+
+If your device cannot reach Metro on the local network, switch your Mac to your iPhone's personal hotspot and restart Metro. Tunnel mode (`--host tunnel`) is a last resort.

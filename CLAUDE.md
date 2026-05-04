@@ -61,6 +61,17 @@ EXPO_PUBLIC_FIREBASE_APP_ID=
 
 ---
 
+## App Config and Bundle Identifiers
+
+`app.config.ts` overrides `app.json` with env-driven bundle identifiers:
+- `IOS_BUNDLE_IDENTIFIER` → `ios.bundleIdentifier` (fallback: `com.furugenisland.yomoyo`)
+- `ANDROID_PACKAGE_NAME` → `android.package` (fallback: `com.furugenisland.yomoyo`)
+
+All other shared config (plugins, Firebase setup, splash, icons) stays in `app.json`.
+Do not add developer-specific values to `app.json`. Add them as env vars in `.env.example`.
+
+---
+
 ## Test Setup
 
 `firebase/firestore` and `firebase/app` are mapped to manual mocks via `moduleNameMapper`
