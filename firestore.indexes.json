@@ -1,0 +1,30 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "readingActivities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "finishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "readingActivities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "finishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "readingActivities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "finishedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

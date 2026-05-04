@@ -38,7 +38,9 @@ export function useFeedState() {
         setTimelineLastDoc(page.lastDoc);
         setFollowingUids(new Set(uids));
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        const e = err as { code?: string; message?: string };
+        console.error('[FeedScreen] timeline load failed — code:', e?.code, '— message:', e?.message, err);
         setTimelineError(true);
       })
       .finally(() => setIsLoadingTimeline(false));
@@ -58,7 +60,9 @@ export function useFeedState() {
         setUpdatesLastDoc(page.lastDoc);
         setUpdatesLoaded(true);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        const e = err as { code?: string; message?: string };
+        console.error('[FeedScreen] updates load failed — code:', e?.code, '— message:', e?.message, err);
         setUpdatesError(true);
       })
       .finally(() => setIsLoadingUpdates(false));
