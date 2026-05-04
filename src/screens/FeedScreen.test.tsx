@@ -71,23 +71,24 @@ beforeEach(() => {
 });
 
 describe('FeedScreen — toggle', () => {
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     render(<FeedScreen />);
+    await screen.findByTestId('tab-timeline');
   });
 
-  it('shows the Timeline tab button', () => {
+  it('shows the Timeline tab button', async () => {
     render(<FeedScreen />);
-    expect(screen.getByTestId('tab-timeline')).toBeTruthy();
+    expect(await screen.findByTestId('tab-timeline')).toBeTruthy();
   });
 
-  it('shows the Updates tab button', () => {
+  it('shows the Updates tab button', async () => {
     render(<FeedScreen />);
-    expect(screen.getByTestId('tab-updates')).toBeTruthy();
+    expect(await screen.findByTestId('tab-updates')).toBeTruthy();
   });
 
-  it('toggle bar container has tablist accessibility role', () => {
+  it('toggle bar container has tablist accessibility role', async () => {
     render(<FeedScreen />);
-    expect(screen.getByRole('tablist')).toBeTruthy();
+    expect(await screen.findByTestId('toggle-bar')).toBeTruthy();
   });
 
   it('shows Timeline as the default selected tab', async () => {

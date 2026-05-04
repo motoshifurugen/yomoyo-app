@@ -101,7 +101,7 @@ export default function FeedScreen() {
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
-      <View style={styles.toggleBar} accessibilityRole="tablist">
+      <View style={styles.toggleBar} testID="toggle-bar" accessibilityRole="tablist">
         <TouchableOpacity
           testID="tab-timeline"
           style={[styles.toggleButton, activeTab === 'timeline' && styles.toggleButtonActive]}
