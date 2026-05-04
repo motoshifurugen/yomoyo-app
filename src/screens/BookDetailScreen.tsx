@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
-import { startReading } from '@/lib/books/readingActivity';
+import { markAsFinished } from '@/lib/books/readingActivity';
 
 type RouteType = RouteProp<RootStackParamList, 'BookDetail'>;
 
@@ -22,15 +22,15 @@ export default function BookDetailScreen() {
   const route = useRoute<RouteType>();
   const { book } = route.params;
   const { user } = useAuth();
-  const [hasStarted, setHasStarted] = useState(false);
+  const [hasFinished, setHasFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleStartReading = async () => {
-    if (!user || isLoading || hasStarted) return;
+  const handleMarkAsFinished = async () => {
+    if (!user || isLoading || hasFinished) return;
     setIsLoading(true);
     try {
-      await startReading(user.uid, book);
-      setHasStarted(true);
+      await markAsFinished(user.uid, book);
+      setHasFinished(true);
     } catch {
       // Write failed — button returns to idle so the user can retry
     } finally {
@@ -52,13 +52,13 @@ export default function BookDetailScreen() {
         {book.authors.length > 0 ? book.authors.join(', ') : t('bookDetail.unknownAuthor')}
       </Text>
       <TouchableOpacity
-        style={[styles.button, (hasStarted || isLoading) && styles.buttonDone]}
-        onPress={handleStartReading}
-        disabled={hasStarted || isLoading}
+        style={[styles.button, (hasFinished || isLoading) && styles.buttonDone]}
+        onPress={handleMarkAsFinished}
+        disabled={hasFinished || isLoading}
         accessibilityRole="button"
       >
         <Text style={styles.buttonText}>
-          {hasStarted ? t('bookDetail.reading') : t('bookDetail.startReading')}
+          {hasFinished ? t('shelf.finished') : t('shelf.markAsFinished')}
         </Text>
       </TouchableOpacity>
     </ScrollView>

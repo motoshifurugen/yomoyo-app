@@ -3,7 +3,6 @@ import {
   collection,
   doc,
   setDoc,
-  updateDoc,
   query,
   where,
   orderBy,
@@ -12,7 +11,6 @@ import {
 } from 'firebase/firestore';
 import type { Book } from './searchBooks';
 
-// Minimal Firestore Timestamp shape needed for reading activity
 type FirestoreTimestamp = { toMillis: () => number; toDate: () => Date };
 
 export type ReadingActivity = {
@@ -22,14 +20,12 @@ export type ReadingActivity = {
   title: string;
   authors: string[];
   thumbnail: string | null;
-  startedAt: FirestoreTimestamp | null;
-  status?: 'reading' | 'finished';
-  finishedAt?: FirestoreTimestamp | null;
+  status: 'finished';
+  finishedAt: FirestoreTimestamp | null;
 };
 
-export async function startReading(userId: string, book: Book): Promise<void> {
+export async function markAsFinished(userId: string, book: Book): Promise<void> {
   const db = getFirestore();
-  // Deterministic doc ID prevents duplicate records for the same user+book
   const docRef = doc(db, 'readingActivities', `${userId}_${book.id}`);
   await setDoc(docRef, {
     userId,
@@ -37,17 +33,8 @@ export async function startReading(userId: string, book: Book): Promise<void> {
     title: book.title,
     authors: book.authors,
     thumbnail: book.thumbnail,
-    startedAt: serverTimestamp(),
-    status: 'reading',
-  });
-}
-
-export async function markAsFinished(userId: string, bookId: string): Promise<void> {
-  const db = getFirestore();
-  const docRef = doc(db, 'readingActivities', `${userId}_${bookId}`);
-  await updateDoc(docRef, {
-    status: 'finished',
     finishedAt: serverTimestamp(),
+    status: 'finished',
   });
 }
 
@@ -60,7 +47,8 @@ export function subscribeToReadingActivities(
   const q = query(
     collection(db, 'readingActivities'),
     where('userId', '==', userId),
-    orderBy('startedAt', 'desc'),
+    where('status', '==', 'finished'),
+    orderBy('finishedAt', 'desc'),
   );
   return onSnapshot(
     q,

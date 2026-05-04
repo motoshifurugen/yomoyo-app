@@ -24,11 +24,11 @@ jest.mock('@/hooks/useAuth', () => ({
 }));
 
 jest.mock('@/lib/books/readingActivity', () => ({
-  startReading: jest.fn(() => Promise.resolve()),
+  markAsFinished: jest.fn(() => Promise.resolve()),
 }));
 
-import { startReading } from '@/lib/books/readingActivity';
-const mockStartReading = startReading as jest.Mock;
+import { markAsFinished } from '@/lib/books/readingActivity';
+const mockMarkAsFinished = markAsFinished as jest.Mock;
 
 describe('BookDetailScreen', () => {
   beforeEach(() => {
@@ -37,7 +37,7 @@ describe('BookDetailScreen', () => {
       key: 'BookDetail',
       name: 'BookDetail',
     });
-    mockStartReading.mockClear();
+    mockMarkAsFinished.mockClear();
   });
 
   it('renders the book title', () => {
@@ -75,33 +75,34 @@ describe('BookDetailScreen', () => {
     expect(screen.getByText('bookDetail.unknownAuthor')).toBeTruthy();
   });
 
-  it('renders the Start Reading button', () => {
+  it('renders the Mark as Finished button', () => {
     render(<BookDetailScreen />);
-    expect(screen.getByText('bookDetail.startReading')).toBeTruthy();
+    expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
   });
 
-  it('calls startReading with user uid and book when button is pressed', async () => {
+  it('calls markAsFinished with user uid and book when button is pressed', async () => {
     render(<BookDetailScreen />);
-    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
-      expect(mockStartReading).toHaveBeenCalledWith('user1', mockBook);
+      expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook);
     });
   });
 
-  it('shows Reading label after successfully pressing the button', async () => {
+  it('shows Finished label and disables button after success', async () => {
     render(<BookDetailScreen />);
-    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
-      expect(screen.getByText('bookDetail.reading')).toBeTruthy();
+      expect(screen.getByText('shelf.finished')).toBeTruthy();
     });
+    expect(screen.getByRole('button').props.accessibilityState?.disabled).toBe(true);
   });
 
-  it('returns to Start Reading label so the user can retry on failure', async () => {
-    mockStartReading.mockRejectedValueOnce(new Error('network error'));
+  it('returns to Mark as Finished label so the user can retry on failure', async () => {
+    mockMarkAsFinished.mockRejectedValueOnce(new Error('network error'));
     render(<BookDetailScreen />);
-    fireEvent.press(screen.getByText('bookDetail.startReading'));
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
-      expect(screen.getByText('bookDetail.startReading')).toBeTruthy();
+      expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
     });
   });
 });
