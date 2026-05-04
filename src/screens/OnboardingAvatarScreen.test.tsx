@@ -105,4 +105,12 @@ describe('OnboardingAvatarScreen', () => {
       expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
     });
   });
+
+  it('prevents a second tap while the first save is in progress', () => {
+    jest.mocked(saveAvatarIdentity).mockReturnValueOnce(new Promise(() => {}));
+    render(<OnboardingAvatarScreen />);
+    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    expect(jest.mocked(saveAvatarIdentity)).toHaveBeenCalledTimes(1);
+  });
 });

@@ -21,12 +21,16 @@ export default function OnboardingAvatarScreen() {
   const { user } = useAuth();
 
   const [identity, setIdentity] = useState<DraftIdentity>(() => generateRandomIdentity());
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleReroll = () => {
+    if (isNavigating) return;
     setIdentity(generateRandomIdentity());
   };
 
   const handleContinue = async () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
     try {
       // user is always set here (avatar screen follows sign-in), guard is for type safety
       if (user) {
@@ -42,22 +46,31 @@ export default function OnboardingAvatarScreen() {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.heading}>{t('onboarding.avatarHeading')}</Text>
-        <View style={styles.avatarFrame}>
-          <Image
-            testID="avatar-image"
-            source={ANIMAL_ASSETS[identity.animalKey]}
-            style={styles.avatarImage}
-            resizeMode="contain"
-          />
-        </View>
+        <Image
+          testID="avatar-image"
+          source={ANIMAL_ASSETS[identity.animalKey]}
+          style={styles.avatarImage}
+          resizeMode="contain"
+        />
         <Text style={styles.label}>{identity.displayLabel}</Text>
       </View>
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button} onPress={handleContinue} accessibilityRole="button">
-          <Text style={styles.buttonText}>{t('onboarding.avatarContinue')}</Text>
+        <TouchableOpacity
+          onPress={handleReroll}
+          style={styles.rerollRow}
+          accessibilityRole="button"
+          disabled={isNavigating}
+        >
+          <Text style={styles.rerollIcon}>↻</Text>
+          <Text style={styles.rerollText}>{t('onboarding.rerollButton')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleReroll} accessibilityRole="button">
-          <Text style={styles.reroll}>{t('onboarding.rerollButton')}</Text>
+        <TouchableOpacity
+          style={[styles.button, isNavigating && styles.buttonDisabled]}
+          onPress={handleContinue}
+          accessibilityRole="button"
+          disabled={isNavigating}
+        >
+          <Text style={styles.buttonText}>{t('onboarding.avatarContinue')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -73,7 +86,7 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    marginBottom: 64,
+    marginBottom: 56,
   },
   heading: {
     fontSize: yomoyoTypography.bodySize,
@@ -82,19 +95,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
   },
-  avatarFrame: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: yomoyoColors.surface,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
   avatarImage: {
-    width: 120,
-    height: 120,
+    width: 140,
+    height: 140,
+    marginBottom: 24,
   },
   label: {
     fontSize: yomoyoTypography.titleSize,
@@ -105,6 +109,21 @@ const styles = StyleSheet.create({
   actions: {
     alignItems: 'center',
   },
+  rerollRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  rerollIcon: {
+    fontSize: 20,
+    color: yomoyoColors.muted,
+    marginRight: 6,
+  },
+  rerollText: {
+    fontSize: yomoyoTypography.secondaryActionSize,
+    fontWeight: yomoyoTypography.secondaryActionWeight,
+    color: yomoyoColors.muted,
+  },
   button: {
     width: '100%',
     height: yomoyoSpacing.buttonHeight,
@@ -112,16 +131,13 @@ const styles = StyleSheet.create({
     backgroundColor: yomoyoColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+  },
+  buttonDisabled: {
+    backgroundColor: yomoyoColors.muted,
   },
   buttonText: {
     color: yomoyoColors.surface,
     fontSize: yomoyoTypography.buttonSize,
     fontWeight: yomoyoTypography.buttonWeight,
-  },
-  reroll: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.secondaryActionWeight,
-    color: yomoyoColors.muted,
   },
 });
