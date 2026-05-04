@@ -97,6 +97,14 @@ describe('OnboardingAvatarScreen', () => {
     });
   });
 
+  it('navigates synchronously without waiting for the save to complete', () => {
+    // Navigation must not be blocked by the async Firestore write
+    jest.mocked(saveAvatarIdentity).mockReturnValueOnce(new Promise(() => {}));
+    render(<OnboardingAvatarScreen />);
+    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
+  });
+
   it('still navigates to OnboardingNotification even if saveAvatarIdentity throws', async () => {
     jest.mocked(saveAvatarIdentity).mockRejectedValueOnce(new Error('network error'));
     render(<OnboardingAvatarScreen />);

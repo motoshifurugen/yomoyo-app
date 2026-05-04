@@ -47,11 +47,11 @@ describe('saveAvatarIdentity', () => {
     expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'users', 'user1');
   });
 
-  it('stores animalKey, adjective, displayLabel, and sets finalizedAt to null', async () => {
+  it('stores animalKey, adjective, and displayLabel', async () => {
     await saveAvatarIdentity('user1', draft);
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
-      { animalKey: 'fox', adjective: 'Quiet', displayLabel: 'Quiet Fox', finalizedAt: null },
+      { animalKey: 'fox', adjective: 'Quiet', displayLabel: 'Quiet Fox' },
       { merge: true },
     );
   });

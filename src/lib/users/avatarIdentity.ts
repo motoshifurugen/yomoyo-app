@@ -57,7 +57,6 @@ export async function saveAvatarIdentity(
       animalKey: identity.animalKey,
       adjective: identity.adjective,
       displayLabel: identity.displayLabel,
-      finalizedAt: null,
     },
     { merge: true },
   );

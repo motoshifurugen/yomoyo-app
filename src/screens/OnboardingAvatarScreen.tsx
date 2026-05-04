@@ -28,16 +28,12 @@ export default function OnboardingAvatarScreen() {
     setIdentity(generateRandomIdentity());
   };
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     if (isNavigating) return;
     setIsNavigating(true);
-    try {
-      // user is always set here (avatar screen follows sign-in), guard is for type safety
-      if (user) {
-        await saveAvatarIdentity(user.uid, identity);
-      }
-    } catch {
-      // Save failure should not block onboarding progress
+    // user is always set here (avatar screen follows sign-in), guard is for type safety
+    if (user) {
+      saveAvatarIdentity(user.uid, identity).catch(() => {});
     }
     navigation.navigate('OnboardingNotification');
   };
