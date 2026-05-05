@@ -1,15 +1,13 @@
 export { getAuth } from '@react-native-firebase/auth';
 
 import { initializeApp, getApps } from 'firebase/app';
-import { initializeAuth, onAuthStateChanged } from 'firebase/auth';
-// `getReactNativePersistence` is exported at runtime by firebase v10 but is
-// missing from the public type declarations. Pull it via the module object and
-// retype it locally so callers stay typed.
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-const firebaseAuthModule = require('firebase/auth') as any;
-const getReactNativePersistence = firebaseAuthModule.getReactNativePersistence as (
-  storage: unknown,
-) => unknown;
+// `getReactNativePersistence` is exported at runtime from firebase/auth's
+// React Native build (selected by Metro via the package's `react-native`
+// field) but is missing from the public type declarations. A single ES
+// import keeps Metro from loading two module instances — important because
+// only the loaded instance registers the auth Component with FirebaseApp.
+// @ts-expect-error: getReactNativePersistence is untyped in firebase v10
+import { initializeAuth, onAuthStateChanged, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Values from GoogleService-Info.plist / google-services.json.
@@ -30,7 +28,7 @@ export const firebaseApp =
 // AND across app restarts. The two clients (RNFB native + JS SDK) are bridged
 // at sign-in/sign-out (see src/lib/auth/jsSdkBridge.ts).
 export const jsSdkAuth = initializeAuth(firebaseApp, {
-  persistence: getReactNativePersistence(AsyncStorage) as never,
+  persistence: getReactNativePersistence(AsyncStorage),
 });
 
 if (__DEV__) {
