@@ -5,6 +5,7 @@ import BookSearchScreen from '@/screens/BookSearchScreen';
 import BookDetailScreen from '@/screens/BookDetailScreen';
 import UserProfileScreen from '@/screens/UserProfileScreen';
 import AddFriendScreen from '@/screens/AddFriendScreen';
+import EditProfileScreen from '@/screens/EditProfileScreen';
 import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,6 +21,11 @@ export default function AppNavigator() {
         name="AddFriend"
         component={AddFriendScreen}
         options={{ headerShown: false, presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

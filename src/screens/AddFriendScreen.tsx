@@ -27,7 +27,7 @@ type SearchState =
   | { kind: 'searching' }
   | { kind: 'notFound' }
   | { kind: 'self' }
-  | { kind: 'match'; uid: string; displayLabel: string; animalKey: AnimalKey };
+  | { kind: 'match'; uid: string; displayName: string; animalKey: AnimalKey };
 
 export default function AddFriendScreen() {
   const { t } = useTranslation();
@@ -56,7 +56,7 @@ export default function AddFriendScreen() {
       setState({
         kind: 'match',
         uid: matchUid,
-        displayLabel: profile.displayLabel,
+        displayName: profile.displayName,
         animalKey: profile.animalKey,
       });
     } catch {
@@ -108,7 +108,7 @@ export default function AddFriendScreen() {
         {state.kind === 'match' && (
           <View style={styles.matchCard} testID="match-card">
             <Image source={ANIMAL_ASSETS[state.animalKey]} style={styles.avatar} />
-            <Text style={styles.matchLabel}>{state.displayLabel}</Text>
+            <Text style={styles.matchLabel}>{state.displayName}</Text>
             <TouchableOpacity
               style={styles.viewProfileButton}
               onPress={handleViewProfile}

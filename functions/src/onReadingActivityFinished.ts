@@ -10,7 +10,7 @@ const PUSH_TITLE = 'Yomoyo';
 
 export interface ValidatedActivity {
   userId: string;
-  displayLabel: string;
+  displayName: string;
   title: string;
 }
 
@@ -32,28 +32,37 @@ export function validateActivityForNotification(
   if (typeof userId !== 'string' || userId.length === 0) {
     return { ok: false, reason: 'missing-userId' };
   }
-  const displayLabel = data.displayLabel;
-  if (typeof displayLabel !== 'string' || displayLabel.length === 0) {
-    return { ok: false, reason: 'missing-displayLabel' };
+  // Prefer the new field; fall back to the legacy field for one release
+  // window so docs written before the rename still produce notifications.
+  const newName = data.displayName;
+  const legacyName = data.displayLabel;
+  const resolvedName =
+    typeof newName === 'string' && newName.length > 0
+      ? newName
+      : typeof legacyName === 'string' && legacyName.length > 0
+        ? legacyName
+        : null;
+  if (resolvedName === null) {
+    return { ok: false, reason: 'missing-displayName' };
   }
   const title = data.title;
   if (typeof title !== 'string' || title.length === 0) {
     return { ok: false, reason: 'missing-title' };
   }
-  return { ok: true, data: { userId, displayLabel, title } };
+  return { ok: true, data: { userId, displayName: resolvedName, title } };
 }
 
 export type NotificationLanguage = 'ja' | 'en';
 
 export function buildNotificationPayload(
-  displayLabel: string,
+  displayName: string,
   bookTitle: string,
   language: NotificationLanguage,
 ): { title: string; body: string } {
   const body =
     language === 'ja'
-      ? `${displayLabel}が「${bookTitle}」を読み終えました。`
-      : `${displayLabel} finished reading "${bookTitle}".`;
+      ? `${displayName}が「${bookTitle}」を読み終えました。`
+      : `${displayName} finished reading "${bookTitle}".`;
   return { title: PUSH_TITLE, body };
 }
 
@@ -85,7 +94,7 @@ export const onReadingActivityFinished = onDocumentCreated(
       });
       return;
     }
-    const { userId: sourceUid, displayLabel, title } = validation.data;
+    const { userId: sourceUid, displayName, title } = validation.data;
 
     try {
       const db = getFirestore();
@@ -120,7 +129,7 @@ export const onReadingActivityFinished = onDocumentCreated(
       const results = await Promise.allSettled(
         recipients.map((r) => {
           const payload = buildNotificationPayload(
-            displayLabel,
+            displayName,
             title,
             r.language,
           );

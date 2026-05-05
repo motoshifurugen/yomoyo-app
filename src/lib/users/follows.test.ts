@@ -101,7 +101,21 @@ describe('getFollowingProfiles', () => {
     expect(result).toEqual([]);
   });
 
-  it('fetches user documents for each followed uid', async () => {
+  it('fetches user documents and returns displayName for each followed uid', async () => {
+    jest.mocked(getDocs).mockResolvedValueOnce({
+      docs: [{ id: 'user1_user2', data: () => ({ followerId: 'user1', followedUid: 'user2' }) }],
+    } as any);
+    jest.mocked(getDoc).mockResolvedValueOnce({
+      exists: () => true,
+      data: () => ({ displayName: 'New Name', animalKey: 'fox' }),
+    } as any);
+
+    const result = await getFollowingProfiles('user1');
+    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'users', 'user2');
+    expect(result).toEqual([{ uid: 'user2', displayName: 'New Name', animalKey: 'fox' }]);
+  });
+
+  it('falls back to legacy displayLabel when displayName is absent', async () => {
     jest.mocked(getDocs).mockResolvedValueOnce({
       docs: [{ id: 'user1_user2', data: () => ({ followerId: 'user1', followedUid: 'user2' }) }],
     } as any);
@@ -111,8 +125,7 @@ describe('getFollowingProfiles', () => {
     } as any);
 
     const result = await getFollowingProfiles('user1');
-    expect(jest.mocked(doc)).toHaveBeenCalledWith(expect.anything(), 'users', 'user2');
-    expect(result).toEqual([{ uid: 'user2', displayLabel: 'Quiet Fox', animalKey: 'fox' }]);
+    expect(result).toEqual([{ uid: 'user2', displayName: 'Quiet Fox', animalKey: 'fox' }]);
   });
 
   it('omits users whose documents do not exist', async () => {
@@ -134,7 +147,7 @@ describe('getFollowingProfiles', () => {
     } as any);
     jest.mocked(getDoc).mockResolvedValueOnce({
       exists: () => true,
-      data: () => ({ animalKey: 'fox' }), // missing displayLabel
+      data: () => ({ animalKey: 'fox' }), // missing both displayName and displayLabel
     } as any);
 
     const result = await getFollowingProfiles('user1');
@@ -152,10 +165,10 @@ describe('getFollowingProfiles', () => {
       .mockRejectedValueOnce(new Error('network error'))
       .mockResolvedValueOnce({
         exists: () => true,
-        data: () => ({ displayLabel: 'Wise Bear', animalKey: 'bear' }),
+        data: () => ({ displayName: 'Wise Bear', animalKey: 'bear' }),
       } as any);
 
     const result = await getFollowingProfiles('user1');
-    expect(result).toEqual([{ uid: 'user3', displayLabel: 'Wise Bear', animalKey: 'bear' }]);
+    expect(result).toEqual([{ uid: 'user3', displayName: 'Wise Bear', animalKey: 'bear' }]);
   });
 });

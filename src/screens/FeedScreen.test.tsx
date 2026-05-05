@@ -47,7 +47,7 @@ const mockActivity = {
   thumbnail: null,
   status: 'finished' as const,
   finishedAt: null,
-  displayLabel: 'Bold Bear',
+  displayName: 'Bold Bear',
   displayAvatar: 'bear',
 };
 
@@ -56,6 +56,19 @@ const secondActivity = {
   id: 'act2',
   userId: 'user3',
   title: 'Kindred',
+  displayName: 'Quiet Fox',
+  displayAvatar: 'fox',
+};
+
+const legacyOnlyActivity = {
+  id: 'act-legacy',
+  userId: 'user4',
+  bookId: 'book2',
+  title: 'Legacy Book',
+  authors: ['Old Author'],
+  thumbnail: null,
+  status: 'finished' as const,
+  finishedAt: null,
   displayLabel: 'Quiet Fox',
   displayAvatar: 'fox',
 };
@@ -123,6 +136,14 @@ describe('FeedScreen — friend updates list', () => {
     await waitFor(() => {
       expect(screen.getByText('Dune')).toBeTruthy();
       expect(screen.getByText('Bold Bear')).toBeTruthy();
+    });
+  });
+
+  it('falls back to legacy displayLabel when only that field is present', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [legacyOnlyActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => {
+      expect(screen.getByText('Quiet Fox')).toBeTruthy();
     });
   });
 

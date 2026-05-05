@@ -20,7 +20,7 @@ const book: Book = {
 };
 
 const presenter = {
-  displayLabel: 'Alice',
+  displayName: 'Alice',
   displayAvatar: 'https://example.com/avatar.jpg',
 };
 
@@ -56,10 +56,16 @@ describe('markAsFinished', () => {
         thumbnail: 'https://example.com/cover.jpg',
         finishedAt: expect.anything(),
         status: 'finished',
-        displayLabel: 'Alice',
+        displayName: 'Alice',
         displayAvatar: 'https://example.com/avatar.jpg',
       },
     );
+  });
+
+  it('does not write the legacy displayLabel field', async () => {
+    await markAsFinished('user1', book, presenter);
+    const payload = jest.mocked(setDoc).mock.calls[0][1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty('displayLabel');
   });
 
   it('stores null thumbnail when book has no cover', async () => {
@@ -71,7 +77,7 @@ describe('markAsFinished', () => {
   });
 
   it('stores null displayAvatar when presenter has no avatar', async () => {
-    await markAsFinished('user1', book, { displayLabel: 'Alice', displayAvatar: null });
+    await markAsFinished('user1', book, { displayName: 'Alice', displayAvatar: null });
     expect(jest.mocked(setDoc)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ displayAvatar: null }),
@@ -119,7 +125,7 @@ describe('subscribeToReadingActivities', () => {
               thumbnail: 'https://example.com/cover.jpg',
               status: 'finished',
               finishedAt: null,
-              displayLabel: 'Alice',
+              displayName: 'Alice',
               displayAvatar: null,
             }),
           },
@@ -141,9 +147,38 @@ describe('subscribeToReadingActivities', () => {
         thumbnail: 'https://example.com/cover.jpg',
         status: 'finished',
         finishedAt: null,
-        displayLabel: 'Alice',
+        displayName: 'Alice',
         displayAvatar: null,
       },
+    ]);
+  });
+
+  it('passes through legacy displayLabel as-is for old docs', () => {
+    jest.mocked(onSnapshot).mockImplementationOnce((_q, onNext: any) => {
+      onNext({
+        docs: [
+          {
+            id: 'act-old',
+            data: () => ({
+              userId: 'user1',
+              bookId: 'book123',
+              title: 'Old Doc',
+              authors: [],
+              thumbnail: null,
+              status: 'finished',
+              finishedAt: null,
+              displayLabel: 'Quiet Fox',
+              displayAvatar: null,
+            }),
+          },
+        ],
+      });
+      return jest.fn();
+    });
+    const onUpdate = jest.fn();
+    subscribeToReadingActivities('user1', onUpdate);
+    expect(onUpdate).toHaveBeenCalledWith([
+      expect.objectContaining({ id: 'act-old', displayLabel: 'Quiet Fox' }),
     ]);
   });
 

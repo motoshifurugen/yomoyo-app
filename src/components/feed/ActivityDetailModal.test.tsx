@@ -20,7 +20,7 @@ const baseActivity: ReadingActivity = {
   thumbnail: 'https://example.com/dune.jpg',
   status: 'finished',
   finishedAt: null,
-  displayLabel: 'Bold Bear',
+  displayName: 'Bold Bear',
   displayAvatar: 'bear',
 };
 
@@ -52,7 +52,7 @@ describe('ActivityDetailModal', () => {
     expect(screen.getByText('Frank Herbert, Brian Herbert')).toBeTruthy();
   });
 
-  it("renders the friend's display label", () => {
+  it("renders the friend's display name", () => {
     render(
       <ActivityDetailModal
         activity={baseActivity}
@@ -62,6 +62,19 @@ describe('ActivityDetailModal', () => {
       />,
     );
     expect(screen.getByText('Bold Bear')).toBeTruthy();
+  });
+
+  it('falls back to legacy displayLabel when displayName is absent', () => {
+    const legacy = { ...baseActivity, displayName: undefined, displayLabel: 'Legacy Bear' };
+    render(
+      <ActivityDetailModal
+        activity={legacy as ReadingActivity}
+        visible={true}
+        onClose={jest.fn()}
+        onViewProfile={jest.fn()}
+      />,
+    );
+    expect(screen.getByText('Legacy Bear')).toBeTruthy();
   });
 
   it('renders the finished-reading sub-label', () => {
