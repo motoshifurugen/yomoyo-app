@@ -7,6 +7,7 @@ import GlassCard from '@/components/ui/GlassCard';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
+import { devSendTestPush } from '@/lib/notifications/devSendTestPush';
 
 type Language = 'ja' | 'en';
 
@@ -16,12 +17,25 @@ export default function SettingsScreen() {
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [devPushStatus, setDevPushStatus] = useState<string | null>(null);
 
   const handleCopyLink = () => {
     if (!user) return;
     Share.share({ message: `yomoyo://user/${user.uid}` })
       .then(() => setCopied(true))
       .catch(() => {});
+  };
+
+  const handleDevSendTestPush = async () => {
+    setDevPushStatus('Sending…');
+    try {
+      const result = await devSendTestPush();
+      setDevPushStatus(`Sent (ticket: ${result.ticket.status})`);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Unknown error';
+      setDevPushStatus(`Failed: ${message}`);
+    }
   };
 
   return (
@@ -64,6 +78,26 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
         </GlassCard>
+
+        {__DEV__ && (
+          <>
+            <Text style={[styles.sectionLabel, styles.sectionLabelSpaced]}>
+              Dev tools
+            </Text>
+            <GlassCard>
+              <TouchableOpacity
+                style={styles.linkButton}
+                onPress={handleDevSendTestPush}
+                accessibilityRole="button"
+              >
+                <Text style={styles.linkButtonText}>Send test push</Text>
+              </TouchableOpacity>
+              {devPushStatus && (
+                <Text style={styles.linkCopiedText}>{devPushStatus}</Text>
+              )}
+            </GlassCard>
+          </>
+        )}
       </View>
     </ScreenContainer>
   );
