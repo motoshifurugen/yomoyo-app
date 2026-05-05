@@ -1,4 +1,7 @@
 const en = {
+  common: {
+    back: 'Go back',
+  },
   tabs: {
     feed: 'Feed',
     friends: 'Friends',
@@ -51,6 +54,7 @@ const en = {
     unfollow: 'Stop receiving',
     notFound: 'This page does not exist.',
     emptyBooks: 'No finished books yet',
+    ownPageNote: 'This is your page',
   },
   onboarding: {
     heading: 'Yomoyo',

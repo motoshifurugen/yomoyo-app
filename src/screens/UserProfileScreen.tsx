@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +14,8 @@ import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 type Route = RouteProp<RootStackParamList, 'UserProfile'>;
 
 type IdentityState = AvatarIdentity | null | 'loading';
@@ -21,6 +24,7 @@ export default function UserProfileScreen() {
   const { params: { uid } } = useRoute<Route>();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const navigation = useNavigation<NavigationProp>();
 
   const [identity, setIdentity] = useState<IdentityState>('loading');
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
@@ -64,6 +68,14 @@ export default function UserProfileScreen() {
     );
   }
 
+  const handleNavBack = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('MainTabs', undefined);
+    }
+  };
+
   const handleFollowToggle = () => {
     if (!user) return;
     if (following) {
@@ -77,13 +89,35 @@ export default function UserProfileScreen() {
 
   return (
     <ScreenContainer>
+      <TouchableOpacity
+        style={styles.navButton}
+        onPress={handleNavBack}
+        accessibilityRole="button"
+        accessibilityLabel={t('common.back')}
+        testID="nav-back-button"
+      >
+        <Text style={styles.navButtonText}>{'←'}</Text>
+      </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.identityBlock}>
           <Image source={ANIMAL_ASSETS[identity.animalKey]} style={styles.avatar} />
           <Text style={styles.displayLabel}>{identity.displayLabel}</Text>
         </View>
 
-        {!isOwnProfile && (
+        {isOwnProfile ? (
+          <View style={styles.ownProfileBlock}>
+            <Text style={styles.ownPageNote}>{t('userProfile.ownPageNote')}</Text>
+            <TouchableOpacity
+              style={styles.shelfButton}
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Shelf' })}
+              accessibilityRole="button"
+              testID="go-to-shelf-button"
+            >
+              <Text style={styles.shelfButtonText}>{t('tabs.shelf')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
           <TouchableOpacity
             style={[styles.followButton, following && styles.followButtonActive]}
             onPress={handleFollowToggle}
@@ -125,8 +159,39 @@ export default function UserProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+  navButton: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+    alignSelf: 'flex-start',
+  },
+  navButtonText: {
+    fontSize: 22,
+    color: yomoyoColors.text,
+  },
+  ownProfileBlock: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  ownPageNote: {
+    fontSize: yomoyoTypography.screenBodySize,
+    color: yomoyoColors.secondaryText,
+    marginBottom: 16,
+  },
+  shelfButton: {
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: yomoyoColors.border,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+  },
+  shelfButtonText: {
+    fontSize: yomoyoTypography.screenBodySize,
+    fontWeight: '500',
+    color: yomoyoColors.text,
+  },
   content: {
-    paddingTop: 24,
+    paddingTop: 16,
     paddingBottom: 24,
   },
   identityBlock: {

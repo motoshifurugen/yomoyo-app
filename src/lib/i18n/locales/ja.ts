@@ -1,4 +1,7 @@
 const ja = {
+  common: {
+    back: '戻る',
+  },
   tabs: {
     feed: 'フィード',
     friends: 'フレンド',
@@ -51,6 +54,7 @@ const ja = {
     unfollow: '受け取るのをやめる',
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
+    ownPageNote: 'これはあなたのページです',
   },
   onboarding: {
     heading: 'Yomoyo',

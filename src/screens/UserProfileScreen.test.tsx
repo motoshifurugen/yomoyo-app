@@ -3,8 +3,17 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 import UserProfileScreen from './UserProfileScreen';
 import { useRoute } from '@react-navigation/native';
 
+const mockGoBack = jest.fn();
+const mockNavigate = jest.fn();
+const mockCanGoBack = jest.fn(() => true);
+
 jest.mock('@react-navigation/native', () => ({
   useRoute: jest.fn(),
+  useNavigation: () => ({
+    goBack: mockGoBack,
+    navigate: mockNavigate,
+    canGoBack: mockCanGoBack,
+  }),
 }));
 
 jest.mock('react-native-safe-area-context', () => ({
@@ -77,6 +86,7 @@ beforeEach(() => {
   mockGetAvatarIdentity.mockResolvedValue(mockIdentity);
   mockSubscribe.mockReturnValue(jest.fn());
   mockIsFollowing.mockResolvedValue(false);
+  mockCanGoBack.mockReturnValue(true);
 });
 
 describe('UserProfileScreen — identity', () => {
@@ -221,5 +231,81 @@ describe('UserProfileScreen — follow actions', () => {
     await waitFor(() => {
       expect(screen.getByTestId('unfollow-button')).toBeTruthy();
     });
+  });
+});
+
+describe('UserProfileScreen — navigation button', () => {
+  it('renders a navigation button', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('nav-back-button')).toBeTruthy();
+  });
+
+  it('calls goBack when canGoBack is true and nav button is pressed', async () => {
+    mockCanGoBack.mockReturnValue(true);
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    fireEvent.press(screen.getByTestId('nav-back-button'));
+    expect(mockGoBack).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('calls navigate to MainTabs when canGoBack is false and nav button is pressed', async () => {
+    mockCanGoBack.mockReturnValue(false);
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    fireEvent.press(screen.getByTestId('nav-back-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', undefined);
+    expect(mockGoBack).not.toHaveBeenCalled();
+  });
+});
+
+describe('UserProfileScreen — self-profile state', () => {
+  beforeEach(() => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user1' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+  });
+
+  it('shows ownPageNote when viewing own profile', async () => {
+    render(<UserProfileScreen />);
+    expect(await screen.findByText('userProfile.ownPageNote')).toBeTruthy();
+  });
+
+  it('does not show ownPageNote when viewing another user', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user2' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.queryByText('userProfile.ownPageNote')).toBeNull();
+  });
+
+  it('shows go-to-shelf-button when viewing own profile', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('userProfile.ownPageNote');
+    expect(screen.getByTestId('go-to-shelf-button')).toBeTruthy();
+  });
+
+  it('does not show go-to-shelf-button when viewing another user', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user2' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.queryByTestId('go-to-shelf-button')).toBeNull();
+  });
+
+  it('navigates to Shelf tab when go-to-shelf-button is pressed', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('userProfile.ownPageNote');
+    fireEvent.press(screen.getByTestId('go-to-shelf-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Shelf' });
   });
 });
