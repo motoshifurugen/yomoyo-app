@@ -10,6 +10,7 @@ import {
   ANIMAL_ASSETS,
 } from '@/lib/users/avatarIdentity';
 import type { DraftIdentity } from '@/lib/users/avatarIdentity';
+import { ensureHandle } from '@/lib/users/handles';
 import type { OnboardingStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
@@ -34,6 +35,7 @@ export default function OnboardingAvatarScreen() {
     // user is always set here (avatar screen follows sign-in), guard is for type safety
     if (user) {
       saveAvatarIdentity(user.uid, identity).catch(() => {});
+      ensureHandle(user.uid).catch(() => {});
     }
     navigation.navigate('OnboardingNotification');
   };

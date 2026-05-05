@@ -35,8 +35,13 @@ jest.mock('@/lib/notifications/registerPushToken', () => ({
   registerPushTokenIfPermitted: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('@/lib/users/handles', () => ({
+  ensureHandle: jest.fn().mockResolvedValue('quietfox'),
+}));
+
 import { checkFirstLaunch } from '@/lib/onboarding';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
+import { ensureHandle } from '@/lib/users/handles';
 
 function renderWithNav() {
   return render(
@@ -124,5 +129,32 @@ describe('RootNavigator', () => {
     renderWithNav();
     await screen.findByText('OnboardingNavigator');
     expect(registerPushTokenIfPermitted).not.toHaveBeenCalled();
+  });
+
+  it('ensures a handle on startup when user is authenticated and onboarding is done', async () => {
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    await waitFor(() => expect(ensureHandle).toHaveBeenCalledWith('abc123'));
+  });
+
+  it('does not ensure a handle on startup when user is signed out', async () => {
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
+    renderWithNav();
+    await screen.findByText('LoginScreen');
+    expect(ensureHandle).not.toHaveBeenCalled();
+  });
+
+  it('does not ensure a handle while onboarding is still active', async () => {
+    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    await screen.findByText('OnboardingNavigator');
+    expect(ensureHandle).not.toHaveBeenCalled();
   });
 });

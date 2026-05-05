@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import SettingsScreen from './SettingsScreen';
 import { setLanguage } from '@/lib/i18n';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
+import { getUserHandle } from '@/lib/users/handles';
 import { Share } from 'react-native';
 
 jest.mock('@/lib/i18n', () => ({
@@ -13,7 +14,12 @@ jest.mock('@/lib/notifications/registerPushToken', () => ({
   registerPushTokenIfPermitted: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('@/lib/users/handles', () => ({
+  getUserHandle: jest.fn().mockResolvedValue('quietfox'),
+}));
+
 const mockedRegisterPushToken = registerPushTokenIfPermitted as jest.Mock;
+const mockedGetUserHandle = getUserHandle as jest.Mock;
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
@@ -90,39 +96,82 @@ describe('SettingsScreen', () => {
   });
 });
 
-describe('SettingsScreen — profile link', () => {
+describe('SettingsScreen — your ID', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedGetUserHandle.mockResolvedValue('quietfox');
   });
 
-  it('renders the profile link section title', () => {
+  it('renders the your-ID section title', () => {
     render(<SettingsScreen />);
-    expect(screen.getByText('settings.profileLinkTitle')).toBeTruthy();
+    expect(screen.getByText('settings.yourIdTitle')).toBeTruthy();
   });
 
-  it('renders the copy link button', () => {
+  it('fetches the current user handle on mount', async () => {
     render(<SettingsScreen />);
-    expect(screen.getByText('settings.copyLink')).toBeTruthy();
+    await waitFor(() => expect(mockedGetUserHandle).toHaveBeenCalledWith('user1'));
   });
 
-  it('calls Share.share with the profile link when copy button is pressed', async () => {
+  it('displays the loaded handle', async () => {
     render(<SettingsScreen />);
-    fireEvent.press(screen.getByText('settings.copyLink'));
+    expect(await screen.findByText('quietfox')).toBeTruthy();
+  });
+
+  it('renders a share-ID button', async () => {
+    render(<SettingsScreen />);
+    expect(await screen.findByText('settings.shareId')).toBeTruthy();
+  });
+
+  it('calls Share.share with the handle as the message', async () => {
+    render(<SettingsScreen />);
+    fireEvent.press(await screen.findByText('settings.shareId'));
     await waitFor(() => {
-      expect(Share.share).toHaveBeenCalledWith({ message: 'yomoyo://user/user1' });
+      expect(Share.share).toHaveBeenCalledWith({ message: 'quietfox' });
     });
   });
 
-  it('shows linkCopied confirmation text after pressing copy', async () => {
+  it('shows the shared confirmation after pressing share', async () => {
     render(<SettingsScreen />);
-    fireEvent.press(screen.getByText('settings.copyLink'));
+    fireEvent.press(await screen.findByText('settings.shareId'));
     await waitFor(() => {
-      expect(screen.getByText('settings.linkCopied')).toBeTruthy();
+      expect(screen.getByText('settings.idShared')).toBeTruthy();
     });
   });
 
-  it('does not show linkCopied text before copy button is pressed', () => {
+  it('does not show the shared confirmation before share is pressed', () => {
     render(<SettingsScreen />);
-    expect(screen.queryByText('settings.linkCopied')).toBeNull();
+    expect(screen.queryByText('settings.idShared')).toBeNull();
+  });
+
+  it('does not crash when getUserHandle returns null', async () => {
+    mockedGetUserHandle.mockResolvedValueOnce(null);
+    render(<SettingsScreen />);
+    await waitFor(() => expect(mockedGetUserHandle).toHaveBeenCalled());
+    expect(screen.queryByText('quietfox')).toBeNull();
+  });
+
+  it('disables the share button while the handle is unavailable', async () => {
+    mockedGetUserHandle.mockResolvedValueOnce(null);
+    render(<SettingsScreen />);
+    await waitFor(() => expect(mockedGetUserHandle).toHaveBeenCalled());
+    fireEvent.press(screen.getByText('settings.shareId'));
+    expect(Share.share).not.toHaveBeenCalled();
+  });
+
+  it('hides the shared confirmation after a short delay', async () => {
+    jest.useFakeTimers();
+    try {
+      render(<SettingsScreen />);
+      fireEvent.press(await screen.findByText('settings.shareId'));
+      await waitFor(() => {
+        expect(screen.getByText('settings.idShared')).toBeTruthy();
+      });
+      act(() => {
+        jest.advanceTimersByTime(2500);
+      });
+      expect(screen.queryByText('settings.idShared')).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
