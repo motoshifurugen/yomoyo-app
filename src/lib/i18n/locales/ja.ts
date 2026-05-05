@@ -16,7 +16,11 @@ const ja = {
   },
   addFriend: {
     heading: '友達を追加',
-    comingSoonBody: 'IDでの友達検索は近日公開予定です。',
+    placeholder: '友達のIDを入力',
+    search: '検索',
+    notFound: 'そのIDのユーザーは見つかりませんでした。',
+    selfMatch: 'これはあなた自身のIDです。',
+    viewProfile: 'プロフィールを見る',
     close: '閉じる',
   },
   bookSearch: {
@@ -38,9 +42,9 @@ const ja = {
   },
   settings: {
     languageTitle: '言語',
-    profileLinkTitle: 'プロフィールリンク',
-    copyLink: 'リンクをコピー',
-    linkCopied: 'コピーしました',
+    yourIdTitle: 'あなたのID',
+    shareId: 'IDを共有',
+    idShared: '共有しました',
   },
   userProfile: {
     follow: 'おたよりを受け取る',

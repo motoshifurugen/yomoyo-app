@@ -3,6 +3,7 @@ node_modules/
 dist/
 ios/
 android/
+coverage/
 .env
 .env.local
 *.log

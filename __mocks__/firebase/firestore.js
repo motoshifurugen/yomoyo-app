@@ -16,6 +16,17 @@ const mockGetDoc = jest.fn(() =>
   Promise.resolve({ exists: () => false, data: () => undefined }),
 );
 const mockDeleteDoc = jest.fn(() => Promise.resolve());
+const mockRunTransaction = jest.fn(async (_db, callback) => {
+  const tx = {
+    get: jest.fn(() =>
+      Promise.resolve({ exists: () => false, data: () => undefined }),
+    ),
+    set: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+  return callback(tx);
+});
 
 module.exports = {
   getFirestore: mockGetFirestore,
@@ -33,4 +44,5 @@ module.exports = {
   onSnapshot: mockOnSnapshot,
   serverTimestamp: mockServerTimestamp,
   getDoc: mockGetDoc,
+  runTransaction: mockRunTransaction,
 };

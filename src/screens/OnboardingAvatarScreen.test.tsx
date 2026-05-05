@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 import OnboardingAvatarScreen from './OnboardingAvatarScreen';
 import { useNavigation } from '@react-navigation/native';
 import { generateRandomIdentity, saveAvatarIdentity } from '@/lib/users/avatarIdentity';
+import { ensureHandle } from '@/lib/users/handles';
 
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
@@ -25,6 +26,10 @@ jest.mock('@/lib/users/avatarIdentity', () => ({
   })),
   saveAvatarIdentity: jest.fn(() => Promise.resolve()),
   ANIMAL_ASSETS: { fox: 1, bear: 2 },
+}));
+
+jest.mock('@/lib/users/handles', () => ({
+  ensureHandle: jest.fn(() => Promise.resolve('quietfox')),
 }));
 
 describe('OnboardingAvatarScreen', () => {
@@ -120,5 +125,22 @@ describe('OnboardingAvatarScreen', () => {
     fireEvent.press(screen.getByText('onboarding.avatarContinue'));
     fireEvent.press(screen.getByText('onboarding.avatarContinue'));
     expect(jest.mocked(saveAvatarIdentity)).toHaveBeenCalledTimes(1);
+  });
+
+  it('reserves a handle for the user when continue is pressed', async () => {
+    render(<OnboardingAvatarScreen />);
+    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    await waitFor(() => {
+      expect(ensureHandle).toHaveBeenCalledWith('user1');
+    });
+  });
+
+  it('still navigates to OnboardingNotification when ensureHandle fails', async () => {
+    jest.mocked(ensureHandle).mockRejectedValueOnce(new Error('reservation failed'));
+    render(<OnboardingAvatarScreen />);
+    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
+    });
   });
 });

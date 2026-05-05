@@ -6,6 +6,7 @@ import LoginScreen from '@/screens/LoginScreen';
 import { useAuth } from '@/hooks/useAuth';
 import { checkFirstLaunch } from '@/lib/onboarding';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
+import { ensureHandle } from '@/lib/users/handles';
 
 type AuthStackParamList = {
   App: undefined;
@@ -27,6 +28,7 @@ export default function RootNavigator() {
   useEffect(() => {
     if (user && onboardingDone) {
       registerPushTokenIfPermitted(user.uid);
+      ensureHandle(user.uid).catch(() => {});
     }
   }, [user, onboardingDone]);
 

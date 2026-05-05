@@ -30,5 +30,22 @@ service cloud.firestore {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
+
+    // Handle reservations: maps a human-readable handle to its owner uid.
+    // Authed users can `get` a single handle by exact ID for friend lookup,
+    // but `list` is denied so the collection cannot be enumerated as a
+    // public directory of user IDs.
+    // Only the claimed owner can create the reservation, and the handle
+    // must satisfy the canonical format (defense-in-depth against a
+    // misbehaving client).
+    // Updates and deletes are disallowed in v1: handles are immutable.
+    match /handles/{handle} {
+      allow get: if request.auth != null;
+      allow list: if false;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.uid
+        && handle.matches('^[a-z0-9_]{4,20}$');
+      allow update, delete: if false;
+    }
   }
 }

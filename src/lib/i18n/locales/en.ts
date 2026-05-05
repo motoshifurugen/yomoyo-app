@@ -16,7 +16,11 @@ const en = {
   },
   addFriend: {
     heading: 'Add a friend',
-    comingSoonBody: 'Friend search by ID is coming soon.',
+    placeholder: "Enter your friend's ID",
+    search: 'Search',
+    notFound: 'No user with that ID.',
+    selfMatch: "That's your own ID.",
+    viewProfile: 'View profile',
     close: 'Close',
   },
   bookSearch: {
@@ -38,9 +42,9 @@ const en = {
   },
   settings: {
     languageTitle: 'Language',
-    profileLinkTitle: 'Profile Link',
-    copyLink: 'Copy Link',
-    linkCopied: 'Copied!',
+    yourIdTitle: 'Your ID',
+    shareId: 'Share my ID',
+    idShared: 'Shared!',
   },
   userProfile: {
     follow: 'Receive updates',
