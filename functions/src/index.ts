@@ -6,6 +6,8 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { sendExpoPush } from './expoPush';
 import { resolveRecipients } from './recipients';
 
+export { onReadingActivityFinished } from './onReadingActivityFinished';
+
 initializeApp();
 
 const REGION = 'asia-northeast1';
