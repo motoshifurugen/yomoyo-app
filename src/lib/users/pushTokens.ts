@@ -7,6 +7,7 @@ import {
 } from 'firebase/firestore';
 
 export type PushTokenPlatform = 'ios' | 'android' | 'web' | 'windows' | 'macos';
+export type PushTokenLanguage = 'ja' | 'en';
 
 export function derivePushTokenId(token: string): string {
   return token.replace(/[\[\]:/\s]/g, '_');
@@ -16,6 +17,7 @@ export async function savePushToken(
   userId: string,
   token: string,
   platform: PushTokenPlatform,
+  language: PushTokenLanguage,
 ): Promise<void> {
   const db = getFirestore();
   const tokenId = derivePushTokenId(token);
@@ -26,6 +28,7 @@ export async function savePushToken(
   const base = {
     token,
     platform,
+    language,
     enabled: true,
     source: 'expo' as const,
     updatedAt: now,

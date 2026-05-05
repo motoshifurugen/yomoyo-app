@@ -2,11 +2,18 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import SettingsScreen from './SettingsScreen';
 import { setLanguage } from '@/lib/i18n';
+import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import { Share } from 'react-native';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
 }));
+
+jest.mock('@/lib/notifications/registerPushToken', () => ({
+  registerPushTokenIfPermitted: jest.fn().mockResolvedValue(undefined),
+}));
+
+const mockedRegisterPushToken = registerPushTokenIfPermitted as jest.Mock;
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
@@ -64,6 +71,22 @@ describe('SettingsScreen', () => {
     render(<SettingsScreen />);
     fireEvent.press(screen.getByText('English'));
     expect(setLanguage).toHaveBeenCalledWith('en');
+  });
+
+  it('re-registers the push token after pressing the Japanese button', async () => {
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('日本語'));
+    await waitFor(() => {
+      expect(mockedRegisterPushToken).toHaveBeenCalledWith('user1');
+    });
+  });
+
+  it('re-registers the push token after pressing the English button', async () => {
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('English'));
+    await waitFor(() => {
+      expect(mockedRegisterPushToken).toHaveBeenCalledWith('user1');
+    });
   });
 });
 

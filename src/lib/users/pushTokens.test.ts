@@ -49,7 +49,7 @@ describe('savePushToken', () => {
   it('writes to users/{uid}/pushTokens/{tokenId} with merge', async () => {
     mockedGetDoc.mockResolvedValueOnce({ exists: () => false });
 
-    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios');
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'en');
 
     expect(mockedDoc).toHaveBeenCalledWith(
       expect.anything(),
@@ -65,7 +65,7 @@ describe('savePushToken', () => {
   it('sets all required fields on first save', async () => {
     mockedGetDoc.mockResolvedValueOnce({ exists: () => false });
 
-    await savePushToken('user1', 'ExponentPushToken[t1]', 'android');
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'android', 'ja');
 
     const payload = mockedSetDoc.mock.calls[0][1];
     expect(payload.token).toBe('ExponentPushToken[t1]');
@@ -80,7 +80,7 @@ describe('savePushToken', () => {
   it('does not overwrite createdAt on a repeat save', async () => {
     mockedGetDoc.mockResolvedValueOnce({ exists: () => true });
 
-    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios');
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'en');
 
     const payload = mockedSetDoc.mock.calls[0][1];
     expect(payload).not.toHaveProperty('createdAt');
@@ -94,11 +94,38 @@ describe('savePushToken', () => {
       .mockResolvedValueOnce({ exists: () => false })
       .mockResolvedValueOnce({ exists: () => true });
 
-    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios');
-    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios');
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'ja');
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'en');
 
     const firstId = mockedDoc.mock.calls[0][4];
     const secondId = mockedDoc.mock.calls[1][4];
     expect(firstId).toBe(secondId);
+  });
+
+  it("persists language as 'ja' on first save", async () => {
+    mockedGetDoc.mockResolvedValueOnce({ exists: () => false });
+
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'ja');
+
+    const payload = mockedSetDoc.mock.calls[0][1];
+    expect(payload.language).toBe('ja');
+  });
+
+  it("persists language as 'en' on first save", async () => {
+    mockedGetDoc.mockResolvedValueOnce({ exists: () => false });
+
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'en');
+
+    const payload = mockedSetDoc.mock.calls[0][1];
+    expect(payload.language).toBe('en');
+  });
+
+  it('updates language on a repeat save (allows change after onboarding)', async () => {
+    mockedGetDoc.mockResolvedValueOnce({ exists: () => true });
+
+    await savePushToken('user1', 'ExponentPushToken[t1]', 'ios', 'en');
+
+    const payload = mockedSetDoc.mock.calls[0][1];
+    expect(payload.language).toBe('en');
   });
 });
