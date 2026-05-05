@@ -4,6 +4,7 @@ import { logger } from 'firebase-functions/v2';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { sendExpoPush } from './expoPush';
+import { resolveRecipients } from './recipients';
 
 initializeApp();
 
@@ -94,3 +95,52 @@ function redactToken(token: string): string {
   const head = token.slice(0, 18);
   return `${head}…`;
 }
+
+interface DryRunResolveRecipientsInput {
+  sourceUid?: string;
+}
+
+interface DryRunRecipient {
+  uid: string;
+  tokenPrefix: string;
+}
+
+interface DryRunResolveRecipientsResult {
+  count: number;
+  recipients: DryRunRecipient[];
+}
+
+export const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
+  { region: REGION, invoker: 'public' },
+  async (req): Promise<DryRunResolveRecipientsResult> => {
+    if (!req.auth) {
+      throw new HttpsError('unauthenticated', 'Sign-in required.');
+    }
+    const callerUid = req.auth.uid;
+    const requestedSourceUid = req.data?.sourceUid;
+    if (
+      typeof requestedSourceUid === 'string' &&
+      requestedSourceUid.length > 0 &&
+      requestedSourceUid !== callerUid
+    ) {
+      throw new HttpsError(
+        'permission-denied',
+        'sourceUid override is not allowed.',
+      );
+    }
+
+    const db = getFirestore();
+    const recipients = await resolveRecipients(db, callerUid);
+    const safe: DryRunRecipient[] = recipients.map((r) => ({
+      uid: r.uid,
+      tokenPrefix: redactToken(r.token),
+    }));
+
+    logger.info('dryRunResolveRecipients invoked', {
+      uid: callerUid,
+      count: safe.length,
+    });
+
+    return { count: safe.length, recipients: safe };
+  },
+);
