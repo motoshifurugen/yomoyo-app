@@ -10,8 +10,8 @@ import {
 } from '@invertase/react-native-apple-authentication';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
-import AuthLogoBlock from '@/components/auth/AuthLogoBlock';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import type { OnboardingStackParamList } from '@/navigation/types';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'OnboardingWelcome'>;
@@ -45,7 +45,18 @@ export default function OnboardingWelcomeScreen() {
 
   return (
     <View style={styles.container}>
-      <AuthLogoBlock />
+      <View style={styles.progressBlock}>
+        <OnboardingProgress
+          currentStep={1}
+          totalSteps={3}
+          accessibilityLabel={t('onboarding.progressLabel', { current: 1, total: 3 })}
+        />
+      </View>
+
+      <View style={styles.intro}>
+        <Text style={styles.heading}>{t('onboarding.introHeading')}</Text>
+        <Text style={styles.body}>{t('onboarding.introBody')}</Text>
+      </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -70,10 +81,31 @@ export default function OnboardingWelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: yomoyoSpacing.horizontalPadding,
+    paddingHorizontal: yomoyoSpacing.horizontalPadding,
+    paddingTop: 16,
+    paddingBottom: 32,
     backgroundColor: yomoyoColors.background,
+  },
+  progressBlock: {
+    paddingTop: 8,
+  },
+  intro: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  heading: {
+    fontSize: yomoyoTypography.titleSize,
+    fontWeight: yomoyoTypography.titleWeight,
+    color: yomoyoColors.text,
+    textAlign: 'center',
+    marginBottom: 18,
+  },
+  body: {
+    fontSize: yomoyoTypography.bodySize,
+    fontWeight: yomoyoTypography.bodyWeight,
+    lineHeight: yomoyoTypography.bodyLineHeight,
+    color: yomoyoColors.secondaryText,
+    textAlign: 'center',
   },
   error: {
     color: yomoyoColors.error,

@@ -13,6 +13,7 @@ import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import { ensureHandle } from '@/lib/users/handles';
 import AnimalGridPicker from '@/components/profile/AnimalGridPicker';
 import DisplayNameInput from '@/components/profile/DisplayNameInput';
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import type { OnboardingStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
@@ -45,6 +46,13 @@ export default function OnboardingAvatarScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.progressBlock}>
+        <OnboardingProgress
+          currentStep={2}
+          totalSteps={3}
+          accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
+        />
+      </View>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>{t('onboarding.avatarHeading')}</Text>
         <View style={styles.gridWrapper}>
@@ -75,8 +83,11 @@ const styles = StyleSheet.create({
     backgroundColor: yomoyoColors.background,
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
   },
+  progressBlock: {
+    paddingTop: 8,
+  },
   scroll: {
-    paddingTop: 32,
+    paddingTop: 16,
     paddingBottom: 16,
   },
   heading: {

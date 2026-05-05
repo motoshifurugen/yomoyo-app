@@ -43,6 +43,20 @@ describe('OnboardingAvatarScreen', () => {
     expect(screen.getByTestId('animal-grid-picker')).toBeTruthy();
   });
 
+  it('renders a 3-step progress indicator at step 2', () => {
+    render(<OnboardingAvatarScreen />);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: false }),
+    );
+  });
+
   it('renders the displayName input', () => {
     render(<OnboardingAvatarScreen />);
     expect(screen.getByTestId('display-name-input')).toBeTruthy();

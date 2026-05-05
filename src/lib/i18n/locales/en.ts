@@ -92,6 +92,9 @@ const en = {
   onboarding: {
     heading: 'Yomoyo',
     concept: "When someone you follow finishes a book, you'll know.",
+    introHeading: 'A quiet place for friends who read',
+    introBody:
+      "Yomoyo isn't a public feed. When a friend you follow finishes a book, a gentle note arrives — nothing more.",
     signInWithGoogle: 'Sign in with Google',
     signInWithApple: 'Sign in with Apple',
     signInError: 'Sign-in failed. Please try again.',
@@ -101,6 +104,7 @@ const en = {
     notificationBody: 'Only when someone you follow finishes a book.',
     allowButton: 'Allow notifications',
     skipLink: 'Maybe later',
+    progressLabel: 'Step {{current}} of {{total}}',
   },
 } as const;
 

@@ -23,31 +23,33 @@ jest.mock('@/lib/auth/apple', () => ({
   signInWithApple: jest.fn().mockResolvedValue(undefined),
 }));
 
-describe('OnboardingWelcomeScreen', () => {
+describe('OnboardingWelcomeScreen (intro + inline sign-in)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
     Platform.OS = 'ios';
   });
 
-  it('renders the Yomoyo logo image', () => {
+  it('renders a 3-step progress indicator at step 1', () => {
     render(<OnboardingWelcomeScreen />);
-    expect(screen.getByTestId('yomoyo-logo')).toBeTruthy();
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: false }),
+    );
   });
 
-  it('renders the subtitle', () => {
+  it('renders the intro heading and body copy', () => {
     render(<OnboardingWelcomeScreen />);
-    expect(screen.getByText('Book notes from friends.')).toBeTruthy();
+    expect(screen.getByText('onboarding.introHeading')).toBeTruthy();
+    expect(screen.getByText('onboarding.introBody')).toBeTruthy();
   });
 
-  it('renders a Google sign-in button with correct label', () => {
+  it('renders a Google sign-in button as the inline get-started action', () => {
     render(<OnboardingWelcomeScreen />);
     expect(screen.getByText('Continue with Google')).toBeTruthy();
-  });
-
-  it('renders the Google icon image', () => {
-    render(<OnboardingWelcomeScreen />);
-    expect(screen.getByTestId('google-icon')).toBeTruthy();
   });
 
   it('renders the Apple sign-in button on iOS', () => {
@@ -68,7 +70,7 @@ describe('OnboardingWelcomeScreen', () => {
     await waitFor(() => expect(signInWithGoogle).toHaveBeenCalled());
   });
 
-  it('navigates to OnboardingNotification after Google sign-in succeeds', async () => {
+  it('navigates to OnboardingAvatar after Google sign-in succeeds', async () => {
     render(<OnboardingWelcomeScreen />);
     fireEvent.press(screen.getByText('Continue with Google'));
     await waitFor(() =>
@@ -83,7 +85,7 @@ describe('OnboardingWelcomeScreen', () => {
     await waitFor(() => expect(signInWithApple).toHaveBeenCalled());
   });
 
-  it('navigates to OnboardingNotification after Apple sign-in succeeds', async () => {
+  it('navigates to OnboardingAvatar after Apple sign-in succeeds', async () => {
     Platform.OS = 'ios';
     render(<OnboardingWelcomeScreen />);
     fireEvent.press(screen.getByTestId('apple-signin-button'));

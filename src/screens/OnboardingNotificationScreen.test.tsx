@@ -42,6 +42,20 @@ describe('OnboardingNotificationScreen', () => {
     expect(screen.getByText('onboarding.notificationHeading')).toBeTruthy();
   });
 
+  it('renders a 3-step progress indicator at step 3 (all filled)', () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+  });
+
   it('renders the notification body key', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     expect(screen.getByText('onboarding.notificationBody')).toBeTruthy();

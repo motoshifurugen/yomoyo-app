@@ -7,6 +7,7 @@ import { markOnboardingDone } from '@/lib/onboarding';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
 type Props = {
@@ -65,6 +66,13 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.progressBlock}>
+        <OnboardingProgress
+          currentStep={3}
+          totalSteps={3}
+          accessibilityLabel={t('onboarding.progressLabel', { current: 3, total: 3 })}
+        />
+      </View>
       <View style={styles.content}>
         <View style={styles.videoFrame}>
           <VideoView
@@ -96,11 +104,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: yomoyoColors.background,
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    justifyContent: 'center',
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
+  progressBlock: {
+    paddingTop: 8,
   },
   content: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: 64,
+    justifyContent: 'center',
   },
   videoFrame: {
     width: 180,

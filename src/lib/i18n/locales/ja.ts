@@ -92,6 +92,9 @@ const ja = {
   onboarding: {
     heading: 'Yomoyo',
     concept: 'フォローしている人が本を読み終えたとき、そっと知らせます。',
+    introHeading: '本を読む友達のための、静かな場所',
+    introBody:
+      'Yomoyoは公開SNSではありません。フォローしている友達が本を読み終えたとき、そっとお知らせが届きます。それだけ。',
     signInWithGoogle: 'Googleでサインイン',
     signInWithApple: 'Appleでサインイン',
     signInError: 'サインインに失敗しました。もう一度お試しください。',
@@ -101,6 +104,7 @@ const ja = {
     notificationBody: 'フォローしている人が本を読み終えたときだけ。',
     allowButton: '通知を許可する',
     skipLink: '後で',
+    progressLabel: '{{total}}ステップ中{{current}}ステップ目',
   },
 } as const;
 
