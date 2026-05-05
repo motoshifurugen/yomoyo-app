@@ -60,8 +60,7 @@ const mockUnfollowUser = unfollowUser as jest.Mock;
 
 const mockIdentity = {
   animalKey: 'fox' as const,
-  adjective: 'Quiet',
-  displayLabel: 'Quiet Fox',
+  displayName: 'Quiet Fox',
   finalizedAt: null,
 };
 
@@ -90,7 +89,7 @@ beforeEach(() => {
 });
 
 describe('UserProfileScreen — identity', () => {
-  it('renders the displayLabel when user exists', async () => {
+  it('renders the displayName when user exists', async () => {
     render(<UserProfileScreen />);
     expect(await screen.findByText('Quiet Fox')).toBeTruthy();
   });
@@ -307,5 +306,29 @@ describe('UserProfileScreen — self-profile state', () => {
     await screen.findByText('userProfile.ownPageNote');
     fireEvent.press(screen.getByTestId('go-to-shelf-button'));
     expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Shelf' });
+  });
+
+  it('shows edit-profile button when viewing own profile', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('edit-profile-button')).toBeTruthy();
+  });
+
+  it('hides edit-profile button when viewing another user', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user2' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.queryByTestId('edit-profile-button')).toBeNull();
+  });
+
+  it('navigates to EditProfile when edit-profile-button is pressed', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    fireEvent.press(screen.getByTestId('edit-profile-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('EditProfile');
   });
 });

@@ -33,6 +33,7 @@ export default function ActivityDetailModal({
 
   const avatarKey = activity.displayAvatar as AnimalKey | undefined;
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
+  const displayName = activity.displayName ?? activity.displayLabel;
   const authorLine =
     activity.authors.length > 0 ? activity.authors.join(', ') : t('bookDetail.unknownAuthor');
 
@@ -73,11 +74,11 @@ export default function ActivityDetailModal({
                 <Image
                   source={avatarSource}
                   style={styles.avatar}
-                  accessibilityLabel={activity.displayLabel ?? undefined}
+                  accessibilityLabel={displayName ?? undefined}
                 />
               )}
               <View style={styles.friendMeta}>
-                <Text style={styles.friendLabel}>{activity.displayLabel ?? '—'}</Text>
+                <Text style={styles.friendLabel}>{displayName ?? '—'}</Text>
                 <Text style={styles.finishedLabel}>{t('timeline.finishedReading')}</Text>
               </View>
             </View>

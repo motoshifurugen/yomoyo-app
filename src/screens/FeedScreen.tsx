@@ -33,6 +33,7 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
   const { t } = useTranslation();
   const avatarKey = item.displayAvatar as AnimalKey | undefined;
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
+  const displayName = item.displayName ?? item.displayLabel;
   return (
     <Pressable
       testID={`activity-row-${item.id}`}
@@ -45,11 +46,11 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
           <Image
             source={avatarSource}
             style={styles.avatar}
-            accessibilityLabel={item.displayLabel ?? undefined}
+            accessibilityLabel={displayName ?? undefined}
           />
         )}
         <View style={styles.cardMeta}>
-          <Text style={styles.cardUser}>{item.displayLabel ?? '—'}</Text>
+          <Text style={styles.cardUser}>{displayName ?? '—'}</Text>
           <Text style={styles.cardLabel}>{t('timeline.finishedReading')}</Text>
         </View>
       </View>

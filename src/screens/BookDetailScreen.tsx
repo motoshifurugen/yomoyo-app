@@ -33,8 +33,8 @@ export default function BookDetailScreen() {
     try {
       const avatarIdentity = await getAvatarIdentity(user.uid);
       const presenter: Presenter = avatarIdentity
-        ? { displayLabel: avatarIdentity.displayLabel, displayAvatar: null }
-        : { displayLabel: user.displayName ?? user.email?.split('@')[0] ?? 'Reader', displayAvatar: user.photoURL ?? null };
+        ? { displayName: avatarIdentity.displayName, displayAvatar: null }
+        : { displayName: user.displayName ?? user.email?.split('@')[0] ?? 'Reader', displayAvatar: user.photoURL ?? null };
       await markAsFinished(user.uid, book, presenter);
       setHasFinished(true);
     } catch {

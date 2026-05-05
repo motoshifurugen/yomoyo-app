@@ -119,8 +119,7 @@ describe('AddFriendScreen — search behavior', () => {
     mockedFindUid.mockResolvedValueOnce('friend-uid');
     mockedGetAvatar.mockResolvedValueOnce({
       animalKey: 'fox',
-      adjective: 'Quiet',
-      displayLabel: 'Quiet Fox',
+      displayName: 'Quiet Fox',
       finalizedAt: null,
     });
     render(<AddFriendScreen />);
@@ -138,8 +137,7 @@ describe('AddFriendScreen — search behavior', () => {
     mockedFindUid.mockResolvedValueOnce('friend-uid');
     mockedGetAvatar.mockResolvedValueOnce({
       animalKey: 'fox',
-      adjective: 'Quiet',
-      displayLabel: 'Quiet Fox',
+      displayName: 'Quiet Fox',
       finalizedAt: null,
     });
     render(<AddFriendScreen />);
@@ -155,8 +153,7 @@ describe('AddFriendScreen — search behavior', () => {
     mockedFindUid.mockResolvedValueOnce('friend-uid');
     mockedGetAvatar.mockResolvedValueOnce({
       animalKey: 'fox',
-      adjective: 'Quiet',
-      displayLabel: 'Quiet Fox',
+      displayName: 'Quiet Fox',
       finalizedAt: null,
     });
     render(<AddFriendScreen />);

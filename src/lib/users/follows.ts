@@ -10,10 +10,11 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
+import { pickDisplayName } from './avatarIdentity';
 
 export type UserProfile = {
   uid: string;
-  displayLabel: string;
+  displayName: string;
   animalKey: string;
 };
 
@@ -53,8 +54,10 @@ export async function getFollowingProfiles(userId: string): Promise<UserProfile[
       const snap = await getDoc(doc(db, 'users', uid));
       if (!snap.exists()) return null;
       const data = snap.data();
-      if (!data?.displayLabel || !data?.animalKey) return null;
-      return { uid, displayLabel: data.displayLabel as string, animalKey: data.animalKey as string };
+      if (!data?.animalKey) return null;
+      const displayName = pickDisplayName(data as Record<string, unknown>);
+      if (displayName === null) return null;
+      return { uid, displayName, animalKey: data.animalKey as string };
     }),
   );
   return results

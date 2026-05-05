@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import OnboardingAvatarScreen from './OnboardingAvatarScreen';
 import { useNavigation } from '@react-navigation/native';
-import { generateRandomIdentity, saveAvatarIdentity } from '@/lib/users/avatarIdentity';
+import { saveAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { ensureHandle } from '@/lib/users/handles';
 
 jest.mock('@react-navigation/native', () => ({
@@ -18,15 +18,13 @@ jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
 }));
 
-jest.mock('@/lib/users/avatarIdentity', () => ({
-  generateRandomIdentity: jest.fn(() => ({
-    animalKey: 'fox',
-    adjective: 'Quiet',
-    displayLabel: 'Quiet Fox',
-  })),
-  saveAvatarIdentity: jest.fn(() => Promise.resolve()),
-  ANIMAL_ASSETS: { fox: 1, bear: 2 },
-}));
+jest.mock('@/lib/users/avatarIdentity', () => {
+  const actual = jest.requireActual('@/lib/users/avatarIdentity');
+  return {
+    ...actual,
+    saveAvatarIdentity: jest.fn(() => Promise.resolve()),
+  };
+});
 
 jest.mock('@/lib/users/handles', () => ({
   ensureHandle: jest.fn(() => Promise.resolve('quietfox')),
@@ -38,82 +36,100 @@ describe('OnboardingAvatarScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.mocked(useNavigation).mockReturnValue({ navigate: mockNavigate } as any);
-    jest.mocked(generateRandomIdentity).mockReturnValue({
-      animalKey: 'fox',
-      adjective: 'Quiet',
-      displayLabel: 'Quiet Fox',
-    });
   });
 
-  it('shows the display label of the assigned identity', () => {
+  it('renders the avatar grid picker', () => {
     render(<OnboardingAvatarScreen />);
-    expect(screen.getByText('Quiet Fox')).toBeTruthy();
+    expect(screen.getByTestId('animal-grid-picker')).toBeTruthy();
   });
 
-  it('renders an animal image', () => {
+  it('renders the displayName input', () => {
     render(<OnboardingAvatarScreen />);
-    expect(screen.getByTestId('avatar-image')).toBeTruthy();
+    expect(screen.getByTestId('display-name-input')).toBeTruthy();
   });
 
-  it('renders a reroll button', () => {
+  it('does not render a reroll button', () => {
     render(<OnboardingAvatarScreen />);
-    expect(screen.getByText('onboarding.rerollButton')).toBeTruthy();
+    expect(screen.queryByText('onboarding.rerollButton')).toBeNull();
   });
 
   it('renders a continue button', () => {
     render(<OnboardingAvatarScreen />);
-    expect(screen.getByText('onboarding.avatarContinue')).toBeTruthy();
+    expect(screen.getByTestId('onboarding-avatar-continue')).toBeTruthy();
   });
 
-  it('calls generateRandomIdentity again when reroll is pressed', () => {
+  it('disables continue when displayName is empty', () => {
     render(<OnboardingAvatarScreen />);
-    const callsBefore = jest.mocked(generateRandomIdentity).mock.calls.length;
-    fireEvent.press(screen.getByText('onboarding.rerollButton'));
-    expect(jest.mocked(generateRandomIdentity).mock.calls.length).toBeGreaterThan(callsBefore);
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    expect(saveAvatarIdentity).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('updates the displayed label after reroll', () => {
-    jest.mocked(generateRandomIdentity)
-      .mockReturnValueOnce({ animalKey: 'fox', adjective: 'Quiet', displayLabel: 'Quiet Fox' })
-      .mockReturnValueOnce({ animalKey: 'bear', adjective: 'Bold', displayLabel: 'Bold Bear' });
-
+  it('disables continue when displayName is too long', () => {
     render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.rerollButton'));
-    expect(screen.getByText('Bold Bear')).toBeTruthy();
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'a'.repeat(21));
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    expect(saveAvatarIdentity).not.toHaveBeenCalled();
   });
 
-  it('calls saveAvatarIdentity with userId and identity when continue is pressed', async () => {
+  it('saves and navigates with the typed displayName when valid', async () => {
     render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    fireEvent.changeText(screen.getByTestId('display-name-input'), '  Foxy  ');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
     await waitFor(() => {
       expect(saveAvatarIdentity).toHaveBeenCalledWith('user1', {
-        animalKey: 'fox',
-        adjective: 'Quiet',
-        displayLabel: 'Quiet Fox',
+        animalKey: expect.any(String),
+        displayName: 'Foxy',
+      });
+      expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
+    });
+  });
+
+  it('persists the picked animal when continuing', async () => {
+    render(<OnboardingAvatarScreen />);
+    fireEvent.press(screen.getByTestId('animal-cell-wolf'));
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Lone');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    await waitFor(() => {
+      expect(saveAvatarIdentity).toHaveBeenCalledWith('user1', {
+        animalKey: 'wolf',
+        displayName: 'Lone',
       });
     });
   });
 
-  it('navigates to OnboardingNotification after continue', async () => {
+  it('reserves a handle for the user when continue is pressed', async () => {
     render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Foxy');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    await waitFor(() => {
+      expect(ensureHandle).toHaveBeenCalledWith('user1');
+    });
+  });
+
+  it('navigates synchronously without waiting for the save to complete', () => {
+    jest.mocked(saveAvatarIdentity).mockReturnValueOnce(new Promise(() => {}));
+    render(<OnboardingAvatarScreen />);
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Foxy');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
+  });
+
+  it('still navigates when saveAvatarIdentity rejects', async () => {
+    jest.mocked(saveAvatarIdentity).mockRejectedValueOnce(new Error('network error'));
+    render(<OnboardingAvatarScreen />);
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Foxy');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
     });
   });
 
-  it('navigates synchronously without waiting for the save to complete', () => {
-    // Navigation must not be blocked by the async Firestore write
-    jest.mocked(saveAvatarIdentity).mockReturnValueOnce(new Promise(() => {}));
+  it('still navigates when ensureHandle rejects', async () => {
+    jest.mocked(ensureHandle).mockRejectedValueOnce(new Error('reservation failed'));
     render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
-    expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
-  });
-
-  it('still navigates to OnboardingNotification even if saveAvatarIdentity throws', async () => {
-    jest.mocked(saveAvatarIdentity).mockRejectedValueOnce(new Error('network error'));
-    render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Foxy');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
     });
@@ -122,25 +138,9 @@ describe('OnboardingAvatarScreen', () => {
   it('prevents a second tap while the first save is in progress', () => {
     jest.mocked(saveAvatarIdentity).mockReturnValueOnce(new Promise(() => {}));
     render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
+    fireEvent.changeText(screen.getByTestId('display-name-input'), 'Foxy');
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
+    fireEvent.press(screen.getByTestId('onboarding-avatar-continue'));
     expect(jest.mocked(saveAvatarIdentity)).toHaveBeenCalledTimes(1);
-  });
-
-  it('reserves a handle for the user when continue is pressed', async () => {
-    render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
-    await waitFor(() => {
-      expect(ensureHandle).toHaveBeenCalledWith('user1');
-    });
-  });
-
-  it('still navigates to OnboardingNotification when ensureHandle fails', async () => {
-    jest.mocked(ensureHandle).mockRejectedValueOnce(new Error('reservation failed'));
-    render(<OnboardingAvatarScreen />);
-    fireEvent.press(screen.getByText('onboarding.avatarContinue'));
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('OnboardingNotification');
-    });
   });
 });

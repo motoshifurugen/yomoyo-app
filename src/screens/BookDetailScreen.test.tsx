@@ -39,8 +39,7 @@ jest.mock('@/lib/users/avatarIdentity', () => ({
   getAvatarIdentity: jest.fn(() =>
     Promise.resolve({
       animalKey: 'fox',
-      adjective: 'Quiet',
-      displayLabel: 'Quiet Fox',
+      displayName: 'Quiet Fox',
       finalizedAt: null,
     }),
   ),
@@ -103,12 +102,12 @@ describe('BookDetailScreen', () => {
     expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
   });
 
-  it('uses avatar identity displayLabel as presenter when avatar identity exists', async () => {
+  it('uses avatar identity displayName as presenter when avatar identity exists', async () => {
     render(<BookDetailScreen />);
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
       expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
-        displayLabel: 'Quiet Fox',
+        displayName: 'Quiet Fox',
         displayAvatar: null,
       });
     });
@@ -120,7 +119,7 @@ describe('BookDetailScreen', () => {
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
       expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
-        displayLabel: 'Alice',
+        displayName: 'Alice',
         displayAvatar: 'https://example.com/avatar.jpg',
       });
     });

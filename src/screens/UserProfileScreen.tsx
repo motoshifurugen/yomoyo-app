@@ -102,20 +102,30 @@ export default function UserProfileScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.identityBlock}>
           <Image source={ANIMAL_ASSETS[identity.animalKey]} style={styles.avatar} />
-          <Text style={styles.displayLabel}>{identity.displayLabel}</Text>
+          <Text style={styles.displayName}>{identity.displayName}</Text>
         </View>
 
         {isOwnProfile ? (
           <View style={styles.ownProfileBlock}>
             <Text style={styles.ownPageNote}>{t('userProfile.ownPageNote')}</Text>
-            <TouchableOpacity
-              style={styles.shelfButton}
-              onPress={() => navigation.navigate('MainTabs', { screen: 'Shelf' })}
-              accessibilityRole="button"
-              testID="go-to-shelf-button"
-            >
-              <Text style={styles.shelfButtonText}>{t('tabs.shelf')}</Text>
-            </TouchableOpacity>
+            <View style={styles.ownActionsRow}>
+              <TouchableOpacity
+                style={styles.shelfButton}
+                onPress={() => navigation.navigate('MainTabs', { screen: 'Shelf' })}
+                accessibilityRole="button"
+                testID="go-to-shelf-button"
+              >
+                <Text style={styles.shelfButtonText}>{t('tabs.shelf')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.shelfButton}
+                onPress={() => navigation.navigate('EditProfile')}
+                accessibilityRole="button"
+                testID="edit-profile-button"
+              >
+                <Text style={styles.shelfButtonText}>{t('userProfile.editProfile')}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ) : (
           <TouchableOpacity
@@ -178,6 +188,10 @@ const styles = StyleSheet.create({
     color: yomoyoColors.secondaryText,
     marginBottom: 16,
   },
+  ownActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
   shelfButton: {
     borderRadius: 20,
     borderWidth: 1,
@@ -204,7 +218,7 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     marginBottom: 12,
   },
-  displayLabel: {
+  displayName: {
     fontSize: yomoyoTypography.screenTitleSize,
     fontWeight: yomoyoTypography.titleWeight,
     color: yomoyoColors.text,

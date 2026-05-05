@@ -44,30 +44,31 @@ describe('validateActivityForNotification', () => {
     expect(result).toEqual({ ok: false, reason: 'missing-userId' });
   });
 
-  it('rejects when displayLabel is missing', () => {
+  it('rejects when both displayName and displayLabel are missing', () => {
     const result = validateActivityForNotification({
       status: 'finished',
       userId: 'A',
       title: 'Norwegian Wood',
     });
-    expect(result).toEqual({ ok: false, reason: 'missing-displayLabel' });
+    expect(result).toEqual({ ok: false, reason: 'missing-displayName' });
   });
 
-  it('rejects when displayLabel is empty string', () => {
+  it('rejects when both displayName and displayLabel are empty strings', () => {
     const result = validateActivityForNotification({
       status: 'finished',
       userId: 'A',
+      displayName: '',
       displayLabel: '',
       title: 'Norwegian Wood',
     });
-    expect(result).toEqual({ ok: false, reason: 'missing-displayLabel' });
+    expect(result).toEqual({ ok: false, reason: 'missing-displayName' });
   });
 
   it('rejects when title is missing', () => {
     const result = validateActivityForNotification({
       status: 'finished',
       userId: 'A',
-      displayLabel: 'Foxy',
+      displayName: 'Foxy',
     });
     expect(result).toEqual({ ok: false, reason: 'missing-title' });
   });
@@ -76,17 +77,17 @@ describe('validateActivityForNotification', () => {
     const result = validateActivityForNotification({
       status: 'finished',
       userId: 'A',
-      displayLabel: 'Foxy',
+      displayName: 'Foxy',
       title: '',
     });
     expect(result).toEqual({ ok: false, reason: 'missing-title' });
   });
 
-  it('accepts a valid finished activity and returns the extracted fields', () => {
+  it('accepts a valid finished activity using displayName', () => {
     const result = validateActivityForNotification({
       status: 'finished',
       userId: 'A',
-      displayLabel: '眠たいキツネ',
+      displayName: '眠たいキツネ',
       title: 'ノルウェイの森',
       bookId: 'b1',
       authors: ['村上春樹'],
@@ -95,9 +96,36 @@ describe('validateActivityForNotification', () => {
       ok: true,
       data: {
         userId: 'A',
-        displayLabel: '眠たいキツネ',
+        displayName: '眠たいキツネ',
         title: 'ノルウェイの森',
       },
+    });
+  });
+
+  it('falls back to legacy displayLabel when displayName is absent', () => {
+    const result = validateActivityForNotification({
+      status: 'finished',
+      userId: 'A',
+      displayLabel: 'Quiet Fox',
+      title: 'Old Book',
+    });
+    expect(result).toEqual({
+      ok: true,
+      data: { userId: 'A', displayName: 'Quiet Fox', title: 'Old Book' },
+    });
+  });
+
+  it('prefers displayName over legacy displayLabel when both are present', () => {
+    const result = validateActivityForNotification({
+      status: 'finished',
+      userId: 'A',
+      displayName: 'New Name',
+      displayLabel: 'Quiet Fox',
+      title: 'Some Book',
+    });
+    expect(result).toEqual({
+      ok: true,
+      data: { userId: 'A', displayName: 'New Name', title: 'Some Book' },
     });
   });
 });

@@ -22,12 +22,15 @@ export type ReadingActivity = {
   thumbnail: string | null;
   status: 'finished';
   finishedAt: FirestoreTimestamp | null;
-  displayLabel?: string;
+  displayName?: string;
   displayAvatar?: string | null;
+  // Legacy field, kept readable for one release window so existing docs still
+  // render correctly. Removed once all live docs have been rewritten.
+  displayLabel?: string;
 };
 
 export type Presenter = {
-  displayLabel: string;
+  displayName: string;
   displayAvatar: string | null;
 };
 
@@ -42,7 +45,7 @@ export async function markAsFinished(userId: string, book: Book, presenter: Pres
     thumbnail: book.thumbnail,
     finishedAt: serverTimestamp(),
     status: 'finished',
-    displayLabel: presenter.displayLabel,
+    displayName: presenter.displayName,
     displayAvatar: presenter.displayAvatar,
   });
 }
