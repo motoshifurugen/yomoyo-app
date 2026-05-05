@@ -6,7 +6,7 @@ import {
 } from './recipients';
 
 type FollowDoc = { followerId: string; followedUid: string };
-type PushTokenDoc = { token: unknown; enabled: unknown };
+type PushTokenDoc = { token: unknown; enabled: unknown; language?: unknown };
 
 interface FakeData {
   follows?: FollowDoc[];
@@ -148,8 +148,8 @@ describe('getEnabledPushTokens', () => {
     });
     const result = await getEnabledPushTokens(db, ['A']);
     expect(result).toEqual([
-      { uid: 'A', token: 't1' },
-      { uid: 'A', token: 't3' },
+      { uid: 'A', token: 't1', language: 'en' },
+      { uid: 'A', token: 't3', language: 'en' },
     ]);
   });
 
@@ -162,8 +162,8 @@ describe('getEnabledPushTokens', () => {
     });
     const result = await getEnabledPushTokens(db, ['A', 'B']);
     expect(result).toEqual([
-      { uid: 'A', token: 't1' },
-      { uid: 'B', token: 't2' },
+      { uid: 'A', token: 't1', language: 'en' },
+      { uid: 'B', token: 't2', language: 'en' },
     ]);
   });
 
@@ -175,7 +175,7 @@ describe('getEnabledPushTokens', () => {
       },
     });
     const result = await getEnabledPushTokens(db, ['A', 'B']);
-    expect(result).toEqual([{ uid: 'A', token: 'shared' }]);
+    expect(result).toEqual([{ uid: 'A', token: 'shared', language: 'en' }]);
   });
 
   it('skips tokens with non-string or empty values', async () => {
@@ -189,7 +189,53 @@ describe('getEnabledPushTokens', () => {
       },
     });
     const result = await getEnabledPushTokens(db, ['A']);
-    expect(result).toEqual([{ uid: 'A', token: 't1' }]);
+    expect(result).toEqual([{ uid: 'A', token: 't1', language: 'en' }]);
+  });
+
+  it("returns stored 'ja' language", async () => {
+    const db = makeFakeFirestore({
+      pushTokens: {
+        A: [{ token: 't1', enabled: true, language: 'ja' }],
+      },
+    });
+    const result = await getEnabledPushTokens(db, ['A']);
+    expect(result).toEqual([{ uid: 'A', token: 't1', language: 'ja' }]);
+  });
+
+  it("returns stored 'en' language", async () => {
+    const db = makeFakeFirestore({
+      pushTokens: {
+        A: [{ token: 't1', enabled: true, language: 'en' }],
+      },
+    });
+    const result = await getEnabledPushTokens(db, ['A']);
+    expect(result).toEqual([{ uid: 'A', token: 't1', language: 'en' }]);
+  });
+
+  it("defaults to 'en' when language field is missing", async () => {
+    const db = makeFakeFirestore({
+      pushTokens: {
+        A: [{ token: 't1', enabled: true }],
+      },
+    });
+    const result = await getEnabledPushTokens(db, ['A']);
+    expect(result).toEqual([{ uid: 'A', token: 't1', language: 'en' }]);
+  });
+
+  it("treats invalid language values as 'en'", async () => {
+    const db = makeFakeFirestore({
+      pushTokens: {
+        A: [{ token: 't1', enabled: true, language: 'fr' }],
+        B: [{ token: 't2', enabled: true, language: 42 }],
+        C: [{ token: 't3', enabled: true, language: null }],
+      },
+    });
+    const result = await getEnabledPushTokens(db, ['A', 'B', 'C']);
+    expect(result).toEqual([
+      { uid: 'A', token: 't1', language: 'en' },
+      { uid: 'B', token: 't2', language: 'en' },
+      { uid: 'C', token: 't3', language: 'en' },
+    ]);
   });
 });
 
@@ -216,15 +262,15 @@ describe('resolveRecipients', () => {
         { followerId: 'B', followedUid: 'X' },
       ],
       pushTokens: {
-        A: [{ token: 't1', enabled: true }],
-        B: [{ token: 't2', enabled: true }],
+        A: [{ token: 't1', enabled: true, language: 'ja' }],
+        B: [{ token: 't2', enabled: true, language: 'en' }],
       },
     });
     const result = await resolveRecipients(db, 'X');
     const sorted = [...result].sort((a, b) => a.token.localeCompare(b.token));
     expect(sorted).toEqual([
-      { uid: 'A', token: 't1' },
-      { uid: 'B', token: 't2' },
+      { uid: 'A', token: 't1', language: 'ja' },
+      { uid: 'B', token: 't2', language: 'en' },
     ]);
   });
 
