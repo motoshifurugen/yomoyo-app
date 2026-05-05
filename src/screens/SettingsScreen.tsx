@@ -32,7 +32,6 @@ export default function SettingsScreen() {
     }
   };
 
-
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       <View style={styles.content}>
