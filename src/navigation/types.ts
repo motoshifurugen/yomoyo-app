@@ -4,6 +4,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   BookSearch: undefined;
   BookDetail: { book: Book };
+  UserProfile: { uid: string };
 };
 
 export type MainTabParamList = {

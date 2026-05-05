@@ -1,11 +1,12 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Share } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import GlassCard from '@/components/ui/GlassCard';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
+import { useAuth } from '@/hooks/useAuth';
 
 type Language = 'ja' | 'en';
 
@@ -13,11 +14,34 @@ export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const currentLanguage = (i18n.language.split('-')[0] ?? 'en') as Language;
   const tabBarInset = useGlassTabBarInset();
+  const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (!user) return;
+    Share.share({ message: `yomoyo://user/${user.uid}` })
+      .then(() => setCopied(true))
+      .catch(() => {});
+  };
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       <View style={styles.content}>
-        <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
+        <Text style={styles.sectionLabel}>{t('settings.profileLinkTitle')}</Text>
+        <GlassCard>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={handleCopyLink}
+            accessibilityRole="button"
+          >
+            <Text style={styles.linkButtonText}>{t('settings.copyLink')}</Text>
+          </TouchableOpacity>
+          {copied && (
+            <Text style={styles.linkCopiedText}>{t('settings.linkCopied')}</Text>
+          )}
+        </GlassCard>
+
+        <Text style={[styles.sectionLabel, styles.sectionLabelSpaced]}>{t('settings.languageTitle')}</Text>
         <GlassCard>
           <View style={styles.row}>
             <TouchableOpacity
@@ -54,6 +78,24 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: yomoyoColors.secondaryText,
     marginBottom: 12,
+  },
+  sectionLabelSpaced: {
+    marginTop: 24,
+  },
+  linkButton: {
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  linkButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: yomoyoColors.primary,
+  },
+  linkCopiedText: {
+    fontSize: 13,
+    color: yomoyoColors.muted,
+    textAlign: 'center',
+    paddingBottom: 8,
   },
   row: {
     flexDirection: 'row',

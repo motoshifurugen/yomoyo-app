@@ -42,6 +42,15 @@ const ja = {
   },
   settings: {
     languageTitle: '言語',
+    profileLinkTitle: 'プロフィールリンク',
+    copyLink: 'リンクをコピー',
+    linkCopied: 'コピーしました',
+  },
+  userProfile: {
+    follow: 'おたよりを受け取る',
+    unfollow: '受け取るのをやめる',
+    notFound: 'このページは存在しません',
+    emptyBooks: '読了した本はまだありません',
   },
   onboarding: {
     heading: 'Yomoyo',
