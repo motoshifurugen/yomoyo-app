@@ -5,6 +5,7 @@ import {
   registerPushTokenIfPermitted,
 } from './registerPushToken';
 import { savePushToken } from '@/lib/users/pushTokens';
+import { getCurrentLanguage } from '@/lib/i18n';
 
 jest.mock('expo-notifications');
 
@@ -12,7 +13,12 @@ jest.mock('@/lib/users/pushTokens', () => ({
   savePushToken: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('@/lib/i18n', () => ({
+  getCurrentLanguage: jest.fn(() => 'en'),
+}));
+
 const mockedSavePushToken = savePushToken as jest.Mock;
+const mockedGetCurrentLanguage = getCurrentLanguage as jest.Mock;
 const mockedRequestPermissions = Notifications.requestPermissionsAsync as jest.Mock;
 const mockedGetPermissions = Notifications.getPermissionsAsync as jest.Mock;
 const mockedGetToken = Notifications.getExpoPushTokenAsync as jest.Mock;
@@ -34,6 +40,7 @@ describe('registerPushTokenAfterGrant', () => {
       'user1',
       'ExponentPushToken[abc]',
       Platform.OS,
+      'en',
     );
   });
 
@@ -82,6 +89,7 @@ describe('registerPushTokenIfPermitted', () => {
       'user1',
       'ExponentPushToken[abc]',
       Platform.OS,
+      'en',
     );
   });
 
@@ -120,5 +128,33 @@ describe('registerPushTokenIfPermitted', () => {
     mockedGetPermissions.mockResolvedValueOnce({ status: 'granted' });
     mockedSavePushToken.mockRejectedValueOnce(new Error('firestore error'));
     await expect(registerPushTokenIfPermitted('user1')).resolves.toBeUndefined();
+  });
+
+  it("passes 'ja' to savePushToken when current language is Japanese", async () => {
+    mockedGetPermissions.mockResolvedValueOnce({ status: 'granted' });
+    mockedGetCurrentLanguage.mockReturnValueOnce('ja');
+
+    await registerPushTokenIfPermitted('user1');
+
+    expect(mockedSavePushToken).toHaveBeenCalledWith(
+      'user1',
+      'ExponentPushToken[abc]',
+      Platform.OS,
+      'ja',
+    );
+  });
+
+  it("passes 'en' to savePushToken when current language is English", async () => {
+    mockedGetPermissions.mockResolvedValueOnce({ status: 'granted' });
+    mockedGetCurrentLanguage.mockReturnValueOnce('en');
+
+    await registerPushTokenIfPermitted('user1');
+
+    expect(mockedSavePushToken).toHaveBeenCalledWith(
+      'user1',
+      'ExponentPushToken[abc]',
+      Platform.OS,
+      'en',
+    );
   });
 });

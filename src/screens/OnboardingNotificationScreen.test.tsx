@@ -25,6 +25,10 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+jest.mock('@/lib/i18n', () => ({
+  getCurrentLanguage: jest.fn(() => 'en'),
+}));
+
 const mockOnComplete = jest.fn();
 
 describe('OnboardingNotificationScreen', () => {

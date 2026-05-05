@@ -7,6 +7,7 @@ import GlassCard from '@/components/ui/GlassCard';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 import { useAuth } from '@/hooks/useAuth';
+import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 
 type Language = 'ja' | 'en';
 
@@ -22,6 +23,13 @@ export default function SettingsScreen() {
     Share.share({ message: `yomoyo://user/${user.uid}` })
       .then(() => setCopied(true))
       .catch(() => {});
+  };
+
+  const handleLanguageChange = async (lang: Language) => {
+    await setLanguage(lang);
+    if (user) {
+      await registerPushTokenIfPermitted(user.uid);
+    }
   };
 
   return (
@@ -46,7 +54,7 @@ export default function SettingsScreen() {
           <View style={styles.row}>
             <TouchableOpacity
               style={[styles.langOption, currentLanguage === 'ja' && styles.langOptionActive]}
-              onPress={() => { void setLanguage('ja'); }}
+              onPress={() => { void handleLanguageChange('ja'); }}
               accessibilityRole="button"
             >
               <Text style={[styles.langText, currentLanguage === 'ja' && styles.langTextActive]}>
@@ -55,7 +63,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.langOption, currentLanguage === 'en' && styles.langOptionActive]}
-              onPress={() => { void setLanguage('en'); }}
+              onPress={() => { void handleLanguageChange('en'); }}
               accessibilityRole="button"
             >
               <Text style={[styles.langText, currentLanguage === 'en' && styles.langTextActive]}>

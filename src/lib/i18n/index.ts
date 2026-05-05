@@ -35,6 +35,10 @@ export async function loadSavedLanguage(): Promise<'ja' | 'en' | null> {
   return null;
 }
 
+export function getCurrentLanguage(): 'ja' | 'en' {
+  return i18n.language === 'ja' ? 'ja' : 'en';
+}
+
 const language = detectLanguage(getDeviceLocales());
 
 i18n.use(initReactI18next).init({

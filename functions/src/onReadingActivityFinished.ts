@@ -43,14 +43,18 @@ export function validateActivityForNotification(
   return { ok: true, data: { userId, displayLabel, title } };
 }
 
+export type NotificationLanguage = 'ja' | 'en';
+
 export function buildNotificationPayload(
   displayLabel: string,
   bookTitle: string,
+  language: NotificationLanguage,
 ): { title: string; body: string } {
-  return {
-    title: PUSH_TITLE,
-    body: `${displayLabel}が「${bookTitle}」を読み終えました。`,
-  };
+  const body =
+    language === 'ja'
+      ? `${displayLabel}が「${bookTitle}」を読み終えました。`
+      : `${displayLabel} finished reading "${bookTitle}".`;
+  return { title: PUSH_TITLE, body };
 }
 
 export function excludeActor<T extends { uid: string }>(
@@ -113,9 +117,15 @@ export const onReadingActivityFinished = onDocumentCreated(
         return;
       }
 
-      const payload = buildNotificationPayload(displayLabel, title);
       const results = await Promise.allSettled(
-        recipients.map((r) => sendExpoPush(r.token, payload)),
+        recipients.map((r) => {
+          const payload = buildNotificationPayload(
+            displayLabel,
+            title,
+            r.language,
+          );
+          return sendExpoPush(r.token, payload);
+        }),
       );
       const sent = results.filter((r) => r.status === 'fulfilled').length;
       const failed = results.length - sent;

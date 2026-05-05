@@ -103,18 +103,48 @@ describe('validateActivityForNotification', () => {
 });
 
 describe('buildNotificationPayload', () => {
-  it('builds the expected one-line Japanese body', () => {
-    const payload = buildNotificationPayload('眠たいキツネ', 'ノルウェイの森');
+  it("builds the Japanese one-line body when language is 'ja'", () => {
+    const payload = buildNotificationPayload(
+      '眠たいキツネ',
+      'ノルウェイの森',
+      'ja',
+    );
     expect(payload).toEqual({
       title: 'Yomoyo',
       body: '眠たいキツネが「ノルウェイの森」を読み終えました。',
     });
   });
 
-  it('preserves arbitrary characters in label and title', () => {
-    const payload = buildNotificationPayload('A & B', 'Title-with-dashes');
+  it("builds the English one-line body when language is 'en'", () => {
+    const payload = buildNotificationPayload(
+      'Sleepy Fox',
+      'Norwegian Wood',
+      'en',
+    );
+    expect(payload).toEqual({
+      title: 'Yomoyo',
+      body: 'Sleepy Fox finished reading "Norwegian Wood".',
+    });
+  });
+
+  it("preserves arbitrary characters in label and title (ja)", () => {
+    const payload = buildNotificationPayload(
+      'A & B',
+      'Title-with-dashes',
+      'ja',
+    );
     expect(payload.title).toBe('Yomoyo');
     expect(payload.body).toBe('A & Bが「Title-with-dashes」を読み終えました。');
+  });
+
+  it('preserves arbitrary characters in label and title (en)', () => {
+    const payload = buildNotificationPayload(
+      'A & B',
+      'Title-with-dashes',
+      'en',
+    );
+    expect(payload.title).toBe('Yomoyo');
+    expect(payload.body).toBe('A & B finished reading "Title-with-dashes".');
   });
 });
 

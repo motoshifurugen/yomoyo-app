@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { savePushToken, type PushTokenPlatform } from '@/lib/users/pushTokens';
+import { getCurrentLanguage } from '@/lib/i18n';
 
 function logFailure(stage: string, err: unknown) {
   if (!__DEV__) return;
@@ -31,7 +32,12 @@ async function fetchAndPersistToken(userId: string): Promise<void> {
   }
 
   try {
-    await savePushToken(userId, token, Platform.OS as PushTokenPlatform);
+    await savePushToken(
+      userId,
+      token,
+      Platform.OS as PushTokenPlatform,
+      getCurrentLanguage(),
+    );
     if (__DEV__) {
       console.log('[PushToken] Persisted token for user:', userId);
     }

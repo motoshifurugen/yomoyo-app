@@ -15,7 +15,13 @@ jest.mock('i18next', () => ({
 
 import i18n from 'i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { detectLanguage, setLanguage, loadSavedLanguage, LANGUAGE_STORAGE_KEY } from '@/lib/i18n';
+import {
+  detectLanguage,
+  setLanguage,
+  loadSavedLanguage,
+  getCurrentLanguage,
+  LANGUAGE_STORAGE_KEY,
+} from '@/lib/i18n';
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -62,6 +68,28 @@ describe('setLanguage', () => {
   it('persists en to AsyncStorage', async () => {
     await setLanguage('en');
     expect(AsyncStorage.setItem).toHaveBeenCalledWith(LANGUAGE_STORAGE_KEY, 'en');
+  });
+});
+
+describe('getCurrentLanguage', () => {
+  it("returns 'ja' when i18n.language is 'ja'", () => {
+    (i18n as unknown as { language: string }).language = 'ja';
+    expect(getCurrentLanguage()).toBe('ja');
+  });
+
+  it("returns 'en' when i18n.language is 'en'", () => {
+    (i18n as unknown as { language: string }).language = 'en';
+    expect(getCurrentLanguage()).toBe('en');
+  });
+
+  it("returns 'en' as fallback for unsupported values", () => {
+    (i18n as unknown as { language: string }).language = 'fr';
+    expect(getCurrentLanguage()).toBe('en');
+  });
+
+  it("returns 'en' when i18n.language is undefined", () => {
+    (i18n as unknown as { language: string | undefined }).language = undefined;
+    expect(getCurrentLanguage()).toBe('en');
   });
 });
 

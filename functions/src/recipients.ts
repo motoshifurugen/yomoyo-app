@@ -1,8 +1,15 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
+export type RecipientLanguage = 'ja' | 'en';
+
 export interface Recipient {
   uid: string;
   token: string;
+  language: RecipientLanguage;
+}
+
+function readLanguage(value: unknown): RecipientLanguage {
+  return value === 'ja' ? 'ja' : 'en';
 }
 
 export async function getFollowerUids(
@@ -36,24 +43,24 @@ export async function getEnabledPushTokens(
         .doc(uid)
         .collection('pushTokens')
         .get();
-      const tokens: string[] = [];
+      const entries: Array<{ token: string; language: RecipientLanguage }> = [];
       for (const doc of snap.docs) {
         if (doc.get('enabled') !== true) continue;
         const token = doc.get('token');
         if (typeof token !== 'string' || token.length === 0) continue;
-        tokens.push(token);
+        entries.push({ token, language: readLanguage(doc.get('language')) });
       }
-      return { uid, tokens };
+      return { uid, entries };
     }),
   );
 
   const seen = new Set<string>();
   const out: Recipient[] = [];
-  for (const { uid, tokens } of perUser) {
-    for (const token of tokens) {
+  for (const { uid, entries } of perUser) {
+    for (const { token, language } of entries) {
       if (seen.has(token)) continue;
       seen.add(token);
-      out.push({ uid, token });
+      out.push({ uid, token, language });
     }
   }
   return out;
