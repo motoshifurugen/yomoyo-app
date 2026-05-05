@@ -5,7 +5,6 @@ const en = {
   tabs: {
     timeline: 'Timeline',
     shelf: 'My Shelf',
-    settings: 'Settings',
   },
   timeline: {
     finishedReading: 'Finished reading',
@@ -39,12 +38,14 @@ const en = {
     emptyFinished: 'No finished books yet',
     addBook: 'Record a finished book',
     markAsFinished: 'Mark as Finished',
-  },
-  settings: {
-    languageTitle: 'Language',
     yourIdTitle: 'Your ID',
     shareId: 'Share my ID',
     idShared: 'Shared!',
+  },
+  settings: {
+    languageTitle: 'Language',
+    openSettings: 'Open settings',
+    close: 'Close',
   },
   userProfile: {
     follow: 'Receive updates',

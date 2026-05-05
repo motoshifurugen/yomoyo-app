@@ -25,6 +25,13 @@ jest.mock('@/lib/books/readingActivity', () => ({
   subscribeToReadingActivities: jest.fn(() => jest.fn()),
 }));
 
+jest.mock('@/components/shelf/MyHandleCard', () => {
+  const { Text } = require('react-native');
+  return function MyHandleCard({ uid }: { uid: string }) {
+    return <Text testID="my-handle-card">{`MyHandleCard:${uid}`}</Text>;
+  };
+});
+
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 const mockSubscribe = subscribeToReadingActivities as jest.Mock;
 
@@ -151,5 +158,11 @@ describe('ShelfScreen', () => {
     expect(mockSetOptions).toHaveBeenCalledWith(
       expect.objectContaining({ headerRight: expect.any(Function) })
     );
+  });
+
+  it('renders the MyHandleCard for the current user', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('my-handle-card')).toBeTruthy();
+    expect(screen.getByText('MyHandleCard:user1')).toBeTruthy();
   });
 });

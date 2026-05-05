@@ -11,7 +11,6 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Timeline: undefined;
   Shelf: undefined;
-  Settings: undefined;
 };
 
 export type OnboardingStackParamList = {
