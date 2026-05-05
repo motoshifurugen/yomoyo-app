@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,15 @@ import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import ActivityDetailModal from '@/components/feed/ActivityDetailModal';
 import AddFriendButton from '@/components/feed/AddFriendButton';
+import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 import type { RootStackParamList } from '@/navigation/types';
+import { interleaveAds, type FeedRow } from '@/lib/ads/interleaveAds';
+import { TIMELINE_AD_CADENCE } from '@/constants/ads';
 import { useFeedState } from './FeedScreen.hooks';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -83,6 +86,30 @@ export default function FeedScreen() {
     [navigation],
   );
 
+  const listData = useMemo<FeedRow<ReadingActivity>[]>(
+    () => interleaveAds(items, TIMELINE_AD_CADENCE),
+    [items],
+  );
+
+  const renderRow = useCallback(
+    ({ item: row }: { item: FeedRow<ReadingActivity> }) => {
+      if (row.kind === 'ad') {
+        return (
+          <View style={styles.adSlot}>
+            <TimelineBannerAd />
+          </View>
+        );
+      }
+      return <ActivityCard item={row.item} onPress={handleRowPress} />;
+    },
+    [handleRowPress],
+  );
+
+  const keyExtractor = useCallback(
+    (row: FeedRow<ReadingActivity>) => (row.kind === 'ad' ? row.key : row.item.id),
+    [],
+  );
+
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       {isLoading ? (
@@ -101,13 +128,13 @@ export default function FeedScreen() {
       ) : (
         <FlatList
           testID="updates-list"
-          data={items}
-          keyExtractor={(item) => item.id}
+          data={listData}
+          keyExtractor={keyExtractor}
           contentContainerStyle={styles.list}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
           ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.loader} /> : null}
-          renderItem={({ item }) => <ActivityCard item={item} onPress={handleRowPress} />}
+          renderItem={renderRow}
         />
       )}
 
@@ -136,6 +163,7 @@ const styles = StyleSheet.create({
   },
   list: { padding: 16 },
   loader: { marginVertical: 16 },
+  adSlot: { marginBottom: 12, alignItems: 'center' },
   card: {
     backgroundColor: yomoyoColors.surface,
     borderRadius: 12,

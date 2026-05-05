@@ -32,6 +32,15 @@ jest.mock('@/lib/users/avatarIdentity', () => ({
   ANIMAL_ASSETS: { fox: 1, bear: 2 },
 }));
 
+jest.mock('@/components/ads/TimelineBannerAd', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () => React.createElement(View, { testID: 'timeline-banner-ad' }),
+  };
+});
+
 import { getFollowingUids } from '@/lib/users/follows';
 import { getFriendsFeed } from '@/lib/books/friendsFeed';
 
@@ -175,6 +184,50 @@ describe('FeedScreen — friend updates list', () => {
       expect(mockGetFriendsFeed).toHaveBeenCalledTimes(2);
       expect(mockGetFriendsFeed).toHaveBeenNthCalledWith(2, ['user2'], cursor);
     });
+  });
+});
+
+describe('FeedScreen — ad placement policy', () => {
+  const buildItems = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      ...mockActivity,
+      id: `act-${i}`,
+      title: `Book ${i}`,
+    }));
+
+  it('does not render an ad in the empty state', async () => {
+    mockGetFollowingUids.mockResolvedValue([]);
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('timeline.emptyBody'));
+    expect(screen.queryByTestId('timeline-banner-ad')).toBeNull();
+  });
+
+  it('does not render an ad in the error state', async () => {
+    mockGetFriendsFeed.mockRejectedValueOnce(new Error('boom'));
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('timeline.loadErrorBody'));
+    expect(screen.queryByTestId('timeline-banner-ad')).toBeNull();
+  });
+
+  it('does not render an ad while the feed is loading', () => {
+    mockGetFriendsFeed.mockReturnValue(new Promise(() => {}));
+    render(<FeedScreen />);
+    expect(screen.queryByTestId('timeline-banner-ad')).toBeNull();
+  });
+
+  it('does not render any ad when only a few items are present (< cadence)', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: buildItems(5), lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Book 0'));
+    expect(screen.queryByTestId('timeline-banner-ad')).toBeNull();
+  });
+
+  it('renders one ad after the 6th item once the cadence is reached with more items following', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: buildItems(13), lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Book 0'));
+    const ads = await screen.findAllByTestId('timeline-banner-ad');
+    expect(ads.length).toBeGreaterThanOrEqual(1);
   });
 });
 
