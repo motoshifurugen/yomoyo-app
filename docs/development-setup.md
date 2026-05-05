@@ -24,7 +24,7 @@ cp .env.example .env
 
 - `IOS_BUNDLE_IDENTIFIER` / `ANDROID_PACKAGE_NAME` — 開発者自身のXコードで登録した署名を利用する (例： `com.yourname.yomoyo`) 
 - `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — Google Cloud Console → Credentials → OAuth 2.0 → Web application
-- `EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY` — Google Cloud Console → Credentials → API key
+- `EXPO_PUBLIC_RAKUTEN_APPLICATION_ID` — Rakuten Developers → アプリID/デベロッパーID登録 → アプリID
 - `EXPO_PUBLIC_FIREBASE_*` — Firebase Console → Project settings → Your apps → `GoogleService-Info.plist`
 
 ### 3. FirebaseのConfigファイルを設置
