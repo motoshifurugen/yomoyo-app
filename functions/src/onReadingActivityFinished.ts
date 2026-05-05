@@ -83,48 +83,56 @@ export const onReadingActivityFinished = onDocumentCreated(
     }
     const { userId: sourceUid, displayLabel, title } = validation.data;
 
-    const db = getFirestore();
-    const activityRef = db.collection('readingActivities').doc(activityId);
+    try {
+      const db = getFirestore();
+      const activityRef = db.collection('readingActivities').doc(activityId);
 
-    const claimed = await db.runTransaction(async (txn) => {
-      const cur = await txn.get(activityRef);
-      if (!cur.exists) return false;
-      if (cur.get('notifiedAt')) return false;
-      txn.update(activityRef, { notifiedAt: FieldValue.serverTimestamp() });
-      return true;
-    });
-    if (!claimed) {
-      logger.info('onReadingActivityFinished: already notified', {
+      const claimed = await db.runTransaction(async (txn) => {
+        const cur = await txn.get(activityRef);
+        if (!cur.exists) return false;
+        if (cur.get('notifiedAt')) return false;
+        txn.update(activityRef, { notifiedAt: FieldValue.serverTimestamp() });
+        return true;
+      });
+      if (!claimed) {
+        logger.info('onReadingActivityFinished: already notified', {
+          activityId,
+          sourceUid,
+        });
+        return;
+      }
+
+      const allRecipients = await resolveRecipients(db, sourceUid);
+      const recipients = excludeActor(allRecipients, sourceUid);
+
+      if (recipients.length === 0) {
+        logger.info('onReadingActivityFinished: no recipients', {
+          activityId,
+          sourceUid,
+        });
+        return;
+      }
+
+      const payload = buildNotificationPayload(displayLabel, title);
+      const results = await Promise.allSettled(
+        recipients.map((r) => sendExpoPush(r.token, payload)),
+      );
+      const sent = results.filter((r) => r.status === 'fulfilled').length;
+      const failed = results.length - sent;
+
+      logger.info('onReadingActivityFinished: dispatched', {
         activityId,
         sourceUid,
+        recipientCount: recipients.length,
+        sent,
+        failed,
       });
-      return;
-    }
-
-    const allRecipients = await resolveRecipients(db, sourceUid);
-    const recipients = excludeActor(allRecipients, sourceUid);
-
-    if (recipients.length === 0) {
-      logger.info('onReadingActivityFinished: no recipients', {
+    } catch (err) {
+      logger.error('onReadingActivityFinished: failed', {
         activityId,
         sourceUid,
+        error: err instanceof Error ? err.message : String(err),
       });
-      return;
     }
-
-    const payload = buildNotificationPayload(displayLabel, title);
-    const results = await Promise.allSettled(
-      recipients.map((r) => sendExpoPush(r.token, payload)),
-    );
-    const sent = results.filter((r) => r.status === 'fulfilled').length;
-    const failed = results.length - sent;
-
-    logger.info('onReadingActivityFinished: dispatched', {
-      activityId,
-      sourceUid,
-      recipientCount: recipients.length,
-      sent,
-      failed,
-    });
   },
 );
