@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { markOnboardingDone } from '@/lib/onboarding';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
+import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
@@ -13,20 +14,6 @@ type Props = {
 };
 
 const videoSource = require('../../assets/videos/notification_loop.mp4');
-
-function logTokenError(err: unknown) {
-  if (!__DEV__) return;
-  const isNoProjectId =
-    err instanceof Error &&
-    (err as { code?: string }).code === 'ERR_NOTIFICATIONS_NO_EXPERIENCE_ID';
-  if (isNoProjectId) {
-    console.warn(
-      '[PushToken] Missing EAS project ID. Run `eas init` or set extra.eas.projectId in app.json, then restart the dev server.'
-    );
-  } else {
-    console.warn('[PushToken] Failed to get push token:', err);
-  }
-}
 
 export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -41,16 +28,9 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const handleAllow = async () => {
     try {
       const { status } = await Notifications.requestPermissionsAsync();
-      if (status === 'granted') {
-        try {
-          const { data } = await Notifications.getExpoPushTokenAsync();
-          if (__DEV__) {
-            console.log('[PushToken] Expo push token:', data);
-          }
-        } catch (err) {
-          logTokenError(err);
-        }
-      } else if (__DEV__) {
+      if (status === 'granted' && user) {
+        await registerPushTokenAfterGrant(user.uid);
+      } else if (status !== 'granted' && __DEV__) {
         console.log('[PushToken] Permission not granted — push token skipped.');
       }
     } catch {
