@@ -7,7 +7,7 @@ import { initializeApp, getApps } from 'firebase/app';
 // import keeps Metro from loading two module instances — important because
 // only the loaded instance registers the auth Component with FirebaseApp.
 // @ts-expect-error: getReactNativePersistence is untyped in firebase v10
-import { initializeAuth, onAuthStateChanged, getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Values from GoogleService-Info.plist / google-services.json.
@@ -30,17 +30,3 @@ export const firebaseApp =
 export const jsSdkAuth = initializeAuth(firebaseApp, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
-
-if (__DEV__) {
-  // TEMP DIAGNOSTIC (Issue #43 follow-up): verify which Firestore project
-  // the JS SDK is actually talking to at runtime.
-  console.log(
-    '[FirebaseDiag] JS SDK projectId =',
-    firebaseApp?.options?.projectId,
-  );
-  // TEMP DIAGNOSTIC (Issue #43 follow-up): JS SDK auth uid as it changes.
-  // Should match the [FirebaseDiag] native auth uid log after the bridge runs.
-  onAuthStateChanged(jsSdkAuth, (jsUser) => {
-    console.log('[FirebaseDiag] JS SDK auth uid =', jsUser?.uid ?? null);
-  });
-}
