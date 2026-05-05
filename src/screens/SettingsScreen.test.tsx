@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import SettingsScreen from './SettingsScreen';
 import { setLanguage } from '@/lib/i18n';
+import { Share } from 'react-native';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
@@ -22,6 +23,12 @@ jest.mock('react-i18next', () => ({
     i18n: { language: 'en' },
   }),
 }));
+
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
+}));
+
+jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
 
 describe('SettingsScreen', () => {
   beforeEach(() => {
@@ -57,5 +64,42 @@ describe('SettingsScreen', () => {
     render(<SettingsScreen />);
     fireEvent.press(screen.getByText('English'));
     expect(setLanguage).toHaveBeenCalledWith('en');
+  });
+});
+
+describe('SettingsScreen — profile link', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the profile link section title', () => {
+    render(<SettingsScreen />);
+    expect(screen.getByText('settings.profileLinkTitle')).toBeTruthy();
+  });
+
+  it('renders the copy link button', () => {
+    render(<SettingsScreen />);
+    expect(screen.getByText('settings.copyLink')).toBeTruthy();
+  });
+
+  it('calls Share.share with the profile link when copy button is pressed', async () => {
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('settings.copyLink'));
+    await waitFor(() => {
+      expect(Share.share).toHaveBeenCalledWith({ message: 'yomoyo://user/user1' });
+    });
+  });
+
+  it('shows linkCopied confirmation text after pressing copy', async () => {
+    render(<SettingsScreen />);
+    fireEvent.press(screen.getByText('settings.copyLink'));
+    await waitFor(() => {
+      expect(screen.getByText('settings.linkCopied')).toBeTruthy();
+    });
+  });
+
+  it('does not show linkCopied text before copy button is pressed', () => {
+    render(<SettingsScreen />);
+    expect(screen.queryByText('settings.linkCopied')).toBeNull();
   });
 });

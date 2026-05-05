@@ -1,9 +1,10 @@
 import type { Book } from '@/lib/books/searchBooks';
 
 export type RootStackParamList = {
-  MainTabs: undefined;
+  MainTabs: { screen?: keyof MainTabParamList } | undefined;
   BookSearch: undefined;
   BookDetail: { book: Book };
+  UserProfile: { uid: string };
 };
 
 export type MainTabParamList = {

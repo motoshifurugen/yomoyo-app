@@ -1,4 +1,7 @@
 const ja = {
+  common: {
+    back: '戻る',
+  },
   tabs: {
     feed: 'フィード',
     friends: 'フレンド',
@@ -42,6 +45,16 @@ const ja = {
   },
   settings: {
     languageTitle: '言語',
+    profileLinkTitle: 'プロフィールリンク',
+    copyLink: 'リンクをコピー',
+    linkCopied: 'コピーしました',
+  },
+  userProfile: {
+    follow: 'おたよりを受け取る',
+    unfollow: '受け取るのをやめる',
+    notFound: 'このページは存在しません',
+    emptyBooks: '読了した本はまだありません',
+    ownPageNote: 'これはあなたのページです',
   },
   onboarding: {
     heading: 'Yomoyo',

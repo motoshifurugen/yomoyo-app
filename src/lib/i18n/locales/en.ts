@@ -1,4 +1,7 @@
 const en = {
+  common: {
+    back: 'Go back',
+  },
   tabs: {
     feed: 'Feed',
     friends: 'Friends',
@@ -42,6 +45,16 @@ const en = {
   },
   settings: {
     languageTitle: 'Language',
+    profileLinkTitle: 'Profile Link',
+    copyLink: 'Copy Link',
+    linkCopied: 'Copied!',
+  },
+  userProfile: {
+    follow: 'Receive updates',
+    unfollow: 'Stop receiving',
+    notFound: 'This page does not exist.',
+    emptyBooks: 'No finished books yet',
+    ownPageNote: 'This is your page',
   },
   onboarding: {
     heading: 'Yomoyo',
