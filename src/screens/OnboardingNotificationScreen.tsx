@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -7,6 +9,7 @@ import { markOnboardingDone } from '@/lib/onboarding';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
 type Props = {
@@ -18,6 +21,7 @@ const videoSource = require('../../assets/videos/notification_loop.mp4');
 export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const player = useVideoPlayer(videoSource, (p) => {
     p.loop = true;
@@ -64,9 +68,28 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 24) + 16 },
+      ]}
+    >
+      <OnboardingProgress
+        currentStep={3}
+        totalSteps={3}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 3, total: 3 })}
+      />
       <View style={styles.content}>
         <View style={styles.videoFrame}>
+          <View
+            testID="notification-video-placeholder"
+            pointerEvents="none"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={styles.placeholder}
+          >
+            <Ionicons name="notifications-outline" size={64} color={yomoyoColors.muted} />
+          </View>
           <VideoView
             accessible={false}
             testID="notification-video"
@@ -96,11 +119,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: yomoyoColors.background,
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    justifyContent: 'center',
   },
   content: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: 64,
+    justifyContent: 'center',
   },
   videoFrame: {
     width: 180,
@@ -112,9 +135,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 40,
   },
+  placeholder: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   video: {
     width: 180,
     height: 180,
+    backgroundColor: 'transparent',
   },
   heading: {
     fontSize: yomoyoTypography.titleSize,

@@ -9,6 +9,10 @@ import { useVideoPlayer } from 'expo-video';
 jest.mock('expo-notifications');
 jest.mock('expo-video');
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 jest.mock('@/lib/onboarding', () => ({
   markOnboardingDone: jest.fn().mockResolvedValue(undefined),
 }));
@@ -40,6 +44,20 @@ describe('OnboardingNotificationScreen', () => {
   it('renders the notification heading key', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     expect(screen.getByText('onboarding.notificationHeading')).toBeTruthy();
+  });
+
+  it('renders a 3-step progress indicator at step 3 (all filled)', () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
   });
 
   it('renders the notification body key', () => {
@@ -240,6 +258,14 @@ describe('OnboardingNotificationScreen', () => {
   it('renders a video element', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     expect(screen.getByTestId('notification-video')).toBeTruthy();
+  });
+
+  it('renders a soft placeholder behind the video so the area is never empty', () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    // Placeholder is intentionally hidden from a11y tree, so opt into hidden elements.
+    expect(
+      screen.getByTestId('notification-video-placeholder', { includeHiddenElements: true }),
+    ).toBeTruthy();
   });
 
   it('creates a video player with autoplay, loop, and mute', () => {

@@ -10,6 +10,10 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -41,6 +45,20 @@ describe('OnboardingAvatarScreen', () => {
   it('renders the avatar grid picker', () => {
     render(<OnboardingAvatarScreen />);
     expect(screen.getByTestId('animal-grid-picker')).toBeTruthy();
+  });
+
+  it('renders a 3-step progress indicator at step 2', () => {
+    render(<OnboardingAvatarScreen />);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    );
+    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: false }),
+    );
   });
 
   it('renders the displayName input', () => {

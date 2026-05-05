@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import { ensureHandle } from '@/lib/users/handles';
 import AnimalGridPicker from '@/components/profile/AnimalGridPicker';
 import DisplayNameInput from '@/components/profile/DisplayNameInput';
+import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import type { OnboardingStackParamList } from '@/navigation/types';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 
@@ -22,6 +24,7 @@ export default function OnboardingAvatarScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [animalKey, setAnimalKey] = useState<AnimalKey>(() => defaultAnimalKey());
   const [displayName, setDisplayName] = useState('');
@@ -44,7 +47,17 @@ export default function OnboardingAvatarScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 24) + 16 },
+      ]}
+    >
+      <OnboardingProgress
+        currentStep={2}
+        totalSteps={3}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
+      />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>{t('onboarding.avatarHeading')}</Text>
         <View style={styles.gridWrapper}>
@@ -76,7 +89,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
   },
   scroll: {
-    paddingTop: 32,
+    paddingTop: 24,
     paddingBottom: 16,
   },
   heading: {
@@ -96,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   actions: {
-    paddingVertical: 16,
+    paddingTop: 16,
   },
   button: {
     height: yomoyoSpacing.buttonHeight,
