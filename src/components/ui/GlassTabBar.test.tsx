@@ -23,14 +23,12 @@ const mockProps = {
     routes: [
       { key: 'Timeline-key', name: 'Timeline' },
       { key: 'Shelf-key', name: 'Shelf' },
-      { key: 'Settings-key', name: 'Settings' },
     ],
     index: 0,
   },
   descriptors: {
     'Timeline-key': { options: { title: 'Timeline' } },
     'Shelf-key': { options: { title: 'Shelf' } },
-    'Settings-key': { options: { title: 'Settings' } },
   },
   navigation: {
     emit: mockEmit,
@@ -49,7 +47,6 @@ describe('GlassTabBar', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
     expect(screen.getByText('Timeline')).toBeTruthy();
     expect(screen.getByText('Shelf')).toBeTruthy();
-    expect(screen.getByText('Settings')).toBeTruthy();
   });
 
   it('dispatches navigation when an inactive tab is pressed', () => {

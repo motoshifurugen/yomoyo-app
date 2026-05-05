@@ -5,7 +5,6 @@ const ja = {
   tabs: {
     timeline: '読書ログ',
     shelf: '本棚',
-    settings: '設定',
   },
   timeline: {
     finishedReading: '読み終えました',
@@ -39,12 +38,14 @@ const ja = {
     emptyFinished: '読了した本はまだありません',
     addBook: '読み終えた本を記録する',
     markAsFinished: '読了にする',
-  },
-  settings: {
-    languageTitle: '言語',
     yourIdTitle: 'あなたのID',
     shareId: 'IDを共有',
     idShared: '共有しました',
+  },
+  settings: {
+    languageTitle: '言語',
+    openSettings: '設定を開く',
+    close: '閉じる',
   },
   userProfile: {
     follow: 'おたよりを受け取る',

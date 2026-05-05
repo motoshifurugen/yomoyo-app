@@ -12,7 +12,6 @@ type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> = {
   Timeline: { active: 'book', inactive: 'book-outline' },
   Shelf: { active: 'library', inactive: 'library-outline' },
-  Settings: { active: 'settings', inactive: 'settings-outline' },
 };
 
 const FALLBACK_ICONS: { active: IoniconName; inactive: IoniconName } = {
