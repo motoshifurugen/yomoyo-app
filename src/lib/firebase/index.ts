@@ -14,3 +14,12 @@ const firebaseConfig = {
 
 export const firebaseApp =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+
+if (__DEV__) {
+  // TEMP DIAGNOSTIC (Issue #43 follow-up): verify which Firestore project
+  // the JS SDK is actually talking to at runtime.
+  console.log(
+    '[FirebaseDiag] JS SDK projectId =',
+    firebaseApp?.options?.projectId,
+  );
+}

@@ -13,6 +13,11 @@ export function useAuth(): AuthState {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(getAuth(), (newUser) => {
+      if (__DEV__) {
+        // TEMP DIAGNOSTIC (Issue #43 follow-up): native auth uid as seen by
+        // @react-native-firebase/auth. JS SDK Firestore does NOT see this.
+        console.log('[FirebaseDiag] native auth uid =', newUser?.uid ?? null);
+      }
       setUser(newUser);
       setLoading(false);
     });

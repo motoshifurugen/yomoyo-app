@@ -30,6 +30,14 @@ export async function getTimeline(
     limit(pageSize),
   );
   const q = cursor ? query(baseQuery, startAfter(cursor)) : baseQuery;
+  if (__DEV__) {
+    // TEMP DIAGNOSTIC (Issue #43 follow-up): timeline query shape.
+    console.log(
+      '[FirebaseDiag] timeline query =',
+      "collection('readingActivities') where status=='finished' orderBy finishedAt desc limit",
+      pageSize,
+    );
+  }
   const snapshot = await getDocs(q);
   const items: ReadingActivity[] = snapshot.docs.map((d) => ({
     id: d.id,

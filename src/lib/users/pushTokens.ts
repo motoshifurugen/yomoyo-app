@@ -20,6 +20,10 @@ export async function savePushToken(
   const db = getFirestore();
   const tokenId = derivePushTokenId(token);
   const ref = doc(db, 'users', userId, 'pushTokens', tokenId);
+  if (__DEV__) {
+    // TEMP DIAGNOSTIC (Issue #43 follow-up): exact path being written.
+    console.log('[FirebaseDiag] pushToken write path =', ref.path);
+  }
   const snap = await getDoc(ref);
   const now = serverTimestamp();
 
