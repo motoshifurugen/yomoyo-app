@@ -2,6 +2,12 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import FeedScreen from './FeedScreen';
 
+const mockNavigate = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -15,13 +21,7 @@ jest.mock('@/hooks/useAuth', () => ({
 }));
 
 jest.mock('@/lib/users/follows', () => ({
-  followUser: jest.fn(() => Promise.resolve()),
-  unfollowUser: jest.fn(() => Promise.resolve()),
   getFollowingUids: jest.fn(() => Promise.resolve([])),
-}));
-
-jest.mock('@/lib/books/timeline', () => ({
-  getTimeline: jest.fn(() => Promise.resolve({ items: [], lastDoc: null })),
 }));
 
 jest.mock('@/lib/books/friendsFeed', () => ({
@@ -32,14 +32,10 @@ jest.mock('@/lib/users/avatarIdentity', () => ({
   ANIMAL_ASSETS: { fox: 1, bear: 2 },
 }));
 
-import { followUser, unfollowUser, getFollowingUids } from '@/lib/users/follows';
-import { getTimeline } from '@/lib/books/timeline';
+import { getFollowingUids } from '@/lib/users/follows';
 import { getFriendsFeed } from '@/lib/books/friendsFeed';
 
-const mockFollowUser = followUser as jest.Mock;
-const mockUnfollowUser = unfollowUser as jest.Mock;
 const mockGetFollowingUids = getFollowingUids as jest.Mock;
-const mockGetTimeline = getTimeline as jest.Mock;
 const mockGetFriendsFeed = getFriendsFeed as jest.Mock;
 
 const mockActivity = {
@@ -55,78 +51,60 @@ const mockActivity = {
   displayAvatar: 'bear',
 };
 
-const mockOwnActivity = {
+const secondActivity = {
   ...mockActivity,
-  id: 'act_self',
-  userId: 'user1',
+  id: 'act2',
+  userId: 'user3',
+  title: 'Kindred',
   displayLabel: 'Quiet Fox',
   displayAvatar: 'fox',
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockGetTimeline.mockResolvedValue({ items: [], lastDoc: null });
-  mockGetFollowingUids.mockResolvedValue([]);
+  mockGetFollowingUids.mockResolvedValue(['user2']);
   mockGetFriendsFeed.mockResolvedValue({ items: [], lastDoc: null });
 });
 
-describe('FeedScreen — toggle', () => {
+describe('FeedScreen — friend updates list', () => {
   it('renders without crashing', async () => {
     render(<FeedScreen />);
-    await screen.findByTestId('tab-timeline');
+    await waitFor(() => expect(mockGetFollowingUids).toHaveBeenCalledWith('user1'));
   });
 
-  it('shows the Timeline tab button', async () => {
+  it('does not render a tab toggle bar', async () => {
     render(<FeedScreen />);
-    expect(await screen.findByTestId('tab-timeline')).toBeTruthy();
+    await waitFor(() => expect(mockGetFollowingUids).toHaveBeenCalled());
+    expect(screen.queryByTestId('toggle-bar')).toBeNull();
+    expect(screen.queryByTestId('tab-timeline')).toBeNull();
+    expect(screen.queryByTestId('tab-updates')).toBeNull();
   });
 
-  it('shows the Updates tab button', async () => {
-    render(<FeedScreen />);
-    expect(await screen.findByTestId('tab-updates')).toBeTruthy();
-  });
-
-  it('toggle bar container has tablist accessibility role', async () => {
-    render(<FeedScreen />);
-    expect(await screen.findByTestId('toggle-bar')).toBeTruthy();
-  });
-
-  it('shows Timeline as the default selected tab', async () => {
+  it('eagerly fetches the friend feed on mount', async () => {
+    mockGetFollowingUids.mockResolvedValue(['user2']);
     render(<FeedScreen />);
     await waitFor(() => {
-      expect(screen.getByText('friends.timelineTab')).toBeTruthy();
-    });
-  });
-
-  it('switches to Updates view when Updates tab is pressed', async () => {
-    render(<FeedScreen />);
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
-    });
-    await waitFor(() => {
-      expect(screen.getByText('friends.updatesTab')).toBeTruthy();
-    });
-  });
-});
-
-describe('FeedScreen — Timeline tab', () => {
-  it('fetches timeline and following UIDs on mount', async () => {
-    render(<FeedScreen />);
-    await waitFor(() => {
-      expect(mockGetTimeline).toHaveBeenCalledWith(null);
       expect(mockGetFollowingUids).toHaveBeenCalledWith('user1');
+      expect(mockGetFriendsFeed).toHaveBeenCalledWith(['user2'], null);
     });
   });
 
-  it('shows empty state when no timeline items', async () => {
+  it('does not call getFriendsFeed when the user follows nobody', async () => {
+    mockGetFollowingUids.mockResolvedValue([]);
+    render(<FeedScreen />);
+    await waitFor(() => expect(mockGetFollowingUids).toHaveBeenCalled());
+    expect(mockGetFriendsFeed).not.toHaveBeenCalled();
+  });
+
+  it('shows the empty state when no items are present', async () => {
     render(<FeedScreen />);
     await waitFor(() => {
-      expect(screen.getByText('friends.timelineEmptyTitle')).toBeTruthy();
+      expect(screen.getByText('timeline.emptyBody')).toBeTruthy();
     });
   });
 
-  it('renders activity cards when timeline has items', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+  it('renders activity rows when the friend feed returns items', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
     render(<FeedScreen />);
     await waitFor(() => {
       expect(screen.getByText('Dune')).toBeTruthy();
@@ -134,153 +112,77 @@ describe('FeedScreen — Timeline tab', () => {
     });
   });
 
-  it('shows Follow button for non-followed users', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
-    mockGetFollowingUids.mockResolvedValue([]);
+  it('does not render any in-row follow / unfollow buttons', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.queryByTestId('follow-user2')).toBeNull();
+    expect(screen.queryByTestId('unfollow-user2')).toBeNull();
+  });
+
+  it('shows the error message when the feed fetch fails', async () => {
+    mockGetFriendsFeed.mockRejectedValueOnce(new Error('network error'));
     render(<FeedScreen />);
     await waitFor(() => {
-      expect(screen.getByTestId('follow-user2')).toBeTruthy();
+      expect(screen.getByText('timeline.loadErrorBody')).toBeTruthy();
     });
   });
 
-  it('shows Receiving button for already-followed users', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
-    mockGetFollowingUids.mockResolvedValue(['user2']);
+  it('paginates when the list end is reached', async () => {
+    const cursor = { id: 'cursor-doc' } as unknown as never;
+    mockGetFriendsFeed
+      .mockResolvedValueOnce({ items: [mockActivity], lastDoc: cursor })
+      .mockResolvedValueOnce({ items: [secondActivity], lastDoc: null });
     render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('updates-list'));
+    fireEvent(screen.getByTestId('updates-list'), 'onEndReached');
     await waitFor(() => {
-      expect(screen.getByTestId('unfollow-user2')).toBeTruthy();
-    });
-  });
-
-  it("does not show a follow button for the current user's own activity", async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockOwnActivity], lastDoc: null });
-    render(<FeedScreen />);
-    await waitFor(() => {
-      expect(screen.queryByTestId('follow-user1')).toBeNull();
-      expect(screen.queryByTestId('unfollow-user1')).toBeNull();
-    });
-  });
-
-  it('calls followUser when Follow is pressed', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
-    render(<FeedScreen />);
-    await waitFor(() => screen.getByTestId('follow-user2'));
-    fireEvent.press(screen.getByTestId('follow-user2'));
-    expect(mockFollowUser).toHaveBeenCalledWith('user1', 'user2');
-  });
-
-  it('calls unfollowUser when Receiving is pressed on a followed user', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
-    mockGetFollowingUids.mockResolvedValue(['user2']);
-    render(<FeedScreen />);
-    await waitFor(() => screen.getByTestId('unfollow-user2'));
-    fireEvent.press(screen.getByTestId('unfollow-user2'));
-    expect(mockUnfollowUser).toHaveBeenCalledWith('user1', 'user2');
-  });
-
-  it('optimistically switches button state after Follow press', async () => {
-    mockGetTimeline.mockResolvedValue({ items: [mockActivity], lastDoc: null });
-    render(<FeedScreen />);
-    await waitFor(() => screen.getByTestId('follow-user2'));
-    fireEvent.press(screen.getByTestId('follow-user2'));
-    await waitFor(() => {
-      expect(screen.getByTestId('unfollow-user2')).toBeTruthy();
-    });
-  });
-
-  it('shows error message when timeline fetch fails', async () => {
-    mockGetTimeline.mockRejectedValueOnce(new Error('network error'));
-    render(<FeedScreen />);
-    await waitFor(() => {
-      expect(screen.getByText('friends.loadErrorBody')).toBeTruthy();
-    });
-  });
-
-  it('loads more timeline items when list end is reached', async () => {
-    const mockCursor = { id: 'cursor-doc' };
-    mockGetTimeline
-      .mockResolvedValueOnce({ items: [mockActivity], lastDoc: mockCursor })
-      .mockResolvedValueOnce({ items: [], lastDoc: null });
-    render(<FeedScreen />);
-    await waitFor(() => screen.getByTestId('timeline-list'));
-    fireEvent(screen.getByTestId('timeline-list'), 'onEndReached');
-    await waitFor(() => {
-      expect(mockGetTimeline).toHaveBeenCalledTimes(2);
-      expect(mockGetTimeline).toHaveBeenNthCalledWith(2, mockCursor);
+      expect(mockGetFriendsFeed).toHaveBeenCalledTimes(2);
+      expect(mockGetFriendsFeed).toHaveBeenNthCalledWith(2, ['user2'], cursor);
     });
   });
 });
 
-describe('FeedScreen — Updates tab', () => {
-  it('fetches updates when Updates tab is first opened', async () => {
-    render(<FeedScreen />);
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
-    });
-    await waitFor(() => {
-      expect(mockGetFollowingUids).toHaveBeenCalledWith('user1');
-    });
-  });
-
-  it('shows empty state when following nobody', async () => {
-    render(<FeedScreen />);
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
-    });
-    await waitFor(() => {
-      expect(screen.getByText('friends.updatesEmptyTitle')).toBeTruthy();
-    });
-  });
-
-  it('renders activity cards when subscribed users have activity', async () => {
-    mockGetFollowingUids.mockResolvedValue(['user2']);
+describe('FeedScreen — row tap modal', () => {
+  beforeEach(() => {
     mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+  });
+
+  it('opens the activity detail modal when a row is tapped', async () => {
     render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('activity-row-act1'));
     await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
+      fireEvent.press(screen.getByTestId('activity-row-act1'));
+    });
+    expect(screen.getByTestId('activity-detail-modal')).toBeTruthy();
+  });
+
+  it('closes the modal when the close button is pressed', async () => {
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('activity-row-act1'));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('activity-row-act1'));
+    });
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('modal-close-button'));
     });
     await waitFor(() => {
-      expect(screen.getByText('Dune')).toBeTruthy();
+      expect(screen.queryByTestId('activity-detail-modal')).toBeNull();
     });
   });
 
-  it('does not show follow action buttons in Updates tab', async () => {
-    mockGetFollowingUids.mockResolvedValue(['user2']);
-    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+  it('navigates to UserProfile and closes the modal when View profile is pressed', async () => {
     render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('activity-row-act1'));
     await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
+      fireEvent.press(screen.getByTestId('activity-row-act1'));
     });
-    await waitFor(() => screen.getByText('Dune'));
-    expect(screen.queryByTestId('unfollow-user2')).toBeNull();
-    expect(screen.queryByTestId('follow-user2')).toBeNull();
-  });
-
-  it('shows error message when updates fetch fails', async () => {
-    mockGetFollowingUids
-      .mockResolvedValueOnce([])               // mount (timeline UIDs)
-      .mockRejectedValueOnce(new Error('network error')); // updates tab open
-    render(<FeedScreen />);
     await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
+      fireEvent.press(screen.getByTestId('modal-view-profile-button'));
     });
+    expect(mockNavigate).toHaveBeenCalledWith('UserProfile', { uid: 'user2' });
     await waitFor(() => {
-      expect(screen.getByText('friends.loadErrorBody')).toBeTruthy();
+      expect(screen.queryByTestId('activity-detail-modal')).toBeNull();
     });
-  });
-
-  it('does not re-fetch updates when switching back after initial load', async () => {
-    render(<FeedScreen />);
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
-    });
-    await waitFor(() => expect(screen.getByText('friends.updatesEmptyTitle')).toBeTruthy());
-
-    fireEvent.press(screen.getByTestId('tab-timeline'));
-    await act(async () => {
-      fireEvent.press(screen.getByTestId('tab-updates'));
-    });
-    // 1 call on mount (timeline) + 1 call on first updates open = 2 total; no 3rd call on re-open
-    expect(mockGetFollowingUids).toHaveBeenCalledTimes(2);
   });
 });

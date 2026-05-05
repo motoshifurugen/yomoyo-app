@@ -21,14 +21,14 @@ const mockEmit = jest.fn().mockReturnValue({ defaultPrevented: false });
 const mockProps = {
   state: {
     routes: [
-      { key: 'Feed-key', name: 'Feed' },
+      { key: 'Timeline-key', name: 'Timeline' },
       { key: 'Shelf-key', name: 'Shelf' },
       { key: 'Settings-key', name: 'Settings' },
     ],
     index: 0,
   },
   descriptors: {
-    'Feed-key': { options: { title: 'Feed' } },
+    'Timeline-key': { options: { title: 'Timeline' } },
     'Shelf-key': { options: { title: 'Shelf' } },
     'Settings-key': { options: { title: 'Settings' } },
   },
@@ -47,7 +47,7 @@ describe('GlassTabBar', () => {
 
   it('renders all tab labels', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    expect(screen.getByText('Feed')).toBeTruthy();
+    expect(screen.getByText('Timeline')).toBeTruthy();
     expect(screen.getByText('Shelf')).toBeTruthy();
     expect(screen.getByText('Settings')).toBeTruthy();
   });
@@ -60,13 +60,13 @@ describe('GlassTabBar', () => {
 
   it('does not dispatch navigation when the active tab is pressed', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    fireEvent.press(screen.getByText('Feed'));
+    fireEvent.press(screen.getByText('Timeline'));
     expect(mockDispatch).not.toHaveBeenCalled();
   });
 
   it('marks the active tab as selected', () => {
     render(<GlassTabBar {...(mockProps as any)} />);
-    const feedTab = screen.getByRole('tab', { name: 'Feed' });
+    const feedTab = screen.getByRole('tab', { name: 'Timeline' });
     expect(feedTab.props.accessibilityState.selected).toBe(true);
   });
 

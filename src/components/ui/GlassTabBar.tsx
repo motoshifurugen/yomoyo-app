@@ -10,7 +10,7 @@ import { yomoyoColors, yomoyoGlass } from '@/constants/yomoyoTheme';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 const TAB_ICONS: Record<string, { active: IoniconName; inactive: IoniconName }> = {
-  Feed: { active: 'book', inactive: 'book-outline' },
+  Timeline: { active: 'book', inactive: 'book-outline' },
   Shelf: { active: 'library', inactive: 'library-outline' },
   Settings: { active: 'settings', inactive: 'settings-outline' },
 };
