@@ -5,6 +5,7 @@ import OnboardingNavigator from './OnboardingNavigator';
 import LoginScreen from '@/screens/LoginScreen';
 import { useAuth } from '@/hooks/useAuth';
 import { checkFirstLaunch } from '@/lib/onboarding';
+import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 
 type AuthStackParamList = {
   App: undefined;
@@ -22,6 +23,12 @@ export default function RootNavigator() {
       .then((isFirst) => setOnboardingDone(!isFirst))
       .catch(() => setOnboardingDone(true));
   }, []);
+
+  useEffect(() => {
+    if (user && onboardingDone) {
+      registerPushTokenIfPermitted(user.uid);
+    }
+  }, [user, onboardingDone]);
 
   if (loading || onboardingDone === null) {
     return null;

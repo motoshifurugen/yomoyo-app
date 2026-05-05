@@ -31,7 +31,12 @@ jest.mock('@/lib/onboarding', () => ({
   checkFirstLaunch: jest.fn(),
 }));
 
+jest.mock('@/lib/notifications/registerPushToken', () => ({
+  registerPushTokenIfPermitted: jest.fn().mockResolvedValue(undefined),
+}));
+
 import { checkFirstLaunch } from '@/lib/onboarding';
+import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 
 function renderWithNav() {
   return render(
@@ -43,6 +48,7 @@ function renderWithNav() {
 
 describe('RootNavigator', () => {
   beforeEach(() => {
+    jest.clearAllMocks();
     jest.mocked(checkFirstLaunch).mockResolvedValue(false);
   });
 
@@ -89,5 +95,34 @@ describe('RootNavigator', () => {
     });
     renderWithNav();
     expect(await screen.findByText('OnboardingNavigator')).toBeTruthy();
+  });
+
+  it('registers the push token on startup when user is authenticated and onboarding is done', async () => {
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    await waitFor(() =>
+      expect(registerPushTokenIfPermitted).toHaveBeenCalledWith('abc123'),
+    );
+  });
+
+  it('does not register the push token on startup when user is signed out', async () => {
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
+    renderWithNav();
+    await screen.findByText('LoginScreen');
+    expect(registerPushTokenIfPermitted).not.toHaveBeenCalled();
+  });
+
+  it('does not register the push token while onboarding is still active', async () => {
+    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    await screen.findByText('OnboardingNavigator');
+    expect(registerPushTokenIfPermitted).not.toHaveBeenCalled();
   });
 });
