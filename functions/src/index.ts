@@ -130,17 +130,25 @@ export const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
     }
 
     const db = getFirestore();
-    const recipients = await resolveRecipients(db, callerUid);
-    const safe: DryRunRecipient[] = recipients.map((r) => ({
-      uid: r.uid,
-      tokenPrefix: redactToken(r.token),
-    }));
+    try {
+      const recipients = await resolveRecipients(db, callerUid);
+      const safe: DryRunRecipient[] = recipients.map((r) => ({
+        uid: r.uid,
+        tokenPrefix: redactToken(r.token),
+      }));
 
-    logger.info('dryRunResolveRecipients invoked', {
-      uid: callerUid,
-      count: safe.length,
-    });
+      logger.info('dryRunResolveRecipients invoked', {
+        uid: callerUid,
+        count: safe.length,
+      });
 
-    return { count: safe.length, recipients: safe };
+      return { count: safe.length, recipients: safe };
+    } catch (err) {
+      logger.error('dryRunResolveRecipients failed', {
+        uid: callerUid,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw new HttpsError('internal', 'Failed to resolve recipients.');
+    }
   },
 );
