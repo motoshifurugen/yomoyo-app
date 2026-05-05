@@ -14,6 +14,20 @@ type Props = {
 
 const videoSource = require('../../assets/videos/notification_loop.mp4');
 
+function logTokenError(err: unknown) {
+  if (!__DEV__) return;
+  const isNoProjectId =
+    err instanceof Error &&
+    (err as { code?: string }).code === 'ERR_NOTIFICATIONS_NO_EXPERIENCE_ID';
+  if (isNoProjectId) {
+    console.warn(
+      '[PushToken] Missing EAS project ID. Run `eas init` or set extra.eas.projectId in app.json, then restart the dev server.'
+    );
+  } else {
+    console.warn('[PushToken] Failed to get push token:', err);
+  }
+}
+
 export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -34,9 +48,7 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
             console.log('[PushToken] Expo push token:', data);
           }
         } catch (err) {
-          if (__DEV__) {
-            console.warn('[PushToken] Failed to get push token:', err);
-          }
+          logTokenError(err);
         }
       } else if (__DEV__) {
         console.log('[PushToken] Permission not granted — push token skipped.');

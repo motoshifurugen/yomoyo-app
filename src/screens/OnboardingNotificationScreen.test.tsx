@@ -201,14 +201,36 @@ describe('OnboardingNotificationScreen', () => {
       new Error('token error')
     );
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
-    const pushTokenWarns = spy.mock.calls.filter(
-      ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
-    );
-    expect(pushTokenWarns.length).toBeGreaterThan(0);
-    spy.mockRestore();
+    try {
+      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      fireEvent.press(screen.getByText('onboarding.allowButton'));
+      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      const pushTokenWarns = spy.mock.calls.filter(
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+      );
+      expect(pushTokenWarns.length).toBeGreaterThan(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('logs a specific warning when EAS project ID is missing', async () => {
+    const noProjectIdError = Object.assign(new Error('No projectId found'), {
+      code: 'ERR_NOTIFICATIONS_NO_EXPERIENCE_ID',
+    });
+    (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(noProjectIdError);
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      fireEvent.press(screen.getByText('onboarding.allowButton'));
+      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      const projectIdWarns = spy.mock.calls.filter(
+        ([msg]) => typeof msg === 'string' && msg.includes('eas init')
+      );
+      expect(projectIdWarns.length).toBeGreaterThan(0);
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it('renders a video element', () => {
