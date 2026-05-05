@@ -61,6 +61,10 @@
   "jest": {
     "preset": "jest-expo",
     "watchman": false,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/functions/"
+    ],
     "moduleNameMapper": {
       "^firebase/firestore$": "<rootDir>/__mocks__/firebase/firestore.js",
       "^firebase/app$": "<rootDir>/__mocks__/firebase/app.js",
