@@ -50,7 +50,13 @@
         }
       ],
       "./plugins/withFmtConsteval",
-      "./plugins/withFirebaseStaticFramework"
-    ]
+      "./plugins/withFirebaseStaticFramework",
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
   }
 }

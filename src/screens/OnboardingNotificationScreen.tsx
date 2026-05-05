@@ -26,7 +26,21 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
 
   const handleAllow = async () => {
     try {
-      await Notifications.requestPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status === 'granted') {
+        try {
+          const { data } = await Notifications.getExpoPushTokenAsync();
+          if (__DEV__) {
+            console.log('[PushToken] Expo push token:', data);
+          }
+        } catch (err) {
+          if (__DEV__) {
+            console.warn('[PushToken] Failed to get push token:', err);
+          }
+        }
+      } else if (__DEV__) {
+        console.log('[PushToken] Permission not granted — push token skipped.');
+      }
     } catch {
       // permission request failure should not block onboarding completion
     }

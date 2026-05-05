@@ -135,6 +135,82 @@ describe('OnboardingNotificationScreen', () => {
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
   });
 
+  it('fetches expo push token when permission is granted', async () => {
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(Notifications.getExpoPushTokenAsync).toHaveBeenCalled());
+  });
+
+  it('does not fetch push token when permission is denied', async () => {
+    (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValueOnce({
+      status: 'denied',
+    });
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    expect(Notifications.getExpoPushTokenAsync).not.toHaveBeenCalled();
+  });
+
+  it('still completes onboarding if getExpoPushTokenAsync throws', async () => {
+    (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(
+      new Error('token error')
+    );
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+  });
+
+  it('logs push token to console in dev mode', async () => {
+    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    const pushTokenCalls = spy.mock.calls.filter(
+      ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+    );
+    expect(pushTokenCalls.length).toBeGreaterThan(0);
+    spy.mockRestore();
+  });
+
+  it('does not log push token in production mode', async () => {
+    const originalDev = global.__DEV__;
+    global.__DEV__ = false;
+    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      fireEvent.press(screen.getByText('onboarding.allowButton'));
+      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      const pushTokenLogs = logSpy.mock.calls.filter(
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+      );
+      const pushTokenWarns = warnSpy.mock.calls.filter(
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+      );
+      expect(pushTokenLogs).toHaveLength(0);
+      expect(pushTokenWarns).toHaveLength(0);
+    } finally {
+      global.__DEV__ = originalDev;
+      logSpy.mockRestore();
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('logs a warning when token fetch fails in dev mode', async () => {
+    (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(
+      new Error('token error')
+    );
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    fireEvent.press(screen.getByText('onboarding.allowButton'));
+    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    const pushTokenWarns = spy.mock.calls.filter(
+      ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+    );
+    expect(pushTokenWarns.length).toBeGreaterThan(0);
+    spy.mockRestore();
+  });
+
   it('renders a video element', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     expect(screen.getByTestId('notification-video')).toBeTruthy();
