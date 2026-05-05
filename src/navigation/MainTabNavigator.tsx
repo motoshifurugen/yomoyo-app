@@ -7,6 +7,7 @@ import SettingsScreen from '@/screens/SettingsScreen';
 import { MainTabParamList } from './types';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import GlassTabBar from '@/components/ui/GlassTabBar';
+import AddFriendButton from '@/components/feed/AddFriendButton';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -29,7 +30,14 @@ export default function MainTabNavigator() {
         headerTitleAlign: 'center',
       }}
     >
-      <Tab.Screen name="Timeline" component={FeedScreen} options={{ title: t('tabs.timeline') }} />
+      <Tab.Screen
+        name="Timeline"
+        component={FeedScreen}
+        options={{
+          title: t('tabs.timeline'),
+          headerRight: () => <AddFriendButton />,
+        }}
+      />
       <Tab.Screen name="Shelf" component={ShelfScreen} options={{ title: t('tabs.shelf') }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('tabs.settings') }} />
     </Tab.Navigator>

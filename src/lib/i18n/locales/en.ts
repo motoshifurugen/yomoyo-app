@@ -14,6 +14,11 @@ const en = {
     modalViewProfile: 'View profile',
     modalClose: 'Close',
   },
+  addFriend: {
+    heading: 'Add a friend',
+    comingSoonBody: 'Friend search by ID is coming soon.',
+    close: 'Close',
+  },
   bookSearch: {
     placeholder: 'Search by title or author',
     button: 'Search',
