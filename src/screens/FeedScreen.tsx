@@ -13,6 +13,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import ActivityDetailModal from '@/components/feed/ActivityDetailModal';
+import AddFriendButton from '@/components/feed/AddFriendButton';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
@@ -94,6 +95,7 @@ export default function FeedScreen() {
       ) : items.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.emptyBody}>{t('timeline.emptyBody')}</Text>
+          <AddFriendButton variant="inline" />
         </View>
       ) : (
         <FlatList

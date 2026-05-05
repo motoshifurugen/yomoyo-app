@@ -14,6 +14,11 @@ const ja = {
     modalViewProfile: 'プロフィールを見る',
     modalClose: '閉じる',
   },
+  addFriend: {
+    heading: '友達を追加',
+    comingSoonBody: 'IDでの友達検索は近日公開予定です。',
+    close: '閉じる',
+  },
   bookSearch: {
     placeholder: 'タイトルや著者で検索',
     button: '検索',

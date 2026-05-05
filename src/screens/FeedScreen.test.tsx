@@ -103,6 +103,20 @@ describe('FeedScreen — friend updates list', () => {
     });
   });
 
+  it('shows an inline add-friend button inside the empty state', async () => {
+    render(<FeedScreen />);
+    await waitFor(() => {
+      expect(screen.getByTestId('add-friend-button-inline')).toBeTruthy();
+    });
+  });
+
+  it('does not show the inline add-friend button once items are present', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.queryByTestId('add-friend-button-inline')).toBeNull();
+  });
+
   it('renders activity rows when the friend feed returns items', async () => {
     mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
     render(<FeedScreen />);
