@@ -3,28 +3,16 @@ const en = {
     back: 'Go back',
   },
   tabs: {
-    feed: 'Feed',
-    friends: 'Friends',
+    timeline: 'Timeline',
     shelf: 'My Shelf',
     settings: 'Settings',
   },
-  feed: {
-    searchBooks: 'Search books',
-    emptyTitle: 'Your reading feed is quiet',
-    emptyBody: 'Visit the Timeline to find readers and receive their updates here.',
+  timeline: {
     finishedReading: 'Finished reading',
-  },
-  friends: {
-    timelineTab: 'Timeline',
-    updatesTab: 'Updates',
-    timelineEmptyTitle: 'No reading activity yet',
-    timelineEmptyBody: 'Reading activity from other readers will appear here.',
-    updatesEmptyTitle: 'No updates yet',
-    updatesEmptyBody: 'Visit the Timeline to discover other readers.',
-    follow: 'Receive updates',
-    following: 'Receiving updates',
-    unfollow: 'Stop receiving',
+    emptyBody: 'Reading records from your friends will appear here.',
     loadErrorBody: 'Something went wrong. Please try again.',
+    modalViewProfile: 'View profile',
+    modalClose: 'Close',
   },
   bookSearch: {
     placeholder: 'Search by title or author',

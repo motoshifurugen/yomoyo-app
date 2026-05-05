@@ -29,7 +29,7 @@ export default function MainTabNavigator() {
         headerTitleAlign: 'center',
       }}
     >
-      <Tab.Screen name="Feed" component={FeedScreen} options={{ title: t('tabs.feed') }} />
+      <Tab.Screen name="Timeline" component={FeedScreen} options={{ title: t('tabs.timeline') }} />
       <Tab.Screen name="Shelf" component={ShelfScreen} options={{ title: t('tabs.shelf') }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('tabs.settings') }} />
     </Tab.Navigator>

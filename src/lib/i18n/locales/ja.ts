@@ -3,28 +3,16 @@ const ja = {
     back: '戻る',
   },
   tabs: {
-    feed: 'フィード',
-    friends: 'フレンド',
+    timeline: '読書ログ',
     shelf: '本棚',
     settings: '設定',
   },
-  feed: {
-    searchBooks: '本を探す',
-    emptyTitle: '読書フィードは、まだ静かです',
-    emptyBody: 'タイムラインで読書記録を見つけてみましょう。',
+  timeline: {
     finishedReading: '読み終えました',
-  },
-  friends: {
-    timelineTab: 'みんなの記録',
-    updatesTab: 'おたより',
-    timelineEmptyTitle: 'まだ読書記録がありません',
-    timelineEmptyBody: '他のリーダーの読書記録がここに表示されます。',
-    updatesEmptyTitle: 'まだおたよりはありません',
-    updatesEmptyBody: 'タイムラインで他のリーダーを探しましょう。',
-    follow: 'おたよりを受け取る',
-    following: '受け取り中',
-    unfollow: '受け取りをやめる',
+    emptyBody: '友達の読了した記録が表示されます。',
     loadErrorBody: '読み込みに失敗しました。もう一度お試しください。',
+    modalViewProfile: 'プロフィールを見る',
+    modalClose: '閉じる',
   },
   bookSearch: {
     placeholder: 'タイトルや著者で検索',

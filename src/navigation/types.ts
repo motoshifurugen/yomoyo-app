@@ -8,7 +8,7 @@ export type RootStackParamList = {
 };
 
 export type MainTabParamList = {
-  Feed: undefined;
+  Timeline: undefined;
   Shelf: undefined;
   Settings: undefined;
 };
