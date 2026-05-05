@@ -55,8 +55,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "71ec785f-5e72-4040-a14e-c0542ab07ae9"
       }
-    }
+    },
+    "owner": "cocoa_hearts"
   }
 }
