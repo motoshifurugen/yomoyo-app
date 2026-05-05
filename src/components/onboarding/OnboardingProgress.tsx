@@ -21,12 +21,17 @@ export default function OnboardingProgress({ currentStep, totalSteps, accessibil
     >
       {segments.map((i) => {
         const filled = i < clamped;
+        const isCurrent = i === clamped - 1;
         return (
           <View
             key={i}
             testID={`onboarding-progress-segment-${i}`}
             accessibilityState={{ selected: filled }}
-            style={[styles.segment, filled ? styles.segmentFilled : styles.segmentEmpty]}
+            style={[
+              styles.segment,
+              filled ? styles.segmentFilledColor : styles.segmentEmptyColor,
+              isCurrent ? styles.segmentWide : styles.segmentNarrow,
+            ]}
           />
         );
       })}
@@ -43,14 +48,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   segment: {
-    flex: 1,
     height: 4,
     borderRadius: 2,
   },
-  segmentFilled: {
+  segmentNarrow: {
+    flex: 1,
+  },
+  segmentWide: {
+    flex: 2,
+  },
+  segmentFilledColor: {
     backgroundColor: yomoyoColors.primary,
   },
-  segmentEmpty: {
+  segmentEmptyColor: {
     backgroundColor: yomoyoColors.border,
   },
 });

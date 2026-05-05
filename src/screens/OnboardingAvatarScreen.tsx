@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,7 @@ export default function OnboardingAvatarScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const [animalKey, setAnimalKey] = useState<AnimalKey>(() => defaultAnimalKey());
   const [displayName, setDisplayName] = useState('');
@@ -45,14 +47,17 @@ export default function OnboardingAvatarScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.progressBlock}>
-        <OnboardingProgress
-          currentStep={2}
-          totalSteps={3}
-          accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
-        />
-      </View>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 24) + 16 },
+      ]}
+    >
+      <OnboardingProgress
+        currentStep={2}
+        totalSteps={3}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
+      />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>{t('onboarding.avatarHeading')}</Text>
         <View style={styles.gridWrapper}>
@@ -83,11 +88,8 @@ const styles = StyleSheet.create({
     backgroundColor: yomoyoColors.background,
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
   },
-  progressBlock: {
-    paddingTop: 8,
-  },
   scroll: {
-    paddingTop: 16,
+    paddingTop: 24,
     paddingBottom: 16,
   },
   heading: {
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   actions: {
-    paddingVertical: 16,
+    paddingTop: 16,
   },
   button: {
     height: yomoyoSpacing.buttonHeight,

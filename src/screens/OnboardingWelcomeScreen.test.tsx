@@ -11,6 +11,10 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
@@ -45,6 +49,11 @@ describe('OnboardingWelcomeScreen (intro + inline sign-in)', () => {
     render(<OnboardingWelcomeScreen />);
     expect(screen.getByText('onboarding.introHeading')).toBeTruthy();
     expect(screen.getByText('onboarding.introBody')).toBeTruthy();
+  });
+
+  it('renders the Yomoyo hero image', () => {
+    render(<OnboardingWelcomeScreen />);
+    expect(screen.getByTestId('yomoyo-logo')).toBeTruthy();
   });
 
   it('renders a Google sign-in button as the inline get-started action', () => {

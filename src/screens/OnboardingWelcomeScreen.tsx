@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Platform, StyleSheet } from 'react-native';
+import { View, Text, Image, Platform, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'OnboardingWelcom
 export default function OnboardingWelcomeScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
@@ -44,16 +46,28 @@ export default function OnboardingWelcomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.progressBlock}>
-        <OnboardingProgress
-          currentStep={1}
-          totalSteps={3}
-          accessibilityLabel={t('onboarding.progressLabel', { current: 1, total: 3 })}
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 24, paddingBottom: Math.max(insets.bottom, 24) + 16 },
+      ]}
+    >
+      <OnboardingProgress
+        currentStep={1}
+        totalSteps={3}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 1, total: 3 })}
+      />
+
+      <View style={styles.heroBlock}>
+        <Image
+          testID="yomoyo-logo"
+          source={require('../../assets/images/yomoyo_logo.png')}
+          style={styles.heroImage}
+          resizeMode="contain"
         />
       </View>
 
-      <View style={styles.intro}>
+      <View style={styles.copyBlock}>
         <Text style={styles.heading}>{t('onboarding.introHeading')}</Text>
         <Text style={styles.body}>{t('onboarding.introBody')}</Text>
       </View>
@@ -82,23 +96,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    paddingTop: 16,
-    paddingBottom: 32,
     backgroundColor: yomoyoColors.background,
   },
-  progressBlock: {
-    paddingTop: 8,
-  },
-  intro: {
+  heroBlock: {
     flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 24,
+  },
+  heroImage: {
+    width: 200,
+    height: 200,
+  },
+  copyBlock: {
+    paddingBottom: 32,
   },
   heading: {
     fontSize: yomoyoTypography.titleSize,
     fontWeight: yomoyoTypography.titleWeight,
     color: yomoyoColors.text,
     textAlign: 'center',
-    marginBottom: 18,
+    marginBottom: 12,
   },
   body: {
     fontSize: yomoyoTypography.bodySize,

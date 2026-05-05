@@ -44,4 +44,18 @@ describe('OnboardingProgress', () => {
     );
     expect(screen.getByLabelText('Step 3 of 3')).toBeTruthy();
   });
+
+  it('makes only the current segment wider; past and future segments are narrow', () => {
+    render(<OnboardingProgress currentStep={2} totalSteps={3} />);
+    const flexOf = (id: string): number => {
+      const styles = screen.getByTestId(id).props.style;
+      const flat = (Array.isArray(styles) ? styles : [styles])
+        .filter(Boolean)
+        .reduce((acc, s) => ({ ...acc, ...s }), {} as Record<string, unknown>);
+      return flat.flex as number;
+    };
+    expect(flexOf('onboarding-progress-segment-0')).toBe(1); // past, narrow
+    expect(flexOf('onboarding-progress-segment-1')).toBe(2); // current, wide
+    expect(flexOf('onboarding-progress-segment-2')).toBe(1); // future, narrow
+  });
 });
