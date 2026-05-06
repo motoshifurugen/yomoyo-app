@@ -44,6 +44,10 @@ const ja = {
   },
   settings: {
     languageTitle: '言語',
+    themeTitle: '外観',
+    themeLight: 'ライト',
+    themeDark: 'ダーク',
+    themeSystem: 'システム',
     openSettings: '設定を開く',
     close: '閉じる',
   },

@@ -44,6 +44,10 @@ const en = {
   },
   settings: {
     languageTitle: 'Language',
+    themeTitle: 'Appearance',
+    themeLight: 'Light',
+    themeDark: 'Dark',
+    themeSystem: 'System',
     openSettings: 'Open settings',
     close: 'Close',
   },
