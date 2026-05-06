@@ -8,9 +8,7 @@ import {
 import { loadSavedThemeMode, saveThemeMode, type ThemeMode } from './themeStorage';
 import { resolveThemeMode, type ResolvedTheme } from './resolveThemeMode';
 import { useSystemColorScheme } from './useSystemColorScheme';
-
-type ThemeColors = typeof lightColors;
-type ThemeGlass = typeof lightGlass;
+import type { ThemeColors, ThemeGlass } from './themeTypes';
 
 type ThemeContextValue = {
   mode: ThemeMode;
