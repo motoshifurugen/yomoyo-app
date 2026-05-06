@@ -11,7 +11,8 @@ import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { markAsFinished } from '@/lib/books/readingActivity';
 import type { Presenter } from '@/lib/books/readingActivity';
@@ -24,6 +25,7 @@ export default function BookDetailScreen() {
   const route = useRoute<RouteType>();
   const { book } = route.params;
   const { user } = useAuth();
+  const styles = useThemedStyles(makeStyles);
   const [hasFinished, setHasFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -71,46 +73,47 @@ export default function BookDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: yomoyoColors.background,
-    flexGrow: 1,
-  },
-  cover: {
-    width: 120,
-    height: 180,
-    borderRadius: 6,
-    marginBottom: 20,
-    backgroundColor: yomoyoColors.border,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: yomoyoTypography.buttonWeight,
-    textAlign: 'center',
-    marginBottom: 8,
-    color: yomoyoColors.text,
-  },
-  author: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  button: {
-    backgroundColor: yomoyoColors.primary,
-    height: 52,
-    borderRadius: 14,
-    paddingHorizontal: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  buttonDone: { backgroundColor: yomoyoColors.muted },
-  buttonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      padding: 24,
+      backgroundColor: colors.background,
+      flexGrow: 1,
+    },
+    cover: {
+      width: 120,
+      height: 180,
+      borderRadius: 6,
+      marginBottom: 20,
+      backgroundColor: colors.border,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: yomoyoTypography.buttonWeight,
+      textAlign: 'center',
+      marginBottom: 8,
+      color: colors.text,
+    },
+    author: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      marginBottom: 32,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      height: 52,
+      borderRadius: 14,
+      paddingHorizontal: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 8,
+    },
+    buttonDone: { backgroundColor: colors.muted },
+    buttonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+  });

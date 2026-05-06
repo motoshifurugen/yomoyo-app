@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { screen, fireEvent } from '@testing-library/react-native';
 import GlassTabBar from './GlassTabBar';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 
 jest.mock('expo-blur', () => {
   const { View } = require('react-native');

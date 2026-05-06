@@ -1,6 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Share } from 'react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import MyHandleCard from './MyHandleCard';
 import { getUserHandle } from '@/lib/users/handles';
 

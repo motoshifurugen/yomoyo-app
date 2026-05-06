@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { yomoyoColors } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type Props = {
   children: React.ReactNode;
@@ -8,6 +8,7 @@ type Props = {
 };
 
 export default function ScreenContainer({ children, bottomInset = 0 }: Props) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={[styles.container, bottomInset > 0 && { paddingBottom: bottomInset }]}>
       {children}
@@ -15,10 +16,11 @@ export default function ScreenContainer({ children, bottomInset = 0 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: yomoyoColors.background,
-    paddingHorizontal: 24,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: 24,
+    },
+  });

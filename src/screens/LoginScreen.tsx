@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Platform, StyleSheet } from 'react-native';
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import {
   AppleButton,
   appleAuth,
@@ -11,6 +12,7 @@ import AuthLogoBlock from '@/components/auth/AuthLogoBlock';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export default function LoginScreen() {
+  const styles = useThemedStyles(makeStyles);
   const [signInError, setSignInError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
@@ -57,25 +59,26 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: yomoyoSpacing.horizontalPadding,
-    backgroundColor: yomoyoColors.background,
-  },
-  error: {
-    color: yomoyoColors.error,
-    fontSize: yomoyoTypography.errorSize,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  buttons: {
-    width: '100%',
-  },
-  appleButton: {
-    width: '100%',
-    height: yomoyoSpacing.buttonHeight,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: yomoyoSpacing.horizontalPadding,
+      backgroundColor: colors.background,
+    },
+    error: {
+      color: colors.error,
+      fontSize: yomoyoTypography.errorSize,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    buttons: {
+      width: '100%',
+    },
+    appleButton: {
+      width: '100%',
+      height: yomoyoSpacing.buttonHeight,
+    },
+  });

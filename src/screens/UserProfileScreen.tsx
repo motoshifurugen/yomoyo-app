@@ -12,7 +12,8 @@ import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -25,6 +26,7 @@ export default function UserProfileScreen() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const styles = useThemedStyles(makeStyles);
 
   const [identity, setIdentity] = useState<IdentityState>('loading');
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
@@ -168,132 +170,133 @@ export default function UserProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  navButton: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-    alignSelf: 'flex-start',
-  },
-  navButtonText: {
-    fontSize: 22,
-    color: yomoyoColors.text,
-  },
-  ownProfileBlock: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  ownPageNote: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.secondaryText,
-    marginBottom: 16,
-  },
-  ownActionsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  shelfButton: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-  },
-  shelfButtonText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: '500',
-    color: yomoyoColors.text,
-  },
-  content: {
-    paddingTop: 16,
-    paddingBottom: 24,
-  },
-  identityBlock: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    marginBottom: 12,
-  },
-  displayName: {
-    fontSize: yomoyoTypography.screenTitleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-  },
-  followButton: {
-    alignSelf: 'center',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: yomoyoColors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 28,
-    marginBottom: 32,
-  },
-  followButtonActive: {
-    backgroundColor: yomoyoColors.primary,
-  },
-  followButtonText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: '500',
-    color: yomoyoColors.primary,
-  },
-  followButtonTextActive: {
-    color: yomoyoColors.surface,
-  },
-  sectionHeader: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: yomoyoColors.secondaryText,
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  emptyText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: yomoyoColors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: yomoyoColors.text,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  thumbnail: {
-    width: 52,
-    height: 72,
-    borderRadius: 6,
-    marginRight: 12,
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: yomoyoColors.border,
-  },
-  cardInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  bookTitle: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-    marginBottom: 4,
-  },
-  author: {
-    fontSize: 14,
-    color: yomoyoColors.secondaryText,
-  },
-  notFound: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-    textAlign: 'center',
-    marginTop: 48,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    navButton: {
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 8,
+      alignSelf: 'flex-start',
+    },
+    navButtonText: {
+      fontSize: 22,
+      color: colors.text,
+    },
+    ownProfileBlock: {
+      alignItems: 'center',
+      marginBottom: 32,
+    },
+    ownPageNote: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.secondaryText,
+      marginBottom: 16,
+    },
+    ownActionsRow: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    shelfButton: {
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 10,
+      paddingHorizontal: 24,
+    },
+    shelfButtonText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    content: {
+      paddingTop: 16,
+      paddingBottom: 24,
+    },
+    identityBlock: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    avatar: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      marginBottom: 12,
+    },
+    displayName: {
+      fontSize: yomoyoTypography.screenTitleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+    },
+    followButton: {
+      alignSelf: 'center',
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      paddingVertical: 10,
+      paddingHorizontal: 28,
+      marginBottom: 32,
+    },
+    followButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    followButtonText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: '500',
+      color: colors.primary,
+    },
+    followButtonTextActive: {
+      color: colors.surface,
+    },
+    sectionHeader: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.secondaryText,
+      marginBottom: 12,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    emptyText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+    },
+    card: {
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 12,
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    thumbnail: {
+      width: 52,
+      height: 72,
+      borderRadius: 6,
+      marginRight: 12,
+    },
+    thumbnailPlaceholder: {
+      backgroundColor: colors.border,
+    },
+    cardInfo: {
+      flex: 1,
+      justifyContent: 'center',
+    },
+    bookTitle: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+      marginBottom: 4,
+    },
+    author: {
+      fontSize: 14,
+      color: colors.secondaryText,
+    },
+    notFound: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+      textAlign: 'center',
+      marginTop: 48,
+    },
+  });

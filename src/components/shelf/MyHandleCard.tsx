@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Share } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { getUserHandle } from '@/lib/users/handles';
 
 const SHARED_CONFIRMATION_MS = 2000;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function MyHandleCard({ uid }: Props) {
   const { t } = useTranslation();
+  const styles = useThemedStyles(makeStyles);
   const [handle, setHandle] = useState<string | null>(null);
   const [shared, setShared] = useState(false);
 
@@ -57,45 +59,46 @@ export default function MyHandleCard({ uid }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 8,
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 12,
-    color: yomoyoColors.muted,
-    marginBottom: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  handle: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-  },
-  handlePlaceholder: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-  },
-  shareButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-  },
-  shareButtonDisabled: {
-    opacity: 0.5,
-  },
-  shareText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: yomoyoColors.primary,
-  },
-  sharedText: {
-    fontSize: 12,
-    color: yomoyoColors.muted,
-    marginTop: 4,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      paddingVertical: 8,
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 12,
+      color: colors.muted,
+      marginBottom: 4,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    handle: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+    },
+    handlePlaceholder: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+    },
+    shareButton: {
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+    },
+    shareButtonDisabled: {
+      opacity: 0.5,
+    },
+    shareText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.primary,
+    },
+    sharedText: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 4,
+    },
+  });

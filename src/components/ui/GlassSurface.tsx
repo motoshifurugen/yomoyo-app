@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Platform, NativeModules, StyleProp, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { yomoyoGlass } from '@/constants/yomoyoTheme';
+import { useTheme, useThemedStyles, type ThemeColors, type ThemeGlass } from '@/lib/theme';
 
 // True only when the expo-blur native module is compiled into the current build.
 // Expo Go does not include it, so this will be false there.
@@ -15,16 +15,19 @@ type Props = {
 };
 
 export default function GlassSurface({ children, borderRadius = 24, style }: Props) {
+  const { resolved, glass } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+
   const glassStyle = {
     borderRadius,
     borderWidth: 1,
-    borderColor: yomoyoGlass.border,
+    borderColor: glass.border,
     overflow: 'hidden' as const,
   };
 
   if (BLUR_NATIVE_AVAILABLE) {
     return (
-      <BlurView intensity={60} tint="light" style={[glassStyle, style]}>
+      <BlurView intensity={60} tint={resolved === 'dark' ? 'dark' : 'light'} style={[glassStyle, style]}>
         {children}
       </BlurView>
     );
@@ -37,8 +40,9 @@ export default function GlassSurface({ children, borderRadius = 24, style }: Pro
   );
 }
 
-const styles = StyleSheet.create({
-  fallback: {
-    backgroundColor: yomoyoGlass.background,
-  },
-});
+const makeStyles = (_colors: ThemeColors, glass: ThemeGlass) =>
+  StyleSheet.create({
+    fallback: {
+      backgroundColor: glass.background,
+    },
+  });

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import FeedScreen from '@/screens/FeedScreen';
 import ShelfScreen from '@/screens/ShelfScreen';
 import { MainTabParamList } from './types';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useTheme } from '@/lib/theme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import GlassTabBar from '@/components/ui/GlassTabBar';
 import AddFriendButton from '@/components/feed/AddFriendButton';
 import SettingsLauncher from '@/components/settings/SettingsLauncher';
@@ -14,16 +15,17 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
 
   return (
     <Tab.Navigator
       tabBar={(props) => <GlassTabBar {...props} />}
       screenOptions={{
         headerStyle: {
-          backgroundColor: yomoyoColors.background,
+          backgroundColor: colors.background,
         },
         headerShadowVisible: false,
-        headerTintColor: yomoyoColors.text,
+        headerTintColor: colors.text,
         headerTitleStyle: {
           fontSize: yomoyoTypography.headerTitleSize,
           fontWeight: yomoyoTypography.titleWeight,

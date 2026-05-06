@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { yomoyoColors } from '@/constants/yomoyoTheme';
+import { useTheme } from '@/lib/theme';
 
 type Props = {
   onPress: () => void;
@@ -10,6 +10,7 @@ type Props = {
 
 export default function SettingsButton({ onPress }: Props) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
 
   return (
     <Pressable
@@ -20,7 +21,7 @@ export default function SettingsButton({ onPress }: Props) {
       style={styles.iconButton}
       hitSlop={8}
     >
-      <Ionicons name="settings-outline" size={22} color={yomoyoColors.text} />
+      <Ionicons name="settings-outline" size={22} color={colors.text} />
     </Pressable>
   );
 }

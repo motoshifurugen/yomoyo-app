@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,6 +22,7 @@ export default function OnboardingWelcomeScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const styles = useThemedStyles(makeStyles);
   const [error, setError] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
@@ -92,50 +94,51 @@ export default function OnboardingWelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    backgroundColor: yomoyoColors.background,
-  },
-  heroBlock: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 24,
-  },
-  heroImage: {
-    width: 200,
-    height: 200,
-  },
-  copyBlock: {
-    paddingBottom: 32,
-  },
-  heading: {
-    fontSize: yomoyoTypography.titleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  body: {
-    fontSize: yomoyoTypography.bodySize,
-    fontWeight: yomoyoTypography.bodyWeight,
-    lineHeight: yomoyoTypography.bodyLineHeight,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-  },
-  error: {
-    color: yomoyoColors.error,
-    fontSize: yomoyoTypography.errorSize,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  buttons: {
-    width: '100%',
-  },
-  appleButton: {
-    width: '100%',
-    height: yomoyoSpacing.buttonHeight,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: yomoyoSpacing.horizontalPadding,
+      backgroundColor: colors.background,
+    },
+    heroBlock: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: 24,
+    },
+    heroImage: {
+      width: 200,
+      height: 200,
+    },
+    copyBlock: {
+      paddingBottom: 32,
+    },
+    heading: {
+      fontSize: yomoyoTypography.titleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 12,
+    },
+    body: {
+      fontSize: yomoyoTypography.bodySize,
+      fontWeight: yomoyoTypography.bodyWeight,
+      lineHeight: yomoyoTypography.bodyLineHeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+    },
+    error: {
+      color: colors.error,
+      fontSize: yomoyoTypography.errorSize,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    buttons: {
+      width: '100%',
+    },
+    appleButton: {
+      width: '100%',
+      height: yomoyoSpacing.buttonHeight,
+    },
+  });

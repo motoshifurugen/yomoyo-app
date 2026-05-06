@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import EditProfileScreen from './EditProfileScreen';
 import { useNavigation } from '@react-navigation/native';
 import { getAvatarIdentity, saveAvatarIdentity } from '@/lib/users/avatarIdentity';

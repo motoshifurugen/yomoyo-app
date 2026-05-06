@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { DISPLAY_NAME_MAX } from '@/lib/users/avatarIdentity';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 export type DisplayNameError = 'empty' | 'too_long' | 'has_newline';
 
@@ -25,6 +26,7 @@ const INPUT_MAX_CHARS = DISPLAY_NAME_MAX * 4;
 
 export default function DisplayNameInput({ value, onChangeText, error }: Props) {
   const { t } = useTranslation();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <TextInput
@@ -51,20 +53,21 @@ export default function DisplayNameInput({ value, onChangeText, error }: Props) 
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.text,
-    backgroundColor: yomoyoColors.surface,
-  },
-  errorText: {
-    marginTop: 6,
-    fontSize: yomoyoTypography.errorSize,
-    color: yomoyoColors.error,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.text,
+      backgroundColor: colors.surface,
+    },
+    errorText: {
+      marginTop: 6,
+      fontSize: yomoyoTypography.errorSize,
+      color: colors.error,
+    },
+  });

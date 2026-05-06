@@ -16,7 +16,8 @@ import AnimalGridPicker from '@/components/profile/AnimalGridPicker';
 import DisplayNameInput from '@/components/profile/DisplayNameInput';
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
 import type { OnboardingStackParamList } from '@/navigation/types';
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'OnboardingAvatar'>;
 
@@ -25,6 +26,7 @@ export default function OnboardingAvatarScreen() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const styles = useThemedStyles(makeStyles);
 
   const [animalKey, setAnimalKey] = useState<AnimalKey>(() => defaultAnimalKey());
   const [displayName, setDisplayName] = useState('');
@@ -82,48 +84,49 @@ export default function OnboardingAvatarScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: yomoyoColors.background,
-    paddingHorizontal: yomoyoSpacing.horizontalPadding,
-  },
-  scroll: {
-    paddingTop: 24,
-    paddingBottom: 16,
-  },
-  heading: {
-    fontSize: yomoyoTypography.bodySize,
-    fontWeight: yomoyoTypography.bodyWeight,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  gridWrapper: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.secondaryActionWeight,
-    color: yomoyoColors.text,
-    marginBottom: 8,
-  },
-  actions: {
-    paddingTop: 16,
-  },
-  button: {
-    height: yomoyoSpacing.buttonHeight,
-    borderRadius: yomoyoSpacing.buttonRadius,
-    backgroundColor: yomoyoColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: yomoyoColors.muted,
-  },
-  buttonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.buttonSize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: yomoyoSpacing.horizontalPadding,
+    },
+    scroll: {
+      paddingTop: 24,
+      paddingBottom: 16,
+    },
+    heading: {
+      fontSize: yomoyoTypography.bodySize,
+      fontWeight: yomoyoTypography.bodyWeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      marginBottom: 24,
+    },
+    gridWrapper: {
+      marginBottom: 24,
+    },
+    label: {
+      fontSize: yomoyoTypography.secondaryActionSize,
+      fontWeight: yomoyoTypography.secondaryActionWeight,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    actions: {
+      paddingTop: 16,
+    },
+    button: {
+      height: yomoyoSpacing.buttonHeight,
+      borderRadius: yomoyoSpacing.buttonRadius,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonDisabled: {
+      backgroundColor: colors.muted,
+    },
+    buttonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.buttonSize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+  });

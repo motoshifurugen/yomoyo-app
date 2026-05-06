@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import SettingsDialog from './SettingsDialog';
 import { setLanguage } from '@/lib/i18n';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';

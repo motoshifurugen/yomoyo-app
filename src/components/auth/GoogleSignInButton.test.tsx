@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react-native';
+import { screen, fireEvent } from '@testing-library/react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import GoogleSignInButton from './GoogleSignInButton';
 
 describe('GoogleSignInButton', () => {

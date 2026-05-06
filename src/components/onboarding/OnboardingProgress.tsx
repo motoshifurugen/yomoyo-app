@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { yomoyoColors } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type Props = {
   currentStep: number;
@@ -9,6 +9,7 @@ type Props = {
 };
 
 export default function OnboardingProgress({ currentStep, totalSteps, accessibilityLabel }: Props) {
+  const styles = useThemedStyles(makeStyles);
   const clamped = Math.min(Math.max(currentStep, 1), totalSteps);
   const segments = Array.from({ length: totalSteps }, (_, i) => i);
   const label = accessibilityLabel ?? `Step ${clamped} of ${totalSteps}`;
@@ -39,28 +40,29 @@ export default function OnboardingProgress({ currentStep, totalSteps, accessibil
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 4,
-    paddingVertical: 12,
-  },
-  segment: {
-    height: 4,
-    borderRadius: 2,
-  },
-  segmentNarrow: {
-    flex: 1,
-  },
-  segmentWide: {
-    flex: 2,
-  },
-  segmentFilledColor: {
-    backgroundColor: yomoyoColors.primary,
-  },
-  segmentEmptyColor: {
-    backgroundColor: yomoyoColors.border,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 4,
+      paddingVertical: 12,
+    },
+    segment: {
+      height: 4,
+      borderRadius: 2,
+    },
+    segmentNarrow: {
+      flex: 1,
+    },
+    segmentWide: {
+      flex: 2,
+    },
+    segmentFilledColor: {
+      backgroundColor: colors.primary,
+    },
+    segmentEmptyColor: {
+      backgroundColor: colors.border,
+    },
+  });

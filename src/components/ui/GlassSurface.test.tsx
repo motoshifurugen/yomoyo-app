@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import GlassSurface from './GlassSurface';
+import { renderWithTheme } from '@/lib/theme/testUtils';
 
 jest.mock('expo-blur', () => {
   const { View } = require('react-native');
@@ -10,7 +11,7 @@ jest.mock('expo-blur', () => {
 
 describe('GlassSurface', () => {
   it('renders children', () => {
-    render(
+    renderWithTheme(
       <GlassSurface>
         <Text>Glass content</Text>
       </GlassSurface>
@@ -19,7 +20,7 @@ describe('GlassSurface', () => {
   });
 
   it('renders with a custom border radius without crashing', () => {
-    render(
+    renderWithTheme(
       <GlassSurface borderRadius={30}>
         <Text>Pill shape</Text>
       </GlassSurface>
@@ -28,9 +29,7 @@ describe('GlassSurface', () => {
   });
 
   it('uses the translucent fallback when native blur is unavailable', () => {
-    // In the test environment, NativeModules.ExpoBlurViewManager is undefined,
-    // so the blur-unavailable path should be taken.
-    render(
+    renderWithTheme(
       <GlassSurface>
         <Text>fallback</Text>
       </GlassSurface>
@@ -39,7 +38,7 @@ describe('GlassSurface', () => {
   });
 
   it('renders children in the fallback view', () => {
-    render(
+    renderWithTheme(
       <GlassSurface>
         <Text>inside fallback</Text>
       </GlassSurface>

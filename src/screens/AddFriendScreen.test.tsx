@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import AddFriendScreen from './AddFriendScreen';
 import { findUidByHandle } from '@/lib/users/handles';
 import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
