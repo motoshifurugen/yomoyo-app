@@ -1,8 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import SettingsDialog from './SettingsDialog';
 import { setLanguage } from '@/lib/i18n';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
+import { THEME_STORAGE_KEY } from '@/lib/theme/themeStorage';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
@@ -100,6 +103,83 @@ describe('SettingsDialog — accessibility', () => {
     render(<SettingsDialog visible={true} onClose={jest.fn()} />);
     const jaButton = screen.getByTestId('settings-dialog-lang-ja');
     expect(jaButton.props.accessibilityState).toEqual({ selected: false });
+  });
+});
+
+describe('SettingsDialog — theme section', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the theme section title when visible', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByText('settings.themeTitle')).toBeTruthy();
+  });
+
+  it('renders all three theme pills', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByTestId('settings-dialog-theme-light')).toBeTruthy();
+    expect(screen.getByTestId('settings-dialog-theme-dark')).toBeTruthy();
+    expect(screen.getByTestId('settings-dialog-theme-system')).toBeTruthy();
+  });
+
+  it('marks the System pill as selected by default (no saved mode)', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    const systemPill = screen.getByTestId('settings-dialog-theme-system');
+    const lightPill = screen.getByTestId('settings-dialog-theme-light');
+    const darkPill = screen.getByTestId('settings-dialog-theme-dark');
+    expect(systemPill.props.accessibilityState).toEqual({ selected: true });
+    expect(lightPill.props.accessibilityState).toEqual({ selected: false });
+    expect(darkPill.props.accessibilityState).toEqual({ selected: false });
+  });
+
+  it('switches selection to Light when the Light pill is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-light'));
+    await waitFor(() => {
+      expect(screen.getByTestId('settings-dialog-theme-light').props.accessibilityState).toEqual({
+        selected: true,
+      });
+    });
+    expect(screen.getByTestId('settings-dialog-theme-system').props.accessibilityState).toEqual({
+      selected: false,
+    });
+  });
+
+  it('switches selection to Dark when the Dark pill is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-dark'));
+    await waitFor(() => {
+      expect(screen.getByTestId('settings-dialog-theme-dark').props.accessibilityState).toEqual({
+        selected: true,
+      });
+    });
+  });
+
+  it('persists "light" to storage when the Light pill is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-light'));
+    await waitFor(() => {
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(THEME_STORAGE_KEY, 'light');
+    });
+  });
+
+  it('persists "dark" to storage when the Dark pill is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-dark'));
+    await waitFor(() => {
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(THEME_STORAGE_KEY, 'dark');
+    });
+  });
+
+  it('persists "system" to storage when the System pill is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    // Start by switching away so System press has a meaningful effect.
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-light'));
+    fireEvent.press(screen.getByTestId('settings-dialog-theme-system'));
+    await waitFor(() => {
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(THEME_STORAGE_KEY, 'system');
+    });
   });
 });
 

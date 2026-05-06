@@ -10,6 +10,12 @@ jest.mock('@/navigation/RootNavigator', () => {
 
 jest.mock('@react-navigation/native', () => ({
   NavigationContainer: ({ children }: { children: React.ReactNode }) => children,
+  DefaultTheme: { dark: false, colors: {} },
+  DarkTheme: { dark: true, colors: {} },
+}));
+
+jest.mock('expo-status-bar', () => ({
+  StatusBar: () => null,
 }));
 
 jest.mock('react-native-safe-area-context', () => ({

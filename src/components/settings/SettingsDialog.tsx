@@ -4,7 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
-import { yomoyoColors, yomoyoGlass, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import {
+  useTheme,
+  useThemedStyles,
+  type ThemeColors,
+  type ThemeGlass,
+  type ThemeMode,
+} from '@/lib/theme';
 
 type Language = 'ja' | 'en';
 
@@ -13,9 +20,98 @@ type Props = {
   onClose: () => void;
 };
 
+type Styles = ReturnType<typeof makeStyles>;
+
+const THEME_MODES: ReadonlyArray<{ mode: ThemeMode; labelKey: string }> = [
+  { mode: 'light', labelKey: 'settings.themeLight' },
+  { mode: 'dark', labelKey: 'settings.themeDark' },
+  { mode: 'system', labelKey: 'settings.themeSystem' },
+];
+
+const LANGUAGES: ReadonlyArray<{ code: Language; label: string }> = [
+  { code: 'ja', label: '日本語' },
+  { code: 'en', label: 'English' },
+];
+
+type TFn = (key: string) => string;
+
+function ThemeSection({
+  styles,
+  t,
+  current,
+  onSelect,
+}: {
+  styles: Styles;
+  t: TFn;
+  current: ThemeMode;
+  onSelect: (next: ThemeMode) => void;
+}) {
+  return (
+    <View>
+      <Text style={styles.sectionLabel}>{t('settings.themeTitle')}</Text>
+      <View style={styles.row}>
+        {THEME_MODES.map(({ mode, labelKey }) => {
+          const active = current === mode;
+          return (
+            <TouchableOpacity
+              key={mode}
+              testID={`settings-dialog-theme-${mode}`}
+              style={[styles.pillOption, active && styles.pillOptionActive]}
+              onPress={() => onSelect(mode)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+            >
+              <Text style={[styles.pillText, active && styles.pillTextActive]}>
+                {t(labelKey)}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+function LanguageSection({
+  styles,
+  t,
+  current,
+  onSelect,
+}: {
+  styles: Styles;
+  t: TFn;
+  current: Language;
+  onSelect: (next: Language) => void;
+}) {
+  return (
+    <View>
+      <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
+      <View style={styles.row}>
+        {LANGUAGES.map(({ code, label }) => {
+          const active = current === code;
+          return (
+            <TouchableOpacity
+              key={code}
+              testID={`settings-dialog-lang-${code}`}
+              style={[styles.pillOption, active && styles.pillOptionActive]}
+              onPress={() => onSelect(code)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+            >
+              <Text style={[styles.pillText, active && styles.pillTextActive]}>{label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 export default function SettingsDialog({ visible, onClose }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { mode, setMode } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const currentLanguage = (i18n.language.split('-')[0] ?? 'en') as Language;
 
   const handleLanguageChange = async (lang: Language) => {
@@ -34,34 +130,14 @@ export default function SettingsDialog({ visible, onClose }: Props) {
         accessibilityRole="button"
       >
         <Pressable style={styles.sheet} onPress={() => {}}>
-          <Text style={styles.sectionLabel}>{t('settings.languageTitle')}</Text>
-          <View style={styles.row}>
-            <TouchableOpacity
-              testID="settings-dialog-lang-ja"
-              style={[styles.langOption, currentLanguage === 'ja' && styles.langOptionActive]}
-              onPress={() => {
-                void handleLanguageChange('ja');
-              }}
-              accessibilityRole="button"
-              accessibilityState={{ selected: currentLanguage === 'ja' }}
-            >
-              <Text style={[styles.langText, currentLanguage === 'ja' && styles.langTextActive]}>
-                日本語
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              testID="settings-dialog-lang-en"
-              style={[styles.langOption, currentLanguage === 'en' && styles.langOptionActive]}
-              onPress={() => {
-                void handleLanguageChange('en');
-              }}
-              accessibilityRole="button"
-              accessibilityState={{ selected: currentLanguage === 'en' }}
-            >
-              <Text style={[styles.langText, currentLanguage === 'en' && styles.langTextActive]}>
-                English
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.sections}>
+            <ThemeSection styles={styles} t={t} current={mode} onSelect={setMode} />
+            <LanguageSection
+              styles={styles}
+              t={t}
+              current={currentLanguage}
+              onSelect={handleLanguageChange}
+            />
           </View>
           <TouchableOpacity
             testID="settings-dialog-close"
@@ -77,59 +153,63 @@ export default function SettingsDialog({ visible, onClose }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  sheet: {
-    backgroundColor: yomoyoColors.surface,
-    borderRadius: 20,
-    padding: 24,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: yomoyoColors.secondaryText,
-    marginBottom: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  langOption: {
-    flex: 1,
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: yomoyoGlass.border,
-    backgroundColor: yomoyoGlass.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  langOptionActive: {
-    borderColor: yomoyoColors.primary,
-    backgroundColor: yomoyoGlass.tealTint,
-  },
-  langText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: yomoyoColors.text,
-  },
-  langTextActive: {
-    color: yomoyoColors.primary,
-    fontWeight: '600',
-  },
-  closeButton: {
-    alignSelf: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginTop: 16,
-  },
-  closeText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-  },
-});
+const makeStyles = (colors: ThemeColors, glass: ThemeGlass) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 24,
+    },
+    sections: {
+      gap: 20,
+    },
+    sectionLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.secondaryText,
+      marginBottom: 12,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    pillOption: {
+      flex: 1,
+      height: 52,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: glass.border,
+      backgroundColor: glass.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    pillOptionActive: {
+      borderColor: colors.primary,
+      backgroundColor: glass.tealTint,
+    },
+    pillText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    pillTextActive: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    closeButton: {
+      alignSelf: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      marginTop: 16,
+    },
+    closeText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+    },
+  });

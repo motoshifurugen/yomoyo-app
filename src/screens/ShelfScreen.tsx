@@ -5,7 +5,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -19,6 +20,7 @@ export default function ShelfScreen() {
   const navigation = useNavigation<NavigationProp>();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
+  const styles = useThemedStyles(makeStyles);
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function ShelfScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, t]);
+  }, [navigation, t, styles]);
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
@@ -86,81 +88,82 @@ export default function ShelfScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  sectionHeader: {
-    fontSize: yomoyoTypography.screenTitleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    marginBottom: 12,
-  },
-  emptyText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-    marginBottom: 8,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: yomoyoColors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    shadowColor: yomoyoColors.text,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  thumbnail: {
-    width: 52,
-    height: 72,
-    borderRadius: 6,
-    marginRight: 12,
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: yomoyoColors.border,
-  },
-  cardInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  bookTitle: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-    marginBottom: 4,
-  },
-  author: {
-    fontSize: 14,
-    color: yomoyoColors.secondaryText,
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 13,
-    color: yomoyoColors.muted,
-  },
-  addButton: {
-    marginTop: 16,
-    backgroundColor: yomoyoColors.primary,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignSelf: 'flex-start',
-  },
-  addButtonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-  headerButton: {
-    paddingHorizontal: 8,
-  },
-  headerButtonText: {
-    fontSize: 24,
-    color: yomoyoColors.primary,
-    lineHeight: 28,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    content: {
+      paddingTop: 16,
+      paddingBottom: 16,
+    },
+    sectionHeader: {
+      fontSize: yomoyoTypography.screenTitleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      marginBottom: 12,
+    },
+    emptyText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+      marginBottom: 8,
+    },
+    card: {
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 12,
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    thumbnail: {
+      width: 52,
+      height: 72,
+      borderRadius: 6,
+      marginRight: 12,
+    },
+    thumbnailPlaceholder: {
+      backgroundColor: colors.border,
+    },
+    cardInfo: {
+      flex: 1,
+      justifyContent: 'center',
+    },
+    bookTitle: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+      marginBottom: 4,
+    },
+    author: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      marginBottom: 4,
+    },
+    date: {
+      fontSize: 13,
+      color: colors.muted,
+    },
+    addButton: {
+      marginTop: 16,
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      alignSelf: 'flex-start',
+    },
+    addButtonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    headerButton: {
+      paddingHorizontal: 8,
+    },
+    headerButtonText: {
+      fontSize: 24,
+      color: colors.primary,
+      lineHeight: 28,
+    },
+  });

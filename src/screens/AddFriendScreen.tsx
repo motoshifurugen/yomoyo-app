@@ -13,7 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { findUidByHandle } from '@/lib/users/handles';
 import { getAvatarIdentity, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
@@ -33,6 +34,7 @@ export default function AddFriendScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const { user } = useAuth();
+  const styles = useThemedStyles(makeStyles);
   const [input, setInput] = useState('');
   const [state, setState] = useState<SearchState>({ kind: 'idle' });
 
@@ -132,101 +134,102 @@ export default function AddFriendScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 24,
-  },
-  heading: {
-    fontSize: yomoyoTypography.screenTitleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 24,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.text,
-  },
-  searchButton: {
-    backgroundColor: yomoyoColors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  searchButtonDisabled: {
-    opacity: 0.5,
-  },
-  searchButtonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-  loading: {
-    marginTop: 16,
-  },
-  message: {
-    marginTop: 16,
-    textAlign: 'center',
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-  },
-  matchCard: {
-    marginTop: 16,
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: yomoyoColors.surface,
-    borderRadius: 12,
-    shadowColor: yomoyoColors.text,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    marginBottom: 12,
-  },
-  matchLabel: {
-    fontSize: yomoyoTypography.titleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    marginBottom: 16,
-  },
-  viewProfileButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: yomoyoColors.primary,
-    borderRadius: 20,
-  },
-  viewProfileText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.primary,
-  },
-  closeButton: {
-    marginTop: 'auto',
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-  },
-  closeText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.muted,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      paddingHorizontal: 16,
+      paddingTop: 24,
+    },
+    heading: {
+      fontSize: yomoyoTypography.screenTitleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 24,
+    },
+    searchRow: {
+      flexDirection: 'row',
+      gap: 8,
+      marginBottom: 24,
+    },
+    input: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.text,
+    },
+    searchButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      justifyContent: 'center',
+    },
+    searchButtonDisabled: {
+      opacity: 0.5,
+    },
+    searchButtonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    loading: {
+      marginTop: 16,
+    },
+    message: {
+      marginTop: 16,
+      textAlign: 'center',
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+    },
+    matchCard: {
+      marginTop: 16,
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    avatar: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      marginBottom: 12,
+    },
+    matchLabel: {
+      fontSize: yomoyoTypography.titleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      marginBottom: 16,
+    },
+    viewProfileButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 24,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 20,
+    },
+    viewProfileText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.primary,
+    },
+    closeButton: {
+      marginTop: 'auto',
+      alignSelf: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 14,
+    },
+    closeText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.muted,
+    },
+  });

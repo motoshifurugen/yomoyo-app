@@ -15,7 +15,8 @@ import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import AnimalGridPicker from '@/components/profile/AnimalGridPicker';
 import DisplayNameInput from '@/components/profile/DisplayNameInput';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -23,6 +24,7 @@ export default function EditProfileScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const styles = useThemedStyles(makeStyles);
 
   const [animalKey, setAnimalKey] = useState<AnimalKey>(() => defaultAnimalKey());
   const [displayName, setDisplayName] = useState('');
@@ -91,42 +93,43 @@ export default function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    paddingVertical: 12,
-  },
-  headerTitle: {
-    fontSize: yomoyoTypography.headerTitleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-  },
-  headerPrimary: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.primary,
-  },
-  headerPrimaryDisabled: {
-    color: yomoyoColors.muted,
-  },
-  headerSecondary: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    color: yomoyoColors.secondaryText,
-  },
-  body: {
-    paddingHorizontal: yomoyoSpacing.horizontalPadding,
-    paddingBottom: 24,
-  },
-  label: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.secondaryActionWeight,
-    color: yomoyoColors.text,
-    marginBottom: 8,
-  },
-  gridSpacer: {
-    height: 24,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: yomoyoSpacing.horizontalPadding,
+      paddingVertical: 12,
+    },
+    headerTitle: {
+      fontSize: yomoyoTypography.headerTitleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+    },
+    headerPrimary: {
+      fontSize: yomoyoTypography.secondaryActionSize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.primary,
+    },
+    headerPrimaryDisabled: {
+      color: colors.muted,
+    },
+    headerSecondary: {
+      fontSize: yomoyoTypography.secondaryActionSize,
+      color: colors.secondaryText,
+    },
+    body: {
+      paddingHorizontal: yomoyoSpacing.horizontalPadding,
+      paddingBottom: 24,
+    },
+    label: {
+      fontSize: yomoyoTypography.secondaryActionSize,
+      fontWeight: yomoyoTypography.secondaryActionWeight,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    gridSpacer: {
+      height: 24,
+    },
+  });

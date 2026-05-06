@@ -9,7 +9,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -28,6 +29,7 @@ export default function ActivityDetailModal({
   onViewProfile,
 }: Props) {
   const { t } = useTranslation();
+  const styles = useThemedStyles(makeStyles);
 
   if (!activity) return null;
 
@@ -107,96 +109,97 @@ export default function ActivityDetailModal({
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: yomoyoColors.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '85%',
-  },
-  content: {
-    padding: 24,
-    alignItems: 'center',
-  },
-  cover: {
-    width: 120,
-    height: 180,
-    borderRadius: 6,
-    marginBottom: 16,
-    backgroundColor: yomoyoColors.border,
-  },
-  coverPlaceholder: {
-    backgroundColor: yomoyoColors.border,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  author: {
-    fontSize: yomoyoTypography.screenBodySize,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  divider: {
-    width: '100%',
-    height: 1,
-    backgroundColor: yomoyoColors.border,
-    marginBottom: 16,
-  },
-  friendBlock: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    marginBottom: 24,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  friendMeta: {
-    flex: 1,
-  },
-  friendLabel: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-  },
-  finishedLabel: {
-    fontSize: 13,
-    color: yomoyoColors.muted,
-    marginTop: 2,
-  },
-  viewProfileButton: {
-    alignSelf: 'stretch',
-    backgroundColor: yomoyoColors.primary,
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  viewProfileText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-  closeButton: {
-    alignSelf: 'stretch',
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  closeText: {
-    color: yomoyoColors.muted,
-    fontSize: yomoyoTypography.screenBodySize,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      maxHeight: '85%',
+    },
+    content: {
+      padding: 24,
+      alignItems: 'center',
+    },
+    cover: {
+      width: 120,
+      height: 180,
+      borderRadius: 6,
+      marginBottom: 16,
+      backgroundColor: colors.border,
+    },
+    coverPlaceholder: {
+      backgroundColor: colors.border,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 6,
+    },
+    author: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    divider: {
+      width: '100%',
+      height: 1,
+      backgroundColor: colors.border,
+      marginBottom: 16,
+    },
+    friendBlock: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'stretch',
+      marginBottom: 24,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      marginRight: 12,
+    },
+    friendMeta: {
+      flex: 1,
+    },
+    friendLabel: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+    },
+    finishedLabel: {
+      fontSize: 13,
+      color: colors.muted,
+      marginTop: 2,
+    },
+    viewProfileButton: {
+      alignSelf: 'stretch',
+      backgroundColor: colors.primary,
+      borderRadius: 14,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    viewProfileText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    closeButton: {
+      alignSelf: 'stretch',
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    closeText: {
+      color: colors.muted,
+      fontSize: yomoyoTypography.screenBodySize,
+    },
+  });

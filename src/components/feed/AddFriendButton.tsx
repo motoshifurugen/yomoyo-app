@@ -6,7 +6,8 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import type { MainTabParamList, RootStackParamList } from '@/navigation/types';
 
 type NavigationProp = CompositeNavigationProp<
@@ -23,6 +24,8 @@ type Props = {
 export default function AddFriendButton({ variant = 'icon' }: Props) {
   const navigation = useNavigation<NavigationProp>();
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const label = t('addFriend.heading');
   const handlePress = () => navigation.navigate('AddFriend');
@@ -50,27 +53,28 @@ export default function AddFriendButton({ variant = 'icon' }: Props) {
       style={styles.iconButton}
       hitSlop={8}
     >
-      <Ionicons name="person-add-outline" size={22} color={yomoyoColors.text} />
+      <Ionicons name="person-add-outline" size={22} color={colors.text} />
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  iconButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  inlineButton: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: yomoyoColors.primary,
-  },
-  inlineText: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.primary,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    iconButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 4,
+    },
+    inlineButton: {
+      marginTop: 16,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    inlineText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.primary,
+    },
+  });

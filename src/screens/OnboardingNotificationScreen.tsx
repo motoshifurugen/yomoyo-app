@@ -10,7 +10,8 @@ import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
-import { yomoyoColors, yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type Props = {
   onComplete: () => void;
@@ -22,6 +23,8 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const player = useVideoPlayer(videoSource, (p) => {
     p.loop = true;
@@ -88,7 +91,7 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
             importantForAccessibility="no-hide-descendants"
             style={styles.placeholder}
           >
-            <Ionicons name="notifications-outline" size={64} color={yomoyoColors.muted} />
+            <Ionicons name="notifications-outline" size={64} color={colors.muted} />
           </View>
           <VideoView
             accessible={false}
@@ -114,71 +117,72 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: yomoyoColors.background,
-    paddingHorizontal: yomoyoSpacing.horizontalPadding,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  videoFrame: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: yomoyoColors.surface,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 40,
-  },
-  placeholder: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  video: {
-    width: 180,
-    height: 180,
-    backgroundColor: 'transparent',
-  },
-  heading: {
-    fontSize: yomoyoTypography.titleSize,
-    fontWeight: yomoyoTypography.titleWeight,
-    color: yomoyoColors.text,
-    textAlign: 'center',
-    marginBottom: 18,
-  },
-  body: {
-    fontSize: yomoyoTypography.bodySize,
-    fontWeight: yomoyoTypography.bodyWeight,
-    lineHeight: yomoyoTypography.bodyLineHeight,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-  },
-  actions: {
-    alignItems: 'center',
-  },
-  button: {
-    width: '100%',
-    height: yomoyoSpacing.buttonHeight,
-    borderRadius: yomoyoSpacing.buttonRadius,
-    backgroundColor: yomoyoColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-  },
-  buttonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.buttonSize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-  skip: {
-    fontSize: yomoyoTypography.secondaryActionSize,
-    fontWeight: yomoyoTypography.secondaryActionWeight,
-    color: yomoyoColors.muted,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      paddingHorizontal: yomoyoSpacing.horizontalPadding,
+    },
+    content: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    videoFrame: {
+      width: 180,
+      height: 180,
+      borderRadius: 90,
+      backgroundColor: colors.surface,
+      overflow: 'hidden',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 40,
+    },
+    placeholder: {
+      ...StyleSheet.absoluteFillObject,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    video: {
+      width: 180,
+      height: 180,
+      backgroundColor: 'transparent',
+    },
+    heading: {
+      fontSize: yomoyoTypography.titleSize,
+      fontWeight: yomoyoTypography.titleWeight,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: 18,
+    },
+    body: {
+      fontSize: yomoyoTypography.bodySize,
+      fontWeight: yomoyoTypography.bodyWeight,
+      lineHeight: yomoyoTypography.bodyLineHeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+    },
+    actions: {
+      alignItems: 'center',
+    },
+    button: {
+      width: '100%',
+      height: yomoyoSpacing.buttonHeight,
+      borderRadius: yomoyoSpacing.buttonRadius,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 24,
+    },
+    buttonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.buttonSize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    skip: {
+      fontSize: yomoyoTypography.secondaryActionSize,
+      fontWeight: yomoyoTypography.secondaryActionWeight,
+      color: colors.muted,
+    },
+  });

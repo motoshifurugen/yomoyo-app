@@ -16,7 +16,8 @@ import ActivityDetailModal from '@/components/feed/ActivityDetailModal';
 import AddFriendButton from '@/components/feed/AddFriendButton';
 import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -34,6 +35,7 @@ type ActivityCardProps = {
 
 const ActivityCard = React.memo(function ActivityCard({ item, onPress }: ActivityCardProps) {
   const { t } = useTranslation();
+  const styles = useThemedStyles(makeStyles);
   const avatarKey = item.displayAvatar as AnimalKey | undefined;
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
   const displayName = item.displayName ?? item.displayLabel;
@@ -67,6 +69,8 @@ export default function FeedScreen() {
   const tabBarInset = useGlassTabBarInset();
   const navigation = useNavigation<NavigationProp>();
   const { items, isLoading, isLoadingMore, hasError, handleLoadMore } = useFeedState();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const [selectedActivity, setSelectedActivity] = useState<ReadingActivity | null>(null);
 
@@ -102,7 +106,7 @@ export default function FeedScreen() {
       }
       return <ActivityCard item={row.item} onPress={handleRowPress} />;
     },
-    [handleRowPress],
+    [handleRowPress, styles.adSlot],
   );
 
   const keyExtractor = useCallback(
@@ -114,7 +118,7 @@ export default function FeedScreen() {
     <ScreenContainer bottomInset={tabBarInset}>
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator color={yomoyoColors.primary} />
+          <ActivityIndicator color={colors.primary} />
         </View>
       ) : hasError ? (
         <View style={styles.center}>
@@ -148,60 +152,61 @@ export default function FeedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  emptyBody: {
-    fontSize: yomoyoTypography.screenBodySize,
-    lineHeight: yomoyoTypography.screenBodyLineHeight,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-  },
-  list: { padding: 16 },
-  loader: { marginVertical: 16 },
-  adSlot: { marginBottom: 12, alignItems: 'center' },
-  card: {
-    backgroundColor: yomoyoColors.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: yomoyoColors.text,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 10,
-  },
-  cardMeta: {
-    flex: 1,
-  },
-  cardUser: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-  },
-  cardLabel: {
-    fontSize: 12,
-    color: yomoyoColors.muted,
-    marginTop: 2,
-  },
-  cardTitle: {
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-    color: yomoyoColors.text,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+    },
+    emptyBody: {
+      fontSize: yomoyoTypography.screenBodySize,
+      lineHeight: yomoyoTypography.screenBodyLineHeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+    },
+    list: { padding: 16 },
+    loader: { marginVertical: 16 },
+    adSlot: { marginBottom: 12, alignItems: 'center' },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 12,
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    avatar: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      marginRight: 10,
+    },
+    cardMeta: {
+      flex: 1,
+    },
+    cardUser: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+    },
+    cardLabel: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 2,
+    },
+    cardTitle: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+      color: colors.text,
+    },
+  });

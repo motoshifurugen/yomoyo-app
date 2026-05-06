@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 export default function AuthLogoBlock() {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.container}>
       <Image
@@ -16,22 +18,23 @@ export default function AuthLogoBlock() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    marginBottom: 52,
-  },
-  logo: {
-    width: 260,
-    height: 260,
-    alignSelf: 'center',
-    marginBottom: 28,
-  },
-  subtitle: {
-    fontSize: yomoyoTypography.subtitleSize,
-    fontWeight: yomoyoTypography.subtitleWeight,
-    color: yomoyoColors.secondaryText,
-    textAlign: 'center',
-    letterSpacing: 0.2,
-  },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      marginBottom: 52,
+    },
+    logo: {
+      width: 260,
+      height: 260,
+      alignSelf: 'center',
+      marginBottom: 28,
+    },
+    subtitle: {
+      fontSize: yomoyoTypography.subtitleSize,
+      fontWeight: yomoyoTypography.subtitleWeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      letterSpacing: 0.2,
+    },
+  });

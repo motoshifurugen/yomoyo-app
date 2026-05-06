@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import LoginScreen from '@/screens/LoginScreen';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';

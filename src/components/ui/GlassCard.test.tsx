@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import GlassCard from './GlassCard';
+import { renderWithTheme } from '@/lib/theme/testUtils';
 
 jest.mock('expo-blur', () => {
   const { View } = require('react-native');
@@ -10,7 +11,7 @@ jest.mock('expo-blur', () => {
 
 describe('GlassCard', () => {
   it('renders children', () => {
-    render(
+    renderWithTheme(
       <GlassCard>
         <Text>Card content</Text>
       </GlassCard>

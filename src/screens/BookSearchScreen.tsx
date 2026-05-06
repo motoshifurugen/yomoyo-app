@@ -14,7 +14,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { searchBooks, type Book } from '@/lib/books/searchBooks';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoColors, yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -25,6 +26,7 @@ function is429Error(error: unknown): boolean {
 export default function BookSearchScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const styles = useThemedStyles(makeStyles);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Book[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -112,59 +114,60 @@ export default function BookSearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: yomoyoColors.background },
-  searchRow: { flexDirection: 'row', padding: 16, gap: 8 },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: yomoyoColors.border,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: yomoyoTypography.screenBodySize,
-  },
-  button: {
-    backgroundColor: yomoyoColors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    color: yomoyoColors.surface,
-    fontSize: yomoyoTypography.screenBodySize,
-    fontWeight: yomoyoTypography.buttonWeight,
-  },
-  loading: { marginTop: 24 },
-  errorText: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: yomoyoColors.error,
-    fontSize: yomoyoTypography.screenBodySize,
-  },
-  noResults: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: yomoyoColors.muted,
-    fontSize: yomoyoTypography.screenBodySize,
-  },
-  resultItem: {
-    flexDirection: 'row',
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: yomoyoColors.border,
-  },
-  thumbnail: { width: 50, height: 72, borderRadius: 4, backgroundColor: yomoyoColors.border },
-  thumbnailPlaceholder: { width: 50, height: 72, borderRadius: 4, backgroundColor: yomoyoColors.border },
-  bookInfo: { flex: 1, marginLeft: 12, justifyContent: 'center' },
-  bookTitle: {
-    fontSize: 15,
-    fontWeight: yomoyoTypography.buttonWeight,
-    marginBottom: 4,
-    color: yomoyoColors.text,
-  },
-  bookAuthor: { fontSize: 13, color: yomoyoColors.secondaryText },
-});
+const makeStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    searchRow: { flexDirection: 'row', padding: 16, gap: 8 },
+    input: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: yomoyoTypography.screenBodySize,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      justifyContent: 'center',
+    },
+    buttonDisabled: {
+      opacity: 0.5,
+    },
+    buttonText: {
+      color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    loading: { marginTop: 24 },
+    errorText: {
+      textAlign: 'center',
+      marginTop: 40,
+      color: colors.error,
+      fontSize: yomoyoTypography.screenBodySize,
+    },
+    noResults: {
+      textAlign: 'center',
+      marginTop: 40,
+      color: colors.muted,
+      fontSize: yomoyoTypography.screenBodySize,
+    },
+    resultItem: {
+      flexDirection: 'row',
+      padding: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    thumbnail: { width: 50, height: 72, borderRadius: 4, backgroundColor: colors.border },
+    thumbnailPlaceholder: { width: 50, height: 72, borderRadius: 4, backgroundColor: colors.border },
+    bookInfo: { flex: 1, marginLeft: 12, justifyContent: 'center' },
+    bookTitle: {
+      fontSize: 15,
+      fontWeight: yomoyoTypography.buttonWeight,
+      marginBottom: 4,
+      color: colors.text,
+    },
+    bookAuthor: { fontSize: 13, color: colors.secondaryText },
+  });
