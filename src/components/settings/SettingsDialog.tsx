@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
-import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import DialogCloseButton from '@/components/ui/DialogCloseButton';
 import {
   useTheme,
   useThemedStyles,
@@ -139,14 +139,12 @@ export default function SettingsDialog({ visible, onClose }: Props) {
               onSelect={handleLanguageChange}
             />
           </View>
-          <TouchableOpacity
+          <DialogCloseButton
             testID="settings-dialog-close"
-            style={styles.closeButton}
+            label={t('settings.close')}
             onPress={onClose}
-            accessibilityRole="button"
-          >
-            <Text style={styles.closeText}>{t('settings.close')}</Text>
-          </TouchableOpacity>
+            style={styles.closeButton}
+          />
         </Pressable>
       </Pressable>
     </Modal>
@@ -203,13 +201,6 @@ const makeStyles = (colors: ThemeColors, glass: ThemeGlass) =>
       fontWeight: '600',
     },
     closeButton: {
-      alignSelf: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
       marginTop: 16,
-    },
-    closeText: {
-      fontSize: yomoyoTypography.screenBodySize,
-      color: colors.muted,
     },
   });

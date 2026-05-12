@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Pressable,
   Image,
   ActivityIndicator,
   StyleSheet,
@@ -13,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
+import DialogCloseButton from '@/components/ui/DialogCloseButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
@@ -121,14 +121,12 @@ export default function AddFriendScreen() {
           </View>
         )}
 
-        <Pressable
+        <DialogCloseButton
           testID="add-friend-close-button"
-          style={styles.closeButton}
+          label={t('addFriend.close')}
           onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-        >
-          <Text style={styles.closeText}>{t('addFriend.close')}</Text>
-        </Pressable>
+          style={styles.closeButton}
+        />
       </View>
     </ScreenContainer>
   );
@@ -224,12 +222,5 @@ const makeStyles = (colors: ThemeColors) =>
     },
     closeButton: {
       marginTop: 'auto',
-      alignSelf: 'center',
-      paddingHorizontal: 24,
-      paddingVertical: 14,
-    },
-    closeText: {
-      fontSize: yomoyoTypography.screenBodySize,
-      color: colors.muted,
     },
   });

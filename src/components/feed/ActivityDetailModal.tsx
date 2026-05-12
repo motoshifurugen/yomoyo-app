@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import DialogCloseButton from '@/components/ui/DialogCloseButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
@@ -94,14 +95,12 @@ export default function ActivityDetailModal({
               <Text style={styles.viewProfileText}>{t('timeline.modalViewProfile')}</Text>
             </Pressable>
 
-            <Pressable
+            <DialogCloseButton
               testID="modal-close-button"
-              style={styles.closeButton}
+              label={t('timeline.modalClose')}
               onPress={onClose}
-              accessibilityRole="button"
-            >
-              <Text style={styles.closeText}>{t('timeline.modalClose')}</Text>
-            </Pressable>
+              style={styles.closeButton}
+            />
           </ScrollView>
         </Pressable>
       </Pressable>
@@ -195,11 +194,5 @@ const makeStyles = (colors: ThemeColors) =>
     },
     closeButton: {
       alignSelf: 'stretch',
-      paddingVertical: 12,
-      alignItems: 'center',
-    },
-    closeText: {
-      color: colors.muted,
-      fontSize: yomoyoTypography.screenBodySize,
     },
   });
