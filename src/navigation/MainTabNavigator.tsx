@@ -38,6 +38,7 @@ export default function MainTabNavigator() {
         component={FeedScreen}
         options={{
           title: t('tabs.timeline'),
+          headerRightContainerStyle: { paddingRight: 8 },
           headerRight: () => (
             <View style={styles.headerRight}>
               <AddFriendButton />
@@ -46,7 +47,14 @@ export default function MainTabNavigator() {
           ),
         }}
       />
-      <Tab.Screen name="Shelf" component={ShelfScreen} options={{ title: t('tabs.shelf') }} />
+      <Tab.Screen
+        name="Shelf"
+        component={ShelfScreen}
+        options={{
+          title: t('tabs.shelf'),
+          headerRightContainerStyle: { paddingRight: 8 },
+        }}
+      />
     </Tab.Navigator>
   );
 }

@@ -5,8 +5,9 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
+import HeaderIconButton from '@/components/ui/HeaderIconButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
-import { useThemedStyles, type ThemeColors } from '@/lib/theme';
+import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -20,6 +21,7 @@ export default function ShelfScreen() {
   const navigation = useNavigation<NavigationProp>();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
+  const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
 
@@ -33,17 +35,17 @@ export default function ShelfScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('BookSearch')}
-          accessibilityRole="button"
+        <HeaderIconButton
+          testID="shelf-add-book-button"
+          iconName="add"
+          color={colors.primary}
+          size={26}
           accessibilityLabel={t('shelf.addBook')}
-          style={styles.headerButton}
-        >
-          <Text style={styles.headerButtonText}>+</Text>
-        </TouchableOpacity>
+          onPress={() => navigation.navigate('BookSearch')}
+        />
       ),
     });
-  }, [navigation, t, styles]);
+  }, [navigation, t, colors.primary]);
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
@@ -157,13 +159,5 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.surface,
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,
-    },
-    headerButton: {
-      paddingHorizontal: 8,
-    },
-    headerButtonText: {
-      fontSize: 24,
-      color: colors.primary,
-      lineHeight: 28,
     },
   });
