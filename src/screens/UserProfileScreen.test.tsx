@@ -17,8 +17,10 @@ jest.mock('@react-navigation/native', () => ({
   }),
 }));
 
+const mockInsets = { bottom: 0, top: 0, left: 0, right: 0 };
+
 jest.mock('react-native-safe-area-context', () => ({
-  useSafeAreaInsets: () => ({ bottom: 0, top: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => mockInsets,
 }));
 
 jest.mock('expo-blur', () => {
@@ -78,6 +80,10 @@ const mockActivity = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockInsets.top = 0;
+  mockInsets.bottom = 0;
+  mockInsets.left = 0;
+  mockInsets.right = 0;
   jest.mocked(useRoute).mockReturnValue({
     params: { uid: 'user2' },
     key: 'UserProfile',
@@ -257,6 +263,35 @@ describe('UserProfileScreen — navigation button', () => {
     fireEvent.press(screen.getByTestId('nav-back-button'));
     expect(mockNavigate).toHaveBeenCalledWith('MainTabs', undefined);
     expect(mockGoBack).not.toHaveBeenCalled();
+  });
+
+  it('places the back button below the safe-area top inset plus a 4pt cushion', async () => {
+    mockInsets.top = 47;
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    const raw = screen.getByTestId('nav-back-button').props.style;
+    const flat = (Array.isArray(raw) ? raw : [raw]).filter(Boolean);
+    const merged = Object.assign({}, ...flat);
+    expect(merged).toEqual(expect.objectContaining({ paddingTop: 51 }));
+  });
+
+  it('keeps a 16pt paddingTop floor on devices without a top inset', async () => {
+    mockInsets.top = 0;
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    const raw = screen.getByTestId('nav-back-button').props.style;
+    const flat = (Array.isArray(raw) ? raw : [raw]).filter(Boolean);
+    const merged = Object.assign({}, ...flat);
+    expect(merged).toEqual(expect.objectContaining({ paddingTop: 16 }));
+  });
+
+  it('applies an 8pt left margin to the back button for edge breathing room', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    const raw = screen.getByTestId('nav-back-button').props.style;
+    const flat = (Array.isArray(raw) ? raw : [raw]).filter(Boolean);
+    const merged = Object.assign({}, ...flat);
+    expect(merged).toEqual(expect.objectContaining({ marginLeft: 8 }));
   });
 });
 

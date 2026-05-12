@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -24,6 +25,7 @@ export default function EditProfileScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const styles = useThemedStyles(makeStyles);
 
   const [animalKey, setAnimalKey] = useState<AnimalKey>(() => defaultAnimalKey());
@@ -62,11 +64,15 @@ export default function EditProfileScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
+      <View
+        testID="edit-profile-header"
+        style={[styles.header, { paddingTop: Math.max(12, insets.top + 4) }]}
+      >
         <TouchableOpacity
           testID="edit-profile-cancel"
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
+          style={styles.headerCancel}
         >
           <Text style={styles.headerSecondary}>{t('profile.edit.cancel')}</Text>
         </TouchableOpacity>
@@ -77,6 +83,7 @@ export default function EditProfileScreen() {
           disabled={!canSave}
           accessibilityRole="button"
           accessibilityState={{ disabled: !canSave }}
+          style={styles.headerSave}
         >
           <Text style={[styles.headerPrimary, !canSave && styles.headerPrimaryDisabled]}>
             {t('profile.edit.save')}
@@ -100,7 +107,13 @@ const makeStyles = (colors: ThemeColors) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: yomoyoSpacing.horizontalPadding,
-      paddingVertical: 12,
+      paddingBottom: 12,
+    },
+    headerCancel: {
+      marginLeft: 8,
+    },
+    headerSave: {
+      marginRight: 8,
     },
     headerTitle: {
       fontSize: yomoyoTypography.headerTitleSize,

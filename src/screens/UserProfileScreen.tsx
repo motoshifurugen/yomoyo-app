@@ -4,6 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useAuth } from '@/hooks/useAuth';
 import { getAvatarIdentity, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
@@ -26,6 +27,7 @@ export default function UserProfileScreen() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
+  const insets = useSafeAreaInsets();
   const styles = useThemedStyles(makeStyles);
 
   const [identity, setIdentity] = useState<IdentityState>('loading');
@@ -92,7 +94,7 @@ export default function UserProfileScreen() {
   return (
     <ScreenContainer>
       <TouchableOpacity
-        style={styles.navButton}
+        style={[styles.navButton, { paddingTop: Math.max(16, insets.top + 4) }]}
         onPress={handleNavBack}
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
@@ -174,8 +176,8 @@ const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     navButton: {
       paddingHorizontal: 16,
-      paddingTop: 16,
       paddingBottom: 8,
+      marginLeft: 8,
       alignSelf: 'flex-start',
     },
     navButtonText: {
