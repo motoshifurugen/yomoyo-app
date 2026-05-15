@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Share } from 'react-native';
+import { View, Text, StyleSheet, Share } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
@@ -45,14 +46,16 @@ export default function MyHandleCard({ uid }: Props) {
         ) : (
           <Text style={styles.handlePlaceholder}>—</Text>
         )}
-        <TouchableOpacity
+        <PressableSurface
+          testID="share-handle-button"
           style={[styles.shareButton, !handle && styles.shareButtonDisabled]}
           onPress={handleShare}
           disabled={!handle}
           accessibilityRole="button"
+          feedback="standard"
         >
           <Text style={styles.shareText}>{t('shelf.shareId')}</Text>
-        </TouchableOpacity>
+        </PressableSurface>
       </View>
       {shared && <Text style={styles.sharedText}>{t('shelf.idShared')}</Text>}
     </View>

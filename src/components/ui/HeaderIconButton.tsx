@@ -1,6 +1,7 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import PressableSurface from './PressableSurface';
 import { useTheme } from '@/lib/theme';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -24,16 +25,17 @@ export default function HeaderIconButton({
 }: Props) {
   const { colors } = useTheme();
   return (
-    <Pressable
+    <PressableSurface
       testID={testID}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={styles.iconButton}
       hitSlop={8}
+      feedback="standard"
     >
       <Ionicons name={iconName} size={size} color={color ?? colors.text} />
-    </Pressable>
+    </PressableSurface>
   );
 }
 

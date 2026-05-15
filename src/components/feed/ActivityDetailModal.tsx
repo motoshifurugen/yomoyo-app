@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import DialogCloseButton from '@/components/ui/DialogCloseButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
@@ -47,11 +48,12 @@ export default function ActivityDetailModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable
+      <PressableSurface
         testID="activity-detail-modal"
         style={styles.backdrop}
         onPress={onClose}
         accessibilityRole="button"
+        feedback="soft"
       >
         {/* Inner Pressable swallows taps so backdrop press does not dismiss when tapping inside the sheet. */}
         <Pressable style={styles.sheet} onPress={() => {}}>
@@ -86,14 +88,15 @@ export default function ActivityDetailModal({
               </View>
             </View>
 
-            <Pressable
+            <PressableSurface
               testID="modal-view-profile-button"
               style={styles.viewProfileButton}
               onPress={() => onViewProfile(activity.userId)}
               accessibilityRole="button"
+              feedback="standard"
             >
               <Text style={styles.viewProfileText}>{t('timeline.modalViewProfile')}</Text>
-            </Pressable>
+            </PressableSurface>
 
             <DialogCloseButton
               testID="modal-close-button"
@@ -103,7 +106,7 @@ export default function ActivityDetailModal({
             />
           </ScrollView>
         </Pressable>
-      </Pressable>
+      </PressableSurface>
     </Modal>
   );
 }

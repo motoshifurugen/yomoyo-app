@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -68,27 +69,29 @@ export default function EditProfileScreen() {
         testID="edit-profile-header"
         style={[styles.header, { paddingTop: Math.max(12, insets.top + 4) }]}
       >
-        <TouchableOpacity
+        <PressableSurface
           testID="edit-profile-cancel"
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
           style={styles.headerCancel}
+          feedback="standard"
         >
           <Text style={styles.headerSecondary}>{t('profile.edit.cancel')}</Text>
-        </TouchableOpacity>
+        </PressableSurface>
         <Text style={styles.headerTitle}>{t('profile.edit.title')}</Text>
-        <TouchableOpacity
+        <PressableSurface
           testID="edit-profile-save"
           onPress={handleSave}
           disabled={!canSave}
           accessibilityRole="button"
           accessibilityState={{ disabled: !canSave }}
           style={styles.headerSave}
+          feedback="confirming"
         >
           <Text style={[styles.headerPrimary, !canSave && styles.headerPrimaryDisabled]}>
             {t('profile.edit.save')}
           </Text>
-        </TouchableOpacity>
+        </PressableSurface>
       </View>
       <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>{t('profile.displayName.label')}</Text>

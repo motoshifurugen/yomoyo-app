@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -31,15 +32,16 @@ export default function AddFriendButton({ variant = 'icon' }: Props) {
 
   if (variant === 'inline') {
     return (
-      <Pressable
+      <PressableSurface
         testID="add-friend-button-inline"
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel={label}
         style={styles.inlineButton}
+        feedback="standard"
       >
         <Text style={styles.inlineText}>{label}</Text>
-      </Pressable>
+      </PressableSurface>
     );
   }
 

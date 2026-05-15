@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import PressableSurface from './PressableSurface';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
@@ -20,15 +21,16 @@ export default function DialogCloseButton({
 }: Props) {
   const themed = useThemedStyles(makeStyles);
   return (
-    <Pressable
+    <PressableSurface
       testID={testID}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       style={[baseStyles.button, style]}
+      feedback="standard"
     >
       <Text style={themed.label}>{label}</Text>
-    </Pressable>
+    </PressableSurface>
   );
 }
 

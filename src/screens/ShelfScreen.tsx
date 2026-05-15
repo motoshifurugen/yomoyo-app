@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -55,13 +56,14 @@ export default function ShelfScreen() {
         {activities.length === 0 ? (
           <>
             <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
-            <TouchableOpacity
+            <PressableSurface
               style={styles.addButton}
               onPress={() => navigation.navigate('BookSearch')}
               accessibilityRole="button"
+              feedback="standard"
             >
               <Text style={styles.addButtonText}>{t('shelf.addBook')}</Text>
-            </TouchableOpacity>
+            </PressableSurface>
           </>
         ) : (
           activities.map((item) => (

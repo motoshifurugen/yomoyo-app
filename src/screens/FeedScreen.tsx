@@ -3,11 +3,11 @@ import {
   View,
   Text,
   FlatList,
-  Pressable,
   Image,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -40,11 +40,12 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
   const displayName = item.displayName ?? item.displayLabel;
   return (
-    <Pressable
+    <PressableSurface
       testID={`activity-row-${item.id}`}
       style={styles.card}
       onPress={() => onPress(item)}
       accessibilityRole="button"
+      feedback="soft"
     >
       <View style={styles.cardHeader}>
         {avatarSource && (
@@ -60,7 +61,7 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
         </View>
       </View>
       <Text style={styles.cardTitle}>{item.title}</Text>
-    </Pressable>
+    </PressableSurface>
   );
 });
 

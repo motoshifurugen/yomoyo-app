@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
+import { Image, Text, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
@@ -10,7 +11,12 @@ interface Props {
 export default function GoogleSignInButton({ onPress }: Props) {
   const styles = useThemedStyles(makeStyles);
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress} accessibilityRole="button">
+    <PressableSurface
+      style={styles.button}
+      onPress={onPress}
+      accessibilityRole="button"
+      feedback="standard"
+    >
       <Image
         testID="google-icon"
         source={require('../../../assets/images/google_g_logo.png')}
@@ -18,7 +24,7 @@ export default function GoogleSignInButton({ onPress }: Props) {
         resizeMode="contain"
       />
       <Text style={styles.label}>Continue with Google</Text>
-    </TouchableOpacity>
+    </PressableSurface>
   );
 }
 
