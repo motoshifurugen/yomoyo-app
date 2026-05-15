@@ -52,7 +52,6 @@ export default function MainTabNavigator() {
         component={ShelfScreen}
         options={{
           title: t('tabs.shelf'),
-          headerRightContainerStyle: { paddingRight: 8 },
         }}
       />
     </Tab.Navigator>

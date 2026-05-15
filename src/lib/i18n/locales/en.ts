@@ -36,7 +36,7 @@ const en = {
   shelf: {
     finished: 'Finished',
     emptyFinished: 'No finished books yet',
-    addBook: 'Record a finished book',
+    addBook: 'Add a finished book',
     markAsFinished: 'Mark as Finished',
     yourIdTitle: 'Your ID',
     shareId: 'Share my ID',

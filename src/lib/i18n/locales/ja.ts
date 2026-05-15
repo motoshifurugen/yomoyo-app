@@ -36,7 +36,7 @@ const ja = {
   shelf: {
     finished: '読了',
     emptyFinished: '読了した本はまだありません',
-    addBook: '読み終えた本を記録する',
+    addBook: '読了本を追加',
     markAsFinished: '読了にする',
     yourIdTitle: 'あなたのID',
     shareId: 'IDを共有',

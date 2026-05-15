@@ -134,31 +134,32 @@ describe('ShelfScreen', () => {
     expect(screen.queryByText('shelf.markAsFinished')).toBeNull();
   });
 
-  it('shows an add-book CTA button in the empty state', () => {
+  it('renders the add-book CTA in the empty state', () => {
     render(<ShelfScreen />);
-    expect(screen.getByText('shelf.addBook')).toBeTruthy();
+    expect(screen.getByTestId('shelf-add-book-button')).toBeTruthy();
   });
 
-  it('navigates to BookSearch when the empty-state CTA is pressed', () => {
-    render(<ShelfScreen />);
-    fireEvent.press(screen.getByText('shelf.addBook'));
-    expect(mockNavigate).toHaveBeenCalledWith('BookSearch');
-  });
-
-  it('hides the empty-state CTA when finished activities exist', () => {
+  it('keeps the add-book CTA visible when finished activities exist', () => {
     mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
       onUpdate([finishedActivity]);
       return jest.fn();
     });
     render(<ShelfScreen />);
-    expect(screen.queryByText('shelf.addBook')).toBeNull();
+    expect(screen.getByTestId('shelf-add-book-button')).toBeTruthy();
   });
 
-  it('registers a headerRight button via navigation.setOptions', () => {
+  it('navigates to BookSearch when the add-book CTA is pressed', () => {
     render(<ShelfScreen />);
-    expect(mockSetOptions).toHaveBeenCalledWith(
-      expect.objectContaining({ headerRight: expect.any(Function) })
+    fireEvent.press(screen.getByTestId('shelf-add-book-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('BookSearch');
+  });
+
+  it('does not register a headerRight button via navigation.setOptions', () => {
+    render(<ShelfScreen />);
+    const headerRightCalls = mockSetOptions.mock.calls.filter(
+      ([options]) => options && Object.prototype.hasOwnProperty.call(options, 'headerRight'),
     );
+    expect(headerRightCalls).toHaveLength(0);
   });
 
   it('renders the MyHandleCard for the current user', () => {
