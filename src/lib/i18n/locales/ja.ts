@@ -48,8 +48,15 @@ const ja = {
     themeLight: 'ライト',
     themeDark: 'ダーク',
     themeSystem: 'システム',
-    openSettings: '設定を開く',
     close: '閉じる',
+  },
+  menu: {
+    openMenu: 'メニューを開く',
+    close: 'メニューを閉じる',
+    dismiss: 'メニューを閉じる',
+    editProfile: 'プロフィールを編集',
+    addFriend: '友達を追加',
+    appearanceLanguage: '外観と言語',
   },
   userProfile: {
     follow: 'おたよりを受け取る',

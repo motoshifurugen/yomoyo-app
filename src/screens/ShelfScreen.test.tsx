@@ -154,11 +154,9 @@ describe('ShelfScreen', () => {
     expect(screen.queryByText('shelf.addBook')).toBeNull();
   });
 
-  it('registers a headerRight button via navigation.setOptions', () => {
+  it('does not register a screen-local headerRight (handled by the navigator now)', () => {
     render(<ShelfScreen />);
-    expect(mockSetOptions).toHaveBeenCalledWith(
-      expect.objectContaining({ headerRight: expect.any(Function) })
-    );
+    expect(mockSetOptions).not.toHaveBeenCalled();
   });
 
   it('renders the MyHandleCard for the current user', () => {

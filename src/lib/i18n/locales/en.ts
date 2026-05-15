@@ -48,8 +48,15 @@ const en = {
     themeLight: 'Light',
     themeDark: 'Dark',
     themeSystem: 'System',
-    openSettings: 'Open settings',
     close: 'Close',
+  },
+  menu: {
+    openMenu: 'Open menu',
+    close: 'Close menu',
+    dismiss: 'Dismiss menu',
+    editProfile: 'Edit profile',
+    addFriend: 'Add a friend',
+    appearanceLanguage: 'Appearance & language',
   },
   userProfile: {
     follow: 'Receive updates',

@@ -50,8 +50,8 @@ jest.mock('@/components/ui/GlassTabBar', () => ({
 
 jest.mock('@/screens/FeedScreen', () => () => null);
 jest.mock('@/screens/ShelfScreen', () => () => null);
-jest.mock('@/components/feed/AddFriendButton', () => () => null);
-jest.mock('@/components/settings/SettingsLauncher', () => () => null);
+jest.mock('@/components/layout/UtilityMenuLauncher', () => () => null);
+jest.mock('@/components/shelf/ShelfAddBookButton', () => () => null);
 
 beforeEach(() => {
   capturedScreens.length = 0;
