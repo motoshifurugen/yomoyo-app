@@ -79,7 +79,11 @@ describe('HeaderIconButton', () => {
         onPress={jest.fn()}
       />,
     );
-    const style = screen.getByTestId('custom-testid').props.style;
-    expect(style).toEqual(expect.objectContaining({ paddingHorizontal: 12, paddingVertical: 8 }));
+    const raw = screen.getByTestId('custom-testid').props.style;
+    const flat = (Array.isArray(raw) ? raw : [raw]).filter(Boolean);
+    const merged = Object.assign({}, ...flat);
+    expect(merged).toEqual(
+      expect.objectContaining({ paddingHorizontal: 12, paddingVertical: 8 }),
+    );
   });
 });

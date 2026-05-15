@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import { ANIMAL_POOL, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
@@ -18,7 +19,7 @@ export default function AnimalGridPicker({ selected, onSelect }: Props) {
       {ANIMAL_POOL.map((key) => {
         const isSelected = key === selected;
         return (
-          <TouchableOpacity
+          <PressableSurface
             key={key}
             testID={`animal-cell-${key}`}
             style={[styles.cell, isSelected && styles.cellSelected]}
@@ -26,9 +27,10 @@ export default function AnimalGridPicker({ selected, onSelect }: Props) {
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={t(`profile.animals.${key}`)}
+            feedback="standard"
           >
             <Image source={ANIMAL_ASSETS[key]} style={styles.image} resizeMode="contain" />
-          </TouchableOpacity>
+          </PressableSurface>
         );
       })}
     </View>

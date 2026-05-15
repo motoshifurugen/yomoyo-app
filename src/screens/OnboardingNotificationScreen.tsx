@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -106,12 +107,17 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
         <Text style={styles.body}>{t('onboarding.notificationBody')}</Text>
       </View>
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.button} onPress={handleAllow} accessibilityRole="button">
+        <PressableSurface
+          style={styles.button}
+          onPress={handleAllow}
+          accessibilityRole="button"
+          feedback="confirming"
+        >
           <Text style={styles.buttonText}>{t('onboarding.allowButton')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSkip} accessibilityRole="button">
+        </PressableSurface>
+        <PressableSurface onPress={handleSkip} accessibilityRole="button" feedback="standard">
           <Text style={styles.skip}>{t('onboarding.skipLink')}</Text>
-        </TouchableOpacity>
+        </PressableSurface>
       </View>
     </View>
   );

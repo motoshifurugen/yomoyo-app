@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -69,16 +70,17 @@ export default function OnboardingAvatarScreen() {
         <DisplayNameInput value={displayName} onChangeText={setDisplayName} error={error} />
       </ScrollView>
       <View style={styles.actions}>
-        <TouchableOpacity
+        <PressableSurface
           testID="onboarding-avatar-continue"
           style={[styles.button, !canContinue && styles.buttonDisabled]}
           onPress={handleContinue}
           accessibilityRole="button"
           accessibilityState={{ disabled: !canContinue }}
           disabled={!canContinue}
+          feedback="confirming"
         >
           <Text style={styles.buttonText}>{t('onboarding.avatarContinue')}</Text>
-        </TouchableOpacity>
+        </PressableSurface>
       </View>
     </View>
   );

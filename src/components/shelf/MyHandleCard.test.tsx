@@ -45,7 +45,8 @@ describe('MyHandleCard', () => {
 
   it('calls Share.share with the handle as the message when pressed', async () => {
     render(<MyHandleCard uid="user1" />);
-    fireEvent.press(await screen.findByText('shelf.shareId'));
+    await screen.findByText('quietfox');
+    fireEvent.press(screen.getByTestId('share-handle-button'));
     await waitFor(() => {
       expect(Share.share).toHaveBeenCalledWith({ message: 'quietfox' });
     });
@@ -53,7 +54,8 @@ describe('MyHandleCard', () => {
 
   it('shows the shared confirmation after pressing share', async () => {
     render(<MyHandleCard uid="user1" />);
-    fireEvent.press(await screen.findByText('shelf.shareId'));
+    await screen.findByText('quietfox');
+    fireEvent.press(screen.getByTestId('share-handle-button'));
     await waitFor(() => {
       expect(screen.getByText('shelf.idShared')).toBeTruthy();
     });
@@ -75,7 +77,7 @@ describe('MyHandleCard', () => {
     mockedGetUserHandle.mockResolvedValueOnce(null);
     render(<MyHandleCard uid="user1" />);
     await waitFor(() => expect(mockedGetUserHandle).toHaveBeenCalled());
-    fireEvent.press(screen.getByText('shelf.shareId'));
+    fireEvent.press(screen.getByTestId('share-handle-button'));
     expect(Share.share).not.toHaveBeenCalled();
   });
 
@@ -83,7 +85,8 @@ describe('MyHandleCard', () => {
     jest.useFakeTimers();
     try {
       render(<MyHandleCard uid="user1" />);
-      fireEvent.press(await screen.findByText('shelf.shareId'));
+      await screen.findByText('quietfox');
+      fireEvent.press(screen.getByTestId('share-handle-button'));
       await waitFor(() => {
         expect(screen.getByText('shelf.idShared')).toBeTruthy();
       });

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, View, Text, Pressable, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
@@ -53,18 +54,19 @@ function ThemeSection({
         {THEME_MODES.map(({ mode, labelKey }) => {
           const active = current === mode;
           return (
-            <TouchableOpacity
+            <PressableSurface
               key={mode}
               testID={`settings-dialog-theme-${mode}`}
               style={[styles.pillOption, active && styles.pillOptionActive]}
               onPress={() => onSelect(mode)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
+              feedback="standard"
             >
               <Text style={[styles.pillText, active && styles.pillTextActive]}>
                 {t(labelKey)}
               </Text>
-            </TouchableOpacity>
+            </PressableSurface>
           );
         })}
       </View>
@@ -90,16 +92,17 @@ function LanguageSection({
         {LANGUAGES.map(({ code, label }) => {
           const active = current === code;
           return (
-            <TouchableOpacity
+            <PressableSurface
               key={code}
               testID={`settings-dialog-lang-${code}`}
               style={[styles.pillOption, active && styles.pillOptionActive]}
               onPress={() => onSelect(code)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
+              feedback="standard"
             >
               <Text style={[styles.pillText, active && styles.pillTextActive]}>{label}</Text>
-            </TouchableOpacity>
+            </PressableSurface>
           );
         })}
       </View>
@@ -123,11 +126,12 @@ export default function SettingsDialog({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable
+      <PressableSurface
         testID="settings-dialog-backdrop"
         style={styles.backdrop}
         onPress={onClose}
         accessibilityRole="button"
+        feedback="soft"
       >
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.sections}>
@@ -146,7 +150,7 @@ export default function SettingsDialog({ visible, onClose }: Props) {
             style={styles.closeButton}
           />
         </Pressable>
-      </Pressable>
+      </PressableSurface>
     </Modal>
   );
 }

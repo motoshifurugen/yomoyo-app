@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
-  View,
   Text,
   Image,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
 } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -59,16 +58,17 @@ export default function BookDetailScreen() {
       <Text style={styles.author}>
         {book.authors.length > 0 ? book.authors.join(', ') : t('bookDetail.unknownAuthor')}
       </Text>
-      <TouchableOpacity
+      <PressableSurface
         style={[styles.button, (hasFinished || isLoading) && styles.buttonDone]}
         onPress={handleMarkAsFinished}
         disabled={hasFinished || isLoading}
         accessibilityRole="button"
+        feedback="confirming"
       >
         <Text style={styles.buttonText}>
           {hasFinished ? t('shelf.finished') : t('shelf.markAsFinished')}
         </Text>
-      </TouchableOpacity>
+      </PressableSurface>
     </ScrollView>
   );
 }

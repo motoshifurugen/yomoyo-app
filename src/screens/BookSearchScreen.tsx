@@ -3,12 +3,12 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   FlatList,
   Image,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -70,15 +70,16 @@ export default function BookSearchScreen() {
           returnKeyType="search"
           onSubmitEditing={handleSearch}
         />
-        <TouchableOpacity
+        <PressableSurface
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleSearch}
           disabled={loading}
           accessibilityRole="button"
           accessibilityLabel={t('bookSearch.button')}
+          feedback="standard"
         >
           <Text style={styles.buttonText}>{t('bookSearch.button')}</Text>
-        </TouchableOpacity>
+        </PressableSurface>
       </View>
 
       {loading && <ActivityIndicator style={styles.loading} />}
@@ -95,7 +96,12 @@ export default function BookSearchScreen() {
         data={results ?? []}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.resultItem} onPress={() => handleSelect(item)}>
+          <PressableSurface
+            style={styles.resultItem}
+            onPress={() => handleSelect(item)}
+            accessibilityRole="button"
+            feedback="soft"
+          >
             {item.thumbnail ? (
               <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
             ) : (
@@ -107,7 +113,7 @@ export default function BookSearchScreen() {
                 {item.authors.length > 0 ? item.authors.join(', ') : t('bookSearch.unknownAuthor')}
               </Text>
             </View>
-          </TouchableOpacity>
+          </PressableSurface>
         )}
       />
     </View>

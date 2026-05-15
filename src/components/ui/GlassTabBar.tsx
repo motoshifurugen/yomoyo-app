@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import PressableSurface from './PressableSurface';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { CommonActions } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -56,17 +57,18 @@ export default function GlassTabBar({ state, descriptors, navigation, insets }: 
             };
 
             return (
-              <TouchableOpacity
+              <PressableSurface
                 key={route.key}
                 style={styles.tab}
                 onPress={onPress}
                 accessibilityRole="tab"
                 accessibilityLabel={label}
                 accessibilityState={{ selected: focused }}
+                feedback="standard"
               >
                 <Ionicons name={iconName} size={22} color={color} />
                 <Text style={[styles.label, { color }]}>{label}</Text>
-              </TouchableOpacity>
+              </PressableSurface>
             );
           })}
         </GlassSurface>

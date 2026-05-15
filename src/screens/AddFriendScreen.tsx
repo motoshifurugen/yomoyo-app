@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   Image,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -87,14 +87,15 @@ export default function AddFriendScreen() {
             returnKeyType="search"
             onSubmitEditing={handleSearch}
           />
-          <TouchableOpacity
+          <PressableSurface
             style={[styles.searchButton, state.kind === 'searching' && styles.searchButtonDisabled]}
             onPress={handleSearch}
             disabled={state.kind === 'searching'}
             accessibilityRole="button"
+            feedback="standard"
           >
             <Text style={styles.searchButtonText}>{t('addFriend.search')}</Text>
-          </TouchableOpacity>
+          </PressableSurface>
         </View>
 
         {state.kind === 'searching' && <ActivityIndicator style={styles.loading} />}
@@ -111,13 +112,14 @@ export default function AddFriendScreen() {
           <View style={styles.matchCard} testID="match-card">
             <Image source={ANIMAL_ASSETS[state.animalKey]} style={styles.avatar} />
             <Text style={styles.matchLabel}>{state.displayName}</Text>
-            <TouchableOpacity
+            <PressableSurface
               style={styles.viewProfileButton}
               onPress={handleViewProfile}
               accessibilityRole="button"
+              feedback="standard"
             >
               <Text style={styles.viewProfileText}>{t('addFriend.viewProfile')}</Text>
-            </TouchableOpacity>
+            </PressableSurface>
           </View>
         )}
 

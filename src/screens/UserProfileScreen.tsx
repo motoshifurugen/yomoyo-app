@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import PressableSurface from '@/components/ui/PressableSurface';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -93,15 +94,16 @@ export default function UserProfileScreen() {
 
   return (
     <ScreenContainer>
-      <TouchableOpacity
+      <PressableSurface
         style={[styles.navButton, { paddingTop: Math.max(16, insets.top + 4) }]}
         onPress={handleNavBack}
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
         testID="nav-back-button"
+        feedback="standard"
       >
         <Text style={styles.navButtonText}>{'←'}</Text>
-      </TouchableOpacity>
+      </PressableSurface>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.identityBlock}>
@@ -113,35 +115,38 @@ export default function UserProfileScreen() {
           <View style={styles.ownProfileBlock}>
             <Text style={styles.ownPageNote}>{t('userProfile.ownPageNote')}</Text>
             <View style={styles.ownActionsRow}>
-              <TouchableOpacity
+              <PressableSurface
                 style={styles.shelfButton}
                 onPress={() => navigation.navigate('MainTabs', { screen: 'Shelf' })}
                 accessibilityRole="button"
                 testID="go-to-shelf-button"
+                feedback="standard"
               >
                 <Text style={styles.shelfButtonText}>{t('tabs.shelf')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </PressableSurface>
+              <PressableSurface
                 style={styles.shelfButton}
                 onPress={() => navigation.navigate('EditProfile')}
                 accessibilityRole="button"
                 testID="edit-profile-button"
+                feedback="standard"
               >
                 <Text style={styles.shelfButtonText}>{t('userProfile.editProfile')}</Text>
-              </TouchableOpacity>
+              </PressableSurface>
             </View>
           </View>
         ) : (
-          <TouchableOpacity
+          <PressableSurface
             style={[styles.followButton, following && styles.followButtonActive]}
             onPress={handleFollowToggle}
             accessibilityRole="button"
             testID={following ? 'unfollow-button' : 'follow-button'}
+            feedback="confirming"
           >
             <Text style={[styles.followButtonText, following && styles.followButtonTextActive]}>
               {following ? t('userProfile.unfollow') : t('userProfile.follow')}
             </Text>
-          </TouchableOpacity>
+          </PressableSurface>
         )}
 
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
