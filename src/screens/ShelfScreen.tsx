@@ -1,12 +1,12 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import HeaderIconButton from '@/components/ui/HeaderIconButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +16,9 @@ import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+const CTA_ICON_SIZE = 20;
+const CTA_GAP_ABOVE_TAB_BAR = 12;
 
 export default function ShelfScreen() {
   const { t } = useTranslation();
@@ -33,38 +36,19 @@ export default function ShelfScreen() {
     return unsubscribe;
   }, [user?.uid]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <HeaderIconButton
-          testID="shelf-add-book-button"
-          iconName="add"
-          color={colors.primary}
-          size={26}
-          accessibilityLabel={t('shelf.addBook')}
-          onPress={() => navigation.navigate('BookSearch')}
-        />
-      ),
-    });
-  }, [navigation, t, colors.primary]);
+  const handleAddBook = () => navigation.navigate('BookSearch');
 
   return (
-    <ScreenContainer bottomInset={tabBarInset}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScreenContainer>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {user?.uid && <MyHandleCard uid={user.uid} />}
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
         {activities.length === 0 ? (
-          <>
-            <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
-            <PressableSurface
-              style={styles.addButton}
-              onPress={() => navigation.navigate('BookSearch')}
-              accessibilityRole="button"
-              feedback="standard"
-            >
-              <Text style={styles.addButtonText}>{t('shelf.addBook')}</Text>
-            </PressableSurface>
-          </>
+          <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
         ) : (
           activities.map((item) => (
             <View key={item.id} style={styles.card}>
@@ -88,12 +72,26 @@ export default function ShelfScreen() {
           ))
         )}
       </ScrollView>
+      <PressableSurface
+        testID="shelf-add-book-button"
+        style={[styles.cta, { marginBottom: tabBarInset + CTA_GAP_ABOVE_TAB_BAR }]}
+        onPress={handleAddBook}
+        accessibilityRole="button"
+        accessibilityLabel={t('shelf.addBook')}
+        feedback="standard"
+      >
+        <Ionicons name="add" size={CTA_ICON_SIZE} color={colors.surface} />
+        <Text style={styles.ctaText}>{t('shelf.addBook')}</Text>
+      </PressableSurface>
     </ScreenContainer>
   );
 }
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    scroll: {
+      flex: 1,
+    },
     content: {
       paddingTop: 16,
       paddingBottom: 16,
@@ -149,15 +147,17 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: 13,
       color: colors.muted,
     },
-    addButton: {
-      marginTop: 16,
+    cta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       backgroundColor: colors.primary,
-      borderRadius: 8,
-      paddingVertical: 12,
+      borderRadius: 14,
+      paddingVertical: 14,
       paddingHorizontal: 20,
-      alignSelf: 'flex-start',
+      gap: 8,
     },
-    addButtonText: {
+    ctaText: {
       color: colors.surface,
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,

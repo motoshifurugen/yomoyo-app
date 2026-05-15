@@ -73,7 +73,7 @@ describe('MainTabNavigator — header right gutter', () => {
     );
   });
 
-  it('applies an 8pt right gutter to the Shelf screen header', () => {
+  it('does not configure a header right gutter for the Shelf screen', () => {
     render(
       <ThemeProvider>
         <MainTabNavigator />
@@ -81,10 +81,7 @@ describe('MainTabNavigator — header right gutter', () => {
     );
     const shelf = capturedScreens.find((s) => s.name === 'Shelf');
     expect(shelf).toBeDefined();
-    expect(shelf?.options).toEqual(
-      expect.objectContaining({
-        headerRightContainerStyle: { paddingRight: 8 },
-      }),
-    );
+    expect(shelf?.options).not.toHaveProperty('headerRightContainerStyle');
+    expect(shelf?.options).not.toHaveProperty('headerRight');
   });
 });
