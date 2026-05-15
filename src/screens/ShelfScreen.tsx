@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
@@ -6,9 +6,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import HeaderIconButton from '@/components/ui/HeaderIconButton';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
-import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -22,7 +21,6 @@ export default function ShelfScreen() {
   const navigation = useNavigation<NavigationProp>();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
-  const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
 
@@ -32,21 +30,6 @@ export default function ShelfScreen() {
     const unsubscribe = subscribeToReadingActivities(uid, setActivities);
     return unsubscribe;
   }, [user?.uid]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <HeaderIconButton
-          testID="shelf-add-book-button"
-          iconName="add"
-          color={colors.primary}
-          size={26}
-          accessibilityLabel={t('shelf.addBook')}
-          onPress={() => navigation.navigate('BookSearch')}
-        />
-      ),
-    });
-  }, [navigation, t, colors.primary]);
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>

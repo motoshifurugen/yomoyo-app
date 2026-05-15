@@ -8,8 +8,8 @@ import { MainTabParamList } from './types';
 import { useTheme } from '@/lib/theme';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import GlassTabBar from '@/components/ui/GlassTabBar';
-import AddFriendButton from '@/components/feed/AddFriendButton';
-import SettingsLauncher from '@/components/settings/SettingsLauncher';
+import UtilityMenuLauncher from '@/components/layout/UtilityMenuLauncher';
+import ShelfAddBookButton from '@/components/shelf/ShelfAddBookButton';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -41,8 +41,7 @@ export default function MainTabNavigator() {
           headerRightContainerStyle: { paddingRight: 8 },
           headerRight: () => (
             <View style={styles.headerRight}>
-              <AddFriendButton />
-              <SettingsLauncher />
+              <UtilityMenuLauncher />
             </View>
           ),
         }}
@@ -53,6 +52,12 @@ export default function MainTabNavigator() {
         options={{
           title: t('tabs.shelf'),
           headerRightContainerStyle: { paddingRight: 8 },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <ShelfAddBookButton />
+              <UtilityMenuLauncher />
+            </View>
+          ),
         }}
       />
     </Tab.Navigator>
