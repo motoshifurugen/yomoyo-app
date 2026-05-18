@@ -3,7 +3,7 @@ const ja = {
     back: '戻る',
   },
   tabs: {
-    timeline: '読書ログ',
+    timeline: 'タイムライン',
     shelf: '私の本棚',
   },
   timeline: {
@@ -34,10 +34,10 @@ const ja = {
     unknownAuthor: '著者不明',
   },
   shelf: {
-    finished: '読了',
-    emptyFinished: '読了した本はまだありません',
-    addBook: '読了本を追加',
-    markAsFinished: '読了にする',
+    finished: '読み終えた本',
+    emptyFinished: '読み終えた本はまだありません',
+    addBook: '本を追加',
+    markAsFinished: '読んだ！',
     yourIdTitle: 'あなたのID',
     shareId: 'IDを共有',
     idShared: '共有しました',
@@ -45,7 +45,7 @@ const ja = {
   },
   settings: {
     languageTitle: '言語',
-    themeTitle: '外観',
+    themeTitle: 'テーマ',
     themeLight: 'ライト',
     themeDark: 'ダーク',
     themeSystem: 'システム',
@@ -54,7 +54,7 @@ const ja = {
   },
   userProfile: {
     follow: 'おたよりを受け取る',
-    unfollow: '受け取るのをやめる',
+    unfollow: 'おたよりを受け取らない',
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
@@ -62,7 +62,7 @@ const ja = {
   },
   profile: {
     displayName: {
-      label: '表示名',
+      label: 'ニックネーム',
       placeholder: 'なまえを入力',
       errors: {
         empty: 'なまえを入力してください。',
