@@ -344,13 +344,13 @@ describe('UserProfileScreen — self-profile state', () => {
     expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Shelf' });
   });
 
-  it('shows edit-profile button when viewing own profile', async () => {
+  it('does not show an edit-profile button on own profile', async () => {
     render(<UserProfileScreen />);
     await screen.findByText('Quiet Fox');
-    expect(screen.getByTestId('edit-profile-button')).toBeTruthy();
+    expect(screen.queryByTestId('edit-profile-button')).toBeNull();
   });
 
-  it('hides edit-profile button when viewing another user', async () => {
+  it('does not show an edit-profile button when viewing another user', async () => {
     jest.mocked(useRoute).mockReturnValue({
       params: { uid: 'user2' },
       key: 'UserProfile',
@@ -359,12 +359,5 @@ describe('UserProfileScreen — self-profile state', () => {
     render(<UserProfileScreen />);
     await screen.findByText('Quiet Fox');
     expect(screen.queryByTestId('edit-profile-button')).toBeNull();
-  });
-
-  it('navigates to EditProfile when edit-profile-button is pressed', async () => {
-    render(<UserProfileScreen />);
-    await screen.findByText('Quiet Fox');
-    fireEvent.press(screen.getByTestId('edit-profile-button'));
-    expect(mockNavigate).toHaveBeenCalledWith('EditProfile');
   });
 });

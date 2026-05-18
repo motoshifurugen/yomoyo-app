@@ -9,6 +9,7 @@ type CapturedScreen = {
 };
 
 const capturedScreens: CapturedScreen[] = [];
+let capturedScreenOptions: Record<string, unknown> | null = null;
 
 jest.mock('@react-navigation/bottom-tabs', () => {
   const actual = jest.requireActual('@react-navigation/bottom-tabs');
@@ -17,8 +18,18 @@ jest.mock('@react-navigation/bottom-tabs', () => {
   return {
     ...actual,
     createBottomTabNavigator: () => ({
-      Navigator: ({ children }: { children: React.ReactNode }) =>
-        React.createElement(View, null, children),
+      Navigator: ({
+        children,
+        screenOptions,
+      }: {
+        children: React.ReactNode;
+        screenOptions?: unknown;
+      }) => {
+        capturedScreenOptions = (typeof screenOptions === 'function'
+          ? screenOptions({})
+          : screenOptions) as Record<string, unknown> | null;
+        return React.createElement(View, null, children);
+      },
       Screen: ({ name, options }: { name: string; options: unknown }) => {
         capturedScreens.push({
           name,
@@ -55,6 +66,7 @@ jest.mock('@/components/settings/SettingsLauncher', () => () => null);
 
 beforeEach(() => {
   capturedScreens.length = 0;
+  capturedScreenOptions = null;
 });
 
 describe('MainTabNavigator — header right gutter', () => {
@@ -83,5 +95,19 @@ describe('MainTabNavigator — header right gutter', () => {
     expect(shelf).toBeDefined();
     expect(shelf?.options).not.toHaveProperty('headerRightContainerStyle');
     expect(shelf?.options).not.toHaveProperty('headerRight');
+  });
+});
+
+describe('MainTabNavigator — header title suppression', () => {
+  it('configures screenOptions with a headerTitle that renders null', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    expect(capturedScreenOptions).not.toBeNull();
+    const headerTitle = (capturedScreenOptions as Record<string, unknown>).headerTitle;
+    expect(typeof headerTitle).toBe('function');
+    expect((headerTitle as (props?: unknown) => unknown)({})).toBeNull();
   });
 });

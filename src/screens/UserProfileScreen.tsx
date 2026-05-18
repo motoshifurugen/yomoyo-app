@@ -124,15 +124,6 @@ export default function UserProfileScreen() {
               >
                 <Text style={styles.shelfButtonText}>{t('tabs.shelf')}</Text>
               </PressableSurface>
-              <PressableSurface
-                style={styles.shelfButton}
-                onPress={() => navigation.navigate('EditProfile')}
-                accessibilityRole="button"
-                testID="edit-profile-button"
-                feedback="standard"
-              >
-                <Text style={styles.shelfButtonText}>{t('userProfile.editProfile')}</Text>
-              </PressableSurface>
             </View>
           </View>
         ) : (

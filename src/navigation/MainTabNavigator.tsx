@@ -31,6 +31,7 @@ export default function MainTabNavigator() {
           fontWeight: yomoyoTypography.titleWeight,
         },
         headerTitleAlign: 'center',
+        headerTitle: () => null,
       }}
     >
       <Tab.Screen

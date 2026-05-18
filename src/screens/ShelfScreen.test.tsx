@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react-native';
+import { screen, fireEvent, within } from '@testing-library/react-native';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import ShelfScreen from './ShelfScreen';
 
@@ -188,5 +188,17 @@ describe('ShelfScreen', () => {
     const handleIndex = tree.indexOf('my-handle-card');
     expect(identityIndex).toBeGreaterThanOrEqual(0);
     expect(handleIndex).toBeGreaterThan(identityIndex);
+  });
+
+  it('exposes a dedicated scroll container for the books list', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('shelf-books-scroll')).toBeTruthy();
+  });
+
+  it('keeps MyIdentityHeader outside the books scroll container', () => {
+    render(<ShelfScreen />);
+    const scroll = screen.getByTestId('shelf-books-scroll');
+    expect(within(scroll).queryByTestId('my-identity-header')).toBeNull();
+    expect(within(scroll).queryByTestId('my-handle-card')).toBeNull();
   });
 });

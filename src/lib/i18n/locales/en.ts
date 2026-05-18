@@ -41,7 +41,12 @@ const en = {
     yourIdTitle: 'Your ID',
     shareId: 'Share my ID',
     idShared: 'Shared!',
-    editHint: 'Edit',
+    changeAvatar: 'Change avatar',
+    editName: 'Edit name',
+    closeAvatarPicker: 'Close',
+    saveName: 'Save',
+    cancelNameEdit: 'Cancel',
+    saveError: 'Could not save. Please try again.',
   },
   settings: {
     languageTitle: 'Language',
@@ -58,7 +63,6 @@ const en = {
     notFound: 'This page does not exist.',
     emptyBooks: 'No finished books yet',
     ownPageNote: 'This is your page',
-    editProfile: 'Edit profile',
   },
   profile: {
     displayName: {

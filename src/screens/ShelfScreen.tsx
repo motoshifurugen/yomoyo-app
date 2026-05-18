@@ -41,14 +41,17 @@ export default function ShelfScreen() {
 
   return (
     <ScreenContainer>
+      <View style={styles.fixedHeader}>
+        {user?.uid && <MyIdentityHeader uid={user.uid} />}
+        {user?.uid && <MyHandleCard uid={user.uid} />}
+        <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
+      </View>
       <ScrollView
+        testID="shelf-books-scroll"
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {user?.uid && <MyIdentityHeader uid={user.uid} />}
-        {user?.uid && <MyHandleCard uid={user.uid} />}
-        <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
         {activities.length === 0 ? (
           <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
         ) : (
@@ -91,11 +94,13 @@ export default function ShelfScreen() {
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    fixedHeader: {
+      paddingTop: 16,
+    },
     scroll: {
       flex: 1,
     },
     content: {
-      paddingTop: 16,
       paddingBottom: 16,
     },
     sectionHeader: {

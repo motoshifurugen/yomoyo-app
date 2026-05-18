@@ -41,7 +41,12 @@ const ja = {
     yourIdTitle: 'あなたのID',
     shareId: 'IDを共有',
     idShared: '共有しました',
-    editHint: '編集',
+    changeAvatar: 'アイコンを変更',
+    editName: 'なまえを編集',
+    closeAvatarPicker: '閉じる',
+    saveName: '保存',
+    cancelNameEdit: 'キャンセル',
+    saveError: '保存できませんでした。もう一度お試しください。',
   },
   settings: {
     languageTitle: '言語',
@@ -58,7 +63,6 @@ const ja = {
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
-    editProfile: 'プロフィールを編集',
   },
   profile: {
     displayName: {
