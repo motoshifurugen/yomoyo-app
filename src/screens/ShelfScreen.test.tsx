@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react-native';
+import { screen, fireEvent, within } from '@testing-library/react-native';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import ShelfScreen from './ShelfScreen';
 
@@ -30,6 +30,13 @@ jest.mock('@/components/shelf/MyHandleCard', () => {
   const { Text } = require('react-native');
   return function MyHandleCard({ uid }: { uid: string }) {
     return <Text testID="my-handle-card">{`MyHandleCard:${uid}`}</Text>;
+  };
+});
+
+jest.mock('@/components/shelf/MyIdentityHeader', () => {
+  const { Text } = require('react-native');
+  return function MyIdentityHeader({ uid }: { uid: string }) {
+    return <Text testID="my-identity-header">{`MyIdentityHeader:${uid}`}</Text>;
   };
 });
 
@@ -166,5 +173,32 @@ describe('ShelfScreen', () => {
     render(<ShelfScreen />);
     expect(screen.getByTestId('my-handle-card')).toBeTruthy();
     expect(screen.getByText('MyHandleCard:user1')).toBeTruthy();
+  });
+
+  it('renders the MyIdentityHeader for the current user', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('my-identity-header')).toBeTruthy();
+    expect(screen.getByText('MyIdentityHeader:user1')).toBeTruthy();
+  });
+
+  it('renders MyIdentityHeader above MyHandleCard', () => {
+    render(<ShelfScreen />);
+    const tree = JSON.stringify(screen.toJSON());
+    const identityIndex = tree.indexOf('my-identity-header');
+    const handleIndex = tree.indexOf('my-handle-card');
+    expect(identityIndex).toBeGreaterThanOrEqual(0);
+    expect(handleIndex).toBeGreaterThan(identityIndex);
+  });
+
+  it('exposes a dedicated scroll container for the books list', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('shelf-books-scroll')).toBeTruthy();
+  });
+
+  it('keeps MyIdentityHeader outside the books scroll container', () => {
+    render(<ShelfScreen />);
+    const scroll = screen.getByTestId('shelf-books-scroll');
+    expect(within(scroll).queryByTestId('my-identity-header')).toBeNull();
+    expect(within(scroll).queryByTestId('my-handle-card')).toBeNull();
   });
 });

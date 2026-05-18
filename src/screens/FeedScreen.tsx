@@ -34,11 +34,11 @@ type ActivityCardProps = {
 };
 
 const ActivityCard = React.memo(function ActivityCard({ item, onPress }: ActivityCardProps) {
-  const { t } = useTranslation();
   const styles = useThemedStyles(makeStyles);
   const avatarKey = item.displayAvatar as AnimalKey | undefined;
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
   const displayName = item.displayName ?? item.displayLabel;
+  const dateText = item.finishedAt ? item.finishedAt.toDate().toLocaleDateString() : null;
   return (
     <PressableSurface
       testID={`activity-row-${item.id}`}
@@ -48,19 +48,47 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
       feedback="soft"
     >
       <View style={styles.cardHeader}>
-        {avatarSource && (
+        {avatarSource ? (
           <Image
             source={avatarSource}
             style={styles.avatar}
             accessibilityLabel={displayName ?? undefined}
           />
+        ) : (
+          <View
+            testID={`activity-avatar-placeholder-${item.id}`}
+            style={[styles.avatar, styles.avatarPlaceholder]}
+          />
         )}
         <View style={styles.cardMeta}>
           <Text style={styles.cardUser}>{displayName ?? '—'}</Text>
-          <Text style={styles.cardLabel}>{t('timeline.finishedReading')}</Text>
         </View>
       </View>
-      <Text style={styles.cardTitle}>{item.title}</Text>
+      <View style={styles.cardBody}>
+        {item.thumbnail ? (
+          <Image
+            testID={`activity-thumbnail-${item.id}`}
+            source={{ uri: item.thumbnail }}
+            style={styles.thumbnail}
+            accessibilityLabel={item.title}
+          />
+        ) : (
+          <View
+            testID={`activity-thumbnail-placeholder-${item.id}`}
+            style={[styles.thumbnail, styles.thumbnailPlaceholder]}
+          />
+        )}
+        <View testID={`activity-info-${item.id}`} style={styles.cardInfo}>
+          <Text style={styles.cardTitle} numberOfLines={2}>
+            {item.title}
+          </Text>
+          {dateText && (
+            <Text testID={`activity-date-${item.id}`} style={styles.cardDate}>
+              {dateText}
+            </Text>
+          )}
+        </View>
+      </View>
     </PressableSurface>
   );
 });
@@ -167,13 +195,13 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.secondaryText,
       textAlign: 'center',
     },
-    list: { padding: 16 },
+    list: { paddingBottom: 16 },
     loader: { marginVertical: 16 },
     adSlot: { marginBottom: 12, alignItems: 'center' },
     card: {
       backgroundColor: colors.surface,
       borderRadius: 12,
-      padding: 16,
+      padding: 12,
       marginBottom: 12,
       shadowColor: colors.text,
       shadowOffset: { width: 0, height: 1 },
@@ -192,6 +220,9 @@ const makeStyles = (colors: ThemeColors) =>
       borderRadius: 16,
       marginRight: 10,
     },
+    avatarPlaceholder: {
+      backgroundColor: colors.border,
+    },
     cardMeta: {
       flex: 1,
     },
@@ -200,14 +231,31 @@ const makeStyles = (colors: ThemeColors) =>
       fontWeight: yomoyoTypography.buttonWeight,
       color: colors.text,
     },
-    cardLabel: {
-      fontSize: 12,
-      color: colors.muted,
-      marginTop: 2,
+    cardBody: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    cardInfo: {
+      flex: 1,
+      justifyContent: 'center',
+    },
+    thumbnail: {
+      width: 52,
+      height: 72,
+      borderRadius: 6,
+      marginRight: 12,
+    },
+    thumbnailPlaceholder: {
+      backgroundColor: colors.border,
     },
     cardTitle: {
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,
       color: colors.text,
+      marginBottom: 4,
+    },
+    cardDate: {
+      fontSize: 13,
+      color: colors.muted,
     },
   });

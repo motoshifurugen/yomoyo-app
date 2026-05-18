@@ -103,25 +103,25 @@ describe('BookDetailScreen', () => {
     expect(screen.getByText('shelf.markAsFinished')).toBeTruthy();
   });
 
-  it('uses avatar identity displayName as presenter when avatar identity exists', async () => {
+  it('passes the avatar identity animalKey as displayAvatar when avatar identity exists', async () => {
     render(<BookDetailScreen />);
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
       expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
         displayName: 'Quiet Fox',
-        displayAvatar: null,
+        displayAvatar: 'fox',
       });
     });
   });
 
-  it('falls back to Firebase Auth displayName when no avatar identity exists', async () => {
+  it('falls back to Firebase Auth displayName and null avatar when no avatar identity exists', async () => {
     mockGetAvatarIdentity.mockResolvedValueOnce(null);
     render(<BookDetailScreen />);
     fireEvent.press(screen.getByText('shelf.markAsFinished'));
     await waitFor(() => {
       expect(mockMarkAsFinished).toHaveBeenCalledWith('user1', mockBook, {
         displayName: 'Alice',
-        displayAvatar: 'https://example.com/avatar.jpg',
+        displayAvatar: null,
       });
     });
   });
