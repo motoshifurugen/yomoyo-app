@@ -232,6 +232,67 @@ describe('FeedScreen — ad placement policy', () => {
   });
 });
 
+describe('FeedScreen — card content', () => {
+  const withThumbnailAndDate = {
+    ...mockActivity,
+    thumbnail: 'https://example.com/cover.jpg',
+    finishedAt: {
+      toMillis: () => 1747612800000,
+      toDate: () => new Date('2026-05-19T00:00:00Z'),
+    },
+  };
+
+  const withoutAvatar = {
+    ...mockActivity,
+    id: 'act-no-avatar',
+    displayAvatar: null,
+  };
+
+  it('does not render the "finished reading" label on cards', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.queryByText('timeline.finishedReading')).toBeNull();
+  });
+
+  it('renders the book thumbnail when activity.thumbnail is present', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [withThumbnailAndDate], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    const thumb = screen.getByTestId('activity-thumbnail-act1');
+    expect(thumb.props.source.uri).toBe('https://example.com/cover.jpg');
+  });
+
+  it('renders a thumbnail placeholder when activity.thumbnail is null', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.getByTestId('activity-thumbnail-placeholder-act1')).toBeTruthy();
+  });
+
+  it('renders an avatar placeholder when displayAvatar is missing', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [withoutAvatar], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.getByTestId('activity-avatar-placeholder-act-no-avatar')).toBeTruthy();
+  });
+
+  it('renders the localized date when finishedAt is present', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [withThumbnailAndDate], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    const expected = new Date('2026-05-19T00:00:00Z').toLocaleDateString();
+    expect(screen.getByTestId('activity-date-act1').props.children).toBe(expected);
+  });
+
+  it('omits the date when finishedAt is null', async () => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.queryByTestId('activity-date-act1')).toBeNull();
+  });
+});
+
 describe('FeedScreen — row tap modal', () => {
   beforeEach(() => {
     mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
