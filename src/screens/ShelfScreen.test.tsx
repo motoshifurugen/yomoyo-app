@@ -33,6 +33,13 @@ jest.mock('@/components/shelf/MyHandleCard', () => {
   };
 });
 
+jest.mock('@/components/shelf/MyIdentityHeader', () => {
+  const { Text } = require('react-native');
+  return function MyIdentityHeader({ uid }: { uid: string }) {
+    return <Text testID="my-identity-header">{`MyIdentityHeader:${uid}`}</Text>;
+  };
+});
+
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 const mockSubscribe = subscribeToReadingActivities as jest.Mock;
 
@@ -166,5 +173,20 @@ describe('ShelfScreen', () => {
     render(<ShelfScreen />);
     expect(screen.getByTestId('my-handle-card')).toBeTruthy();
     expect(screen.getByText('MyHandleCard:user1')).toBeTruthy();
+  });
+
+  it('renders the MyIdentityHeader for the current user', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('my-identity-header')).toBeTruthy();
+    expect(screen.getByText('MyIdentityHeader:user1')).toBeTruthy();
+  });
+
+  it('renders MyIdentityHeader above MyHandleCard', () => {
+    render(<ShelfScreen />);
+    const tree = JSON.stringify(screen.toJSON());
+    const identityIndex = tree.indexOf('my-identity-header');
+    const handleIndex = tree.indexOf('my-handle-card');
+    expect(identityIndex).toBeGreaterThanOrEqual(0);
+    expect(handleIndex).toBeGreaterThan(identityIndex);
   });
 });

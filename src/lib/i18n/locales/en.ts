@@ -41,6 +41,7 @@ const en = {
     yourIdTitle: 'Your ID',
     shareId: 'Share my ID',
     idShared: 'Shared!',
+    editHint: 'Edit',
   },
   settings: {
     languageTitle: 'Language',

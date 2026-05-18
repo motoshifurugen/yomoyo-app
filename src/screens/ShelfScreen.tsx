@@ -14,6 +14,7 @@ import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
+import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -45,6 +46,7 @@ export default function ShelfScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {user?.uid && <MyIdentityHeader uid={user.uid} />}
         {user?.uid && <MyHandleCard uid={user.uid} />}
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
         {activities.length === 0 ? (

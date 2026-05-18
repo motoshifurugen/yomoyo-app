@@ -4,7 +4,7 @@ const ja = {
   },
   tabs: {
     timeline: '読書ログ',
-    shelf: '本棚',
+    shelf: '私の本棚',
   },
   timeline: {
     finishedReading: '読み終えました',
@@ -41,6 +41,7 @@ const ja = {
     yourIdTitle: 'あなたのID',
     shareId: 'IDを共有',
     idShared: '共有しました',
+    editHint: '編集',
   },
   settings: {
     languageTitle: '言語',
