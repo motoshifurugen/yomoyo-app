@@ -291,6 +291,16 @@ describe('FeedScreen — card content', () => {
     await waitFor(() => screen.getByText('Dune'));
     expect(screen.queryByTestId('activity-date-act1')).toBeNull();
   });
+
+  it('places the date inside the title block (sibling of the title), matching the shelf card layout', async () => {
+    const { within } = require('@testing-library/react-native');
+    mockGetFriendsFeed.mockResolvedValue({ items: [withThumbnailAndDate], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    const titleBlock = screen.getByTestId('activity-info-act1');
+    expect(within(titleBlock).getByTestId('activity-date-act1')).toBeTruthy();
+    expect(within(titleBlock).getByText('Dune')).toBeTruthy();
+  });
 });
 
 describe('FeedScreen — row tap modal', () => {

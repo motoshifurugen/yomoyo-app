@@ -78,17 +78,17 @@ const ActivityCard = React.memo(function ActivityCard({ item, onPress }: Activit
             style={[styles.thumbnail, styles.thumbnailPlaceholder]}
           />
         )}
-        <View style={styles.cardBodyText}>
+        <View testID={`activity-info-${item.id}`} style={styles.cardInfo}>
           <Text style={styles.cardTitle} numberOfLines={2}>
             {item.title}
           </Text>
+          {dateText && (
+            <Text testID={`activity-date-${item.id}`} style={styles.cardDate}>
+              {dateText}
+            </Text>
+          )}
         </View>
       </View>
-      {dateText && (
-        <Text testID={`activity-date-${item.id}`} style={styles.cardDate}>
-          {dateText}
-        </Text>
-      )}
     </PressableSurface>
   );
 });
@@ -195,13 +195,13 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.secondaryText,
       textAlign: 'center',
     },
-    list: { padding: 16 },
+    list: { paddingBottom: 16 },
     loader: { marginVertical: 16 },
     adSlot: { marginBottom: 12, alignItems: 'center' },
     card: {
       backgroundColor: colors.surface,
       borderRadius: 12,
-      padding: 16,
+      padding: 12,
       marginBottom: 12,
       shadowColor: colors.text,
       shadowOffset: { width: 0, height: 1 },
@@ -235,7 +235,7 @@ const makeStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'flex-start',
     },
-    cardBodyText: {
+    cardInfo: {
       flex: 1,
       justifyContent: 'center',
     },
@@ -252,11 +252,10 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,
       color: colors.text,
+      marginBottom: 4,
     },
     cardDate: {
-      alignSelf: 'flex-end',
-      marginTop: 8,
-      fontSize: 11,
+      fontSize: 13,
       color: colors.muted,
     },
   });
