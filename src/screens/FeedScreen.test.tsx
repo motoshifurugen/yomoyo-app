@@ -30,7 +30,8 @@ jest.mock('@/lib/books/friendsFeed', () => ({
 }));
 
 jest.mock('@/lib/users/avatarIdentity', () => ({
-  ANIMAL_ASSETS: { fox: 1, bear: 2 },
+  ANIMAL_ASSETS: { fox: 1, bear: 2, seal: 3 },
+  getAvatarIdentity: jest.fn(() => Promise.resolve(null)),
 }));
 
 jest.mock('@/components/ads/TimelineBannerAd', () => {
@@ -44,9 +45,11 @@ jest.mock('@/components/ads/TimelineBannerAd', () => {
 
 import { getFollowingUids } from '@/lib/users/follows';
 import { getFriendsFeed } from '@/lib/books/friendsFeed';
+import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
 
 const mockGetFollowingUids = getFollowingUids as jest.Mock;
 const mockGetFriendsFeed = getFriendsFeed as jest.Mock;
+const mockGetAvatarIdentity = getAvatarIdentity as jest.Mock;
 
 const mockActivity = {
   id: 'act1',
@@ -290,6 +293,38 @@ describe('FeedScreen — card content', () => {
     render(<FeedScreen />);
     await waitFor(() => screen.getByText('Dune'));
     expect(screen.queryByTestId('activity-date-act1')).toBeNull();
+  });
+
+  it('renders an avatar when displayAvatar is missing on the doc but resolvable via avatar identity', async () => {
+    const itemMissingAvatar = {
+      ...mockActivity,
+      id: 'act-legacy-1',
+      userId: 'legacy-user',
+      displayAvatar: null,
+    };
+    mockGetAvatarIdentity.mockResolvedValueOnce({
+      animalKey: 'fox',
+      displayName: 'Legacy Fox',
+      finalizedAt: null,
+    });
+    mockGetFriendsFeed.mockResolvedValue({ items: [itemMissingAvatar], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.queryByTestId('activity-avatar-placeholder-act-legacy-1')).toBeNull();
+  });
+
+  it('keeps the avatar placeholder when displayAvatar is missing and avatar identity lookup fails', async () => {
+    const itemMissingAvatar = {
+      ...mockActivity,
+      id: 'act-no-identity',
+      userId: 'ghost-user',
+      displayAvatar: null,
+    };
+    mockGetAvatarIdentity.mockRejectedValueOnce(new Error('not found'));
+    mockGetFriendsFeed.mockResolvedValue({ items: [itemMissingAvatar], lastDoc: null });
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.getByTestId('activity-avatar-placeholder-act-no-identity')).toBeTruthy();
   });
 
   it('places the date inside the title block (sibling of the title), matching the shelf card layout', async () => {
