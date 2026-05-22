@@ -9,7 +9,9 @@ import { useTheme } from '@/lib/theme';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import GlassTabBar from '@/components/ui/GlassTabBar';
 import AddFriendButton from '@/components/feed/AddFriendButton';
+import BookmarkFilterToggle from '@/components/feed/BookmarkFilterToggle';
 import SettingsLauncher from '@/components/settings/SettingsLauncher';
+import { BookmarkFilterProvider } from '@/lib/books/bookmarkFilterContext';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -18,6 +20,7 @@ export default function MainTabNavigator() {
   const { colors } = useTheme();
 
   return (
+    <BookmarkFilterProvider>
     <Tab.Navigator
       tabBar={(props) => <GlassTabBar {...props} />}
       screenOptions={{
@@ -39,6 +42,8 @@ export default function MainTabNavigator() {
         component={FeedScreen}
         options={{
           title: t('tabs.timeline'),
+          headerLeftContainerStyle: { paddingLeft: 8 },
+          headerLeft: () => <BookmarkFilterToggle />,
           headerRightContainerStyle: { paddingRight: 8 },
           headerRight: () => (
             <View style={styles.headerRight}>
@@ -56,6 +61,7 @@ export default function MainTabNavigator() {
         }}
       />
     </Tab.Navigator>
+    </BookmarkFilterProvider>
   );
 }
 

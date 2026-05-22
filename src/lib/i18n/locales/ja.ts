@@ -9,9 +9,14 @@ const ja = {
   timeline: {
     finishedReading: '読み終えました',
     emptyBody: '友達の読了した記録が表示されます。',
+    emptyBookmarks: 'ブックマークはまだありません。気になる本のしおりアイコンを押して保存できます。',
     loadErrorBody: '読み込みに失敗しました。もう一度お試しください。',
     modalViewProfile: 'プロフィールを見る',
     modalClose: '閉じる',
+    bookmarkAdd: 'ブックマークに追加',
+    bookmarkRemove: 'ブックマークを外す',
+    filterBookmarks: 'ブックマークのみ表示',
+    filterAll: 'すべて表示',
   },
   addFriend: {
     heading: '友達を追加',
