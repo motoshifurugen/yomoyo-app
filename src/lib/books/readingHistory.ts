@@ -1,5 +1,7 @@
 import type { ReadingActivity } from './readingActivity';
 
+export const HISTORY_WINDOW_WEEKS = 36;
+
 export type WeekBucket = {
   weekStart: Date;
   count: number;

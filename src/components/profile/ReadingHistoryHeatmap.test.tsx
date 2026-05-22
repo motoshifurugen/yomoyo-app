@@ -1,7 +1,13 @@
 import React from 'react';
-import { screen } from '@testing-library/react-native';
+import { screen, within } from '@testing-library/react-native';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import ReadingHistoryHeatmap from './ReadingHistoryHeatmap';
+
+const makeBuckets = (n: number) =>
+  Array.from({ length: n }, (_, i) => ({
+    weekStart: new Date(2026, 0, 5 + i * 7), // 2026-01-05 is a Monday
+    count: 0,
+  }));
 
 const makeBucket = (year: number, month: number, day: number, count: number) => ({
   weekStart: new Date(year, month, day),
@@ -80,5 +86,46 @@ describe('ReadingHistoryHeatmap', () => {
     render(<ReadingHistoryHeatmap buckets={[]} />);
     expect(screen.queryAllByTestId(/^history-tile-/)).toHaveLength(0);
     expect(screen.getByTestId('reading-history-heatmap')).toBeTruthy();
+  });
+
+  describe('3-row grid layout', () => {
+    it('renders 3 row containers', () => {
+      render(<ReadingHistoryHeatmap buckets={makeBuckets(36)} />);
+      expect(screen.getAllByTestId(/^history-row-/)).toHaveLength(3);
+    });
+
+    it('distributes 36 buckets as 12 tiles per row', () => {
+      render(<ReadingHistoryHeatmap buckets={makeBuckets(36)} />);
+      for (const i of [0, 1, 2]) {
+        const tiles = within(screen.getByTestId(`history-row-${i}`)).getAllByTestId(
+          /^history-tile-/,
+        );
+        expect(tiles).toHaveLength(12);
+      }
+    });
+
+    it('places the chronologically oldest tiles in the top row', () => {
+      render(<ReadingHistoryHeatmap buckets={makeBuckets(36)} />);
+      const row0 = within(screen.getByTestId('history-row-0')).getAllByTestId(
+        /^history-tile-/,
+      );
+      expect(row0[0].props.testID).toBe('history-tile-0');
+      expect(row0[row0.length - 1].props.testID).toBe('history-tile-11');
+    });
+
+    it('places the chronologically newest tiles in the bottom row', () => {
+      render(<ReadingHistoryHeatmap buckets={makeBuckets(36)} />);
+      const row2 = within(screen.getByTestId('history-row-2')).getAllByTestId(
+        /^history-tile-/,
+      );
+      expect(row2[0].props.testID).toBe('history-tile-24');
+      expect(row2[row2.length - 1].props.testID).toBe('history-tile-35');
+    });
+
+    it('still renders all tiles when bucket count is not divisible by 3', () => {
+      render(<ReadingHistoryHeatmap buckets={makeBuckets(26)} />);
+      expect(screen.getAllByTestId(/^history-tile-/)).toHaveLength(26);
+      expect(screen.getAllByTestId(/^history-row-/)).toHaveLength(3);
+    });
   });
 });

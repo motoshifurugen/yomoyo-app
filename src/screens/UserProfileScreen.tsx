@@ -12,7 +12,7 @@ import { getAvatarIdentity, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AvatarIdentity } from '@/lib/users/avatarIdentity';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
-import { bucketActivitiesByWeek } from '@/lib/books/readingHistory';
+import { bucketActivitiesByWeek, HISTORY_WINDOW_WEEKS } from '@/lib/books/readingHistory';
 import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
@@ -24,8 +24,6 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type Route = RouteProp<RootStackParamList, 'UserProfile'>;
 
 type IdentityState = AvatarIdentity | null | 'loading';
-
-const HISTORY_WINDOW_WEEKS = 26;
 
 export default function UserProfileScreen() {
   const { params: { uid } } = useRoute<Route>();

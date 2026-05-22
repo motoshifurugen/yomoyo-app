@@ -349,10 +349,16 @@ describe('UserProfileScreen — reading history heatmap', () => {
     expect(screen.getByTestId('reading-history-heatmap')).toBeTruthy();
   });
 
-  it('renders exactly 26 weekly tiles', async () => {
+  it('renders exactly 36 weekly tiles (the configured window)', async () => {
     render(<UserProfileScreen />);
     await screen.findByText('Quiet Fox');
-    expect(screen.getAllByTestId(/^history-tile-/)).toHaveLength(26);
+    expect(screen.getAllByTestId(/^history-tile-/)).toHaveLength(36);
+  });
+
+  it('lays the heatmap out in 3 rows', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getAllByTestId(/^history-row-/)).toHaveLength(3);
   });
 });
 

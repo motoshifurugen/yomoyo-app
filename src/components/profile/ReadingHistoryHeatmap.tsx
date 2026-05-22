@@ -8,34 +8,59 @@ type Props = {
   formatTileLabel?: (bucket: WeekBucket) => string;
 };
 
+const ROWS = 3;
 const TILE_SIZE = 12;
 const TILE_GAP = 3;
 const TILE_RADIUS = 3;
+const OPACITY_BANDS = [0.1, 0.35, 0.65, 1] as const;
 
 function opacityForCount(count: number): number {
-  if (count <= 0) return 0.1;
-  if (count === 1) return 0.35;
-  if (count === 2) return 0.65;
-  return 1;
+  if (count <= 0) return OPACITY_BANDS[0];
+  if (count === 1) return OPACITY_BANDS[1];
+  if (count === 2) return OPACITY_BANDS[2];
+  return OPACITY_BANDS[3];
+}
+
+function splitIntoRows<T>(items: T[], rowCount: number): T[][] {
+  if (items.length === 0) return [];
+  const perRow = Math.ceil(items.length / rowCount);
+  const rows: T[][] = [];
+  for (let r = 0; r < rowCount; r++) {
+    rows.push(items.slice(r * perRow, (r + 1) * perRow));
+  }
+  return rows;
 }
 
 export default function ReadingHistoryHeatmap({ buckets, formatTileLabel }: Props) {
   const styles = useThemedStyles(makeStyles);
+  const rows = splitIntoRows(buckets, ROWS);
 
   return (
-    <View style={styles.row} testID="reading-history-heatmap" accessibilityRole="image">
-      {buckets.map((bucket, index) => {
-        const label = formatTileLabel
-          ? formatTileLabel(bucket)
-          : String(bucket.count);
+    <View style={styles.grid} testID="reading-history-heatmap" accessibilityRole="image">
+      {rows.map((rowBuckets, rowIndex) => {
+        const startIndex = rowIndex * Math.ceil(buckets.length / ROWS);
         return (
           <View
-            key={`${bucket.weekStart.getTime()}-${index}`}
-            testID={`history-tile-${index}`}
-            accessibilityLabel={label}
-            accessibilityRole="image"
-            style={[styles.tile, { opacity: opacityForCount(bucket.count) }]}
-          />
+            key={`row-${rowIndex}`}
+            style={styles.row}
+            testID={`history-row-${rowIndex}`}
+          >
+            {rowBuckets.map((bucket, colIndex) => {
+              const index = startIndex + colIndex;
+              const label = formatTileLabel
+                ? formatTileLabel(bucket)
+                : String(bucket.count);
+              return (
+                <View
+                  key={`${bucket.weekStart.getTime()}-${index}`}
+                  testID={`history-tile-${index}`}
+                  accessibilityLabel={label}
+                  accessibilityRole="image"
+                  style={[styles.tile, { opacity: opacityForCount(bucket.count) }]}
+                />
+              );
+            })}
+          </View>
         );
       })}
     </View>
@@ -44,9 +69,13 @@ export default function ReadingHistoryHeatmap({ buckets, formatTileLabel }: Prop
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    grid: {
+      flexDirection: 'column',
+    },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
+      marginBottom: TILE_GAP,
     },
     tile: {
       width: TILE_SIZE,
