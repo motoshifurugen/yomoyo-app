@@ -1,4 +1,11 @@
+jest.mock('./coverFallback', () => ({
+  resolveCoverForIsbn: jest.fn(),
+}));
+
 import { isIsbn13, lookupByIsbn } from './openBD';
+import { resolveCoverForIsbn } from './coverFallback';
+
+const mockResolveCover = resolveCoverForIsbn as jest.Mock;
 
 describe('isIsbn13', () => {
   it('returns true for a valid 978-prefixed ISBN-13', () => {
@@ -34,6 +41,11 @@ describe('isIsbn13', () => {
 
 describe('lookupByIsbn', () => {
   const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    mockResolveCover.mockReset();
+    mockResolveCover.mockResolvedValue(null);
+  });
 
   afterEach(() => {
     global.fetch = originalFetch;
@@ -151,5 +163,55 @@ describe('lookupByIsbn', () => {
   it('throws when the HTTP response is not ok', async () => {
     mockFetch([], { ok: false, status: 500 });
     await expect(lookupByIsbn('9784101001456')).rejects.toThrow(/500/);
+  });
+
+  it('does not invoke the cover fallback when openBD provides a valid https cover', async () => {
+    mockFetch([
+      {
+        summary: {
+          title: 'Title',
+          cover: 'https://cover.openbd.jp/x.jpg',
+        },
+      },
+    ]);
+    await lookupByIsbn('9784101001456');
+    expect(mockResolveCover).not.toHaveBeenCalled();
+  });
+
+  it('uses the cover fallback when openBD has no cover', async () => {
+    mockFetch([{ summary: { title: 'Title' } }]);
+    mockResolveCover.mockResolvedValueOnce(
+      'https://covers.example/9784101001456.jpg',
+    );
+
+    const book = await lookupByIsbn('9784101001456');
+
+    expect(mockResolveCover).toHaveBeenCalledWith('9784101001456');
+    expect(book?.thumbnail).toBe('https://covers.example/9784101001456.jpg');
+  });
+
+  it('uses the cover fallback when the openBD cover is dropped as non-https', async () => {
+    mockFetch([
+      {
+        summary: {
+          title: 'Title',
+          cover: 'http://insecure/x.jpg',
+        },
+      },
+    ]);
+    mockResolveCover.mockResolvedValueOnce('https://covers.example/x.jpg');
+
+    const book = await lookupByIsbn('9784101001456');
+
+    expect(book?.thumbnail).toBe('https://covers.example/x.jpg');
+  });
+
+  it('returns null thumbnail when the cover fallback throws', async () => {
+    mockFetch([{ summary: { title: 'Title' } }]);
+    mockResolveCover.mockRejectedValueOnce(new Error('boom'));
+
+    const book = await lookupByIsbn('9784101001456');
+
+    expect(book?.thumbnail).toBeNull();
   });
 });
