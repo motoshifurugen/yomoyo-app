@@ -240,6 +240,79 @@ describe('UserProfileScreen — follow actions', () => {
   });
 });
 
+describe('UserProfileScreen — post-follow success state', () => {
+  it('does not show the success block before any follow action', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.queryByTestId('follow-success-block')).toBeNull();
+  });
+
+  it('does not show the success block when the user already follows this profile', async () => {
+    mockIsFollowing.mockResolvedValueOnce(true);
+    render(<UserProfileScreen />);
+    await screen.findByTestId('unfollow-button');
+    expect(screen.queryByTestId('follow-success-block')).toBeNull();
+  });
+
+  it('shows the success block after the user transitions from not-following to following', async () => {
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-success-block')).toBeTruthy();
+    });
+  });
+
+  it('renders a back-to-timeline CTA inside the success block', async () => {
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    expect(await screen.findByTestId('back-to-timeline-button')).toBeTruthy();
+  });
+
+  it('navigates to the Timeline tab when the back-to-timeline CTA is pressed', async () => {
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    fireEvent.press(await screen.findByTestId('back-to-timeline-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Timeline' });
+  });
+
+  it('keeps the unfollow button accessible underneath the success block', async () => {
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    await screen.findByTestId('follow-success-block');
+    expect(screen.getByTestId('unfollow-button')).toBeTruthy();
+  });
+
+  it('hides the success block if the user immediately unfollows', async () => {
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    fireEvent.press(await screen.findByTestId('unfollow-button'));
+    await waitFor(() => {
+      expect(screen.queryByTestId('follow-success-block')).toBeNull();
+    });
+  });
+
+  it('does not show the success block if followUser rejects', async () => {
+    mockFollowUser.mockRejectedValueOnce(new Error('network error'));
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    await waitFor(() => {
+      expect(screen.getByTestId('follow-button')).toBeTruthy();
+    });
+    expect(screen.queryByTestId('follow-success-block')).toBeNull();
+  });
+
+  it('does not show the success block on own profile', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user1' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('userProfile.ownPageNote');
+    expect(screen.queryByTestId('follow-success-block')).toBeNull();
+  });
+});
+
 describe('UserProfileScreen — navigation button', () => {
   it('renders a navigation button', async () => {
     render(<UserProfileScreen />);

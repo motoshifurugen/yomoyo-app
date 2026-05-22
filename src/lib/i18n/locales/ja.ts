@@ -63,6 +63,8 @@ const ja = {
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
+    followSuccess: 'これから{{name}}さんの読書記録がタイムラインに届きます。',
+    backToTimeline: 'タイムラインに戻る',
   },
   profile: {
     displayName: {
