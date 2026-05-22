@@ -63,6 +63,15 @@ jest.mock('@/screens/FeedScreen', () => () => null);
 jest.mock('@/screens/ShelfScreen', () => () => null);
 jest.mock('@/components/feed/AddFriendButton', () => () => null);
 jest.mock('@/components/settings/SettingsLauncher', () => () => null);
+jest.mock('@/components/feed/BookmarkFilterToggle', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () =>
+      React.createElement(View, { testID: 'bookmark-filter-toggle-mock' }),
+  };
+});
 
 beforeEach(() => {
   capturedScreens.length = 0;
@@ -95,6 +104,51 @@ describe('MainTabNavigator — header right gutter', () => {
     expect(shelf).toBeDefined();
     expect(shelf?.options).not.toHaveProperty('headerRightContainerStyle');
     expect(shelf?.options).not.toHaveProperty('headerRight');
+  });
+});
+
+describe('MainTabNavigator — Timeline bookmark filter entry (headerLeft)', () => {
+  it('places the bookmark filter toggle in the Timeline headerLeft slot', () => {
+    const { render: rtlRender } = require('@testing-library/react-native');
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
+    expect(timeline).toBeDefined();
+    const headerLeft = (timeline?.options as Record<string, unknown>).headerLeft as
+      | ((props?: unknown) => React.ReactElement)
+      | undefined;
+    expect(typeof headerLeft).toBe('function');
+    const tree = rtlRender(<ThemeProvider>{headerLeft!({})}</ThemeProvider>);
+    expect(tree.getByTestId('bookmark-filter-toggle-mock')).toBeTruthy();
+    tree.unmount();
+  });
+
+  it('applies an 8pt left gutter to the Timeline screen header', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
+    expect(timeline?.options).toEqual(
+      expect.objectContaining({
+        headerLeftContainerStyle: { paddingLeft: 8 },
+      }),
+    );
+  });
+
+  it('does not place a headerLeft on the Shelf screen', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const shelf = capturedScreens.find((s) => s.name === 'Shelf');
+    expect(shelf?.options).not.toHaveProperty('headerLeft');
+    expect(shelf?.options).not.toHaveProperty('headerLeftContainerStyle');
   });
 });
 

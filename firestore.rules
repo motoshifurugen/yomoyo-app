@@ -29,6 +29,11 @@ service cloud.firestore {
       match /pushTokens/{tokenId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Bookmarks are private to the user — never readable by anyone else.
+      match /bookmarks/{activityId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Handle reservations: maps a human-readable handle to its owner uid.

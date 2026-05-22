@@ -1,7 +1,25 @@
 import React from 'react';
 import { screen, fireEvent, waitFor, act } from '@testing-library/react-native';
-import { renderWithTheme as render } from '@/lib/theme/testUtils';
+import { ThemeProvider } from '@/lib/theme/ThemeProvider';
+import { render as rtlRender } from '@testing-library/react-native';
+import {
+  BookmarkFilterProvider,
+  type BookmarkFilterMode,
+} from '@/lib/books/bookmarkFilterContext';
 import FeedScreen from './FeedScreen';
+
+function render(
+  ui: React.ReactElement,
+  options?: { initialMode?: BookmarkFilterMode },
+) {
+  return rtlRender(
+    <ThemeProvider>
+      <BookmarkFilterProvider initialMode={options?.initialMode ?? 'all'}>
+        {ui}
+      </BookmarkFilterProvider>
+    </ThemeProvider>,
+  );
+}
 
 const mockNavigate = jest.fn();
 
@@ -29,6 +47,15 @@ jest.mock('@/lib/books/friendsFeed', () => ({
   getFriendsFeed: jest.fn(() => Promise.resolve({ items: [], lastDoc: null })),
 }));
 
+jest.mock('@/lib/books/bookmarks', () => ({
+  getBookmarkIds: jest.fn(() => Promise.resolve(new Set())),
+  getBookmarkedActivities: jest.fn(() =>
+    Promise.resolve({ items: [], lastDoc: null }),
+  ),
+  addBookmark: jest.fn(() => Promise.resolve()),
+  removeBookmark: jest.fn(() => Promise.resolve()),
+}));
+
 jest.mock('@/lib/users/avatarIdentity', () => ({
   ANIMAL_ASSETS: { fox: 1, bear: 2, seal: 3 },
   getAvatarIdentity: jest.fn(() => Promise.resolve(null)),
@@ -46,10 +73,20 @@ jest.mock('@/components/ads/TimelineBannerAd', () => {
 import { getFollowingUids } from '@/lib/users/follows';
 import { getFriendsFeed } from '@/lib/books/friendsFeed';
 import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
+import {
+  getBookmarkIds,
+  getBookmarkedActivities,
+  addBookmark,
+  removeBookmark,
+} from '@/lib/books/bookmarks';
 
 const mockGetFollowingUids = getFollowingUids as jest.Mock;
 const mockGetFriendsFeed = getFriendsFeed as jest.Mock;
 const mockGetAvatarIdentity = getAvatarIdentity as jest.Mock;
+const mockGetBookmarkIds = getBookmarkIds as jest.Mock;
+const mockGetBookmarkedActivities = getBookmarkedActivities as jest.Mock;
+const mockAddBookmark = addBookmark as jest.Mock;
+const mockRemoveBookmark = removeBookmark as jest.Mock;
 
 const mockActivity = {
   id: 'act1',
@@ -90,6 +127,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockGetFollowingUids.mockResolvedValue(['user2']);
   mockGetFriendsFeed.mockResolvedValue({ items: [], lastDoc: null });
+  mockGetBookmarkIds.mockResolvedValue(new Set());
+  mockGetBookmarkedActivities.mockResolvedValue({ items: [], lastDoc: null });
+  mockAddBookmark.mockResolvedValue(undefined);
+  mockRemoveBookmark.mockResolvedValue(undefined);
 });
 
 describe('FeedScreen — friend updates list', () => {
@@ -378,6 +419,79 @@ describe('FeedScreen — row tap modal', () => {
     expect(mockNavigate).toHaveBeenCalledWith('UserProfile', { uid: 'user2' });
     await waitFor(() => {
       expect(screen.queryByTestId('activity-detail-modal')).toBeNull();
+    });
+  });
+});
+
+describe('FeedScreen — bookmark icon on cards', () => {
+  beforeEach(() => {
+    mockGetFriendsFeed.mockResolvedValue({ items: [mockActivity], lastDoc: null });
+  });
+
+  it('renders a bookmark toggle button on each activity card', async () => {
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(screen.getByTestId('bookmark-toggle-act1')).toBeTruthy();
+  });
+
+  it('shows the off (outline) state when the activity is not in the bookmark set', async () => {
+    mockGetBookmarkIds.mockResolvedValue(new Set());
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByText('Dune'));
+    expect(
+      screen.getByTestId('bookmark-toggle-act1').props.accessibilityState?.selected,
+    ).toBe(false);
+  });
+
+  it('shows the on (filled) state when the activity is already bookmarked', async () => {
+    mockGetBookmarkIds.mockResolvedValue(new Set(['act1']));
+    render(<FeedScreen />);
+    await waitFor(() => {
+      expect(
+        screen.getByTestId('bookmark-toggle-act1').props.accessibilityState?.selected,
+      ).toBe(true);
+    });
+  });
+
+  it('calls addBookmark when an unbookmarked icon is pressed', async () => {
+    mockGetBookmarkIds.mockResolvedValue(new Set());
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('bookmark-toggle-act1'));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('bookmark-toggle-act1'));
+    });
+    expect(mockAddBookmark).toHaveBeenCalledWith('user1', 'act1');
+  });
+
+  it('does NOT open the detail modal when the bookmark icon is pressed (tap isolation)', async () => {
+    render(<FeedScreen />);
+    await waitFor(() => screen.getByTestId('bookmark-toggle-act1'));
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('bookmark-toggle-act1'));
+    });
+    expect(screen.queryByTestId('activity-detail-modal')).toBeNull();
+  });
+});
+
+describe('FeedScreen — bookmark-only mode empty state', () => {
+  it('shows the bookmark-specific empty copy when in bookmarks mode with no items', async () => {
+    mockGetBookmarkedActivities.mockResolvedValue({ items: [], lastDoc: null });
+    render(<FeedScreen />, { initialMode: 'bookmarks' });
+    await waitFor(() => {
+      expect(screen.getByText('timeline.emptyBookmarks')).toBeTruthy();
+    });
+    expect(screen.queryByText('timeline.emptyBody')).toBeNull();
+    expect(screen.queryByTestId('add-friend-button-inline')).toBeNull();
+  });
+
+  it('renders bookmarked activities when bookmarks-mode returns items', async () => {
+    mockGetBookmarkedActivities.mockResolvedValue({
+      items: [{ ...mockActivity, id: 'bm1', title: 'Saved Book' }],
+      lastDoc: null,
+    });
+    render(<FeedScreen />, { initialMode: 'bookmarks' });
+    await waitFor(() => {
+      expect(screen.getByText('Saved Book')).toBeTruthy();
     });
   });
 });

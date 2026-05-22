@@ -9,9 +9,14 @@ const en = {
   timeline: {
     finishedReading: 'Finished reading',
     emptyBody: 'Reading records from your friends will appear here.',
+    emptyBookmarks: 'No bookmarks yet. Tap the bookmark icon on a card to save it.',
     loadErrorBody: 'Something went wrong. Please try again.',
     modalViewProfile: 'View profile',
     modalClose: 'Close',
+    bookmarkAdd: 'Save bookmark',
+    bookmarkRemove: 'Remove bookmark',
+    filterBookmarks: 'Show bookmarks only',
+    filterAll: 'Show all',
   },
   addFriend: {
     heading: 'Add a friend',
