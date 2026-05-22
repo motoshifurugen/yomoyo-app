@@ -29,7 +29,10 @@ jest.mock('expo-blur', () => {
 });
 
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: { count?: number }) =>
+      options && typeof options.count === 'number' ? `${key}:${options.count}` : key,
+  }),
 }));
 
 jest.mock('@/hooks/useAuth', () => ({
@@ -292,6 +295,64 @@ describe('UserProfileScreen — navigation button', () => {
     const flat = (Array.isArray(raw) ? raw : [raw]).filter(Boolean);
     const merged = Object.assign({}, ...flat);
     expect(merged).toEqual(expect.objectContaining({ marginLeft: 8 }));
+  });
+});
+
+describe('UserProfileScreen — finished count', () => {
+  it('shows zero finished books when there are no activities', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('finished-count')).toHaveTextContent(/:0\b/);
+  });
+
+  it('shows the number of finished activities', async () => {
+    mockSubscribe.mockImplementation((_uid: string, onUpdate: Function) => {
+      onUpdate([mockActivity, { ...mockActivity, id: 'act2', bookId: 'b2' }, { ...mockActivity, id: 'act3', bookId: 'b3' }]);
+      return jest.fn();
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('finished-count')).toHaveTextContent(/:3\b/);
+  });
+
+  it('shows the count on own profile too', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user1' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    mockSubscribe.mockImplementation((_uid: string, onUpdate: Function) => {
+      onUpdate([mockActivity]);
+      return jest.fn();
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('finished-count')).toHaveTextContent(/:1\b/);
+  });
+});
+
+describe('UserProfileScreen — reading history heatmap', () => {
+  it('renders the heatmap on a stranger profile', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('reading-history-heatmap')).toBeTruthy();
+  });
+
+  it('renders the heatmap on own profile', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user1' },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getByTestId('reading-history-heatmap')).toBeTruthy();
+  });
+
+  it('renders exactly 26 weekly tiles', async () => {
+    render(<UserProfileScreen />);
+    await screen.findByText('Quiet Fox');
+    expect(screen.getAllByTestId(/^history-tile-/)).toHaveLength(26);
   });
 });
 
