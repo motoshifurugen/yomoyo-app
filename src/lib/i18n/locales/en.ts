@@ -68,6 +68,13 @@ const en = {
     notFound: 'This page does not exist.',
     emptyBooks: 'No finished books yet',
     ownPageNote: 'This is your page',
+    finishedCount_one: '{{count}} book finished',
+    finishedCount_other: '{{count}} books finished',
+    history: {
+      weekTileLabel_zero: 'No books finished this week',
+      weekTileLabel_one: '1 book finished this week',
+      weekTileLabel_other: '{{count}} books finished this week',
+    },
   },
   profile: {
     displayName: {

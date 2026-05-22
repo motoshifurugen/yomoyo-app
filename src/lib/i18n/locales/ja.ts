@@ -68,6 +68,13 @@ const ja = {
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
+    finishedCount_one: '{{count}}冊読み終えました',
+    finishedCount_other: '{{count}}冊読み終えました',
+    history: {
+      weekTileLabel_zero: 'この週は読了なし',
+      weekTileLabel_one: 'この週に1冊読了',
+      weekTileLabel_other: 'この週に{{count}}冊読了',
+    },
   },
   profile: {
     displayName: {

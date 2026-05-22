@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -12,6 +12,8 @@ import { getAvatarIdentity, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AvatarIdentity } from '@/lib/users/avatarIdentity';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import { bucketActivitiesByWeek, HISTORY_WINDOW_WEEKS } from '@/lib/books/readingHistory';
+import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
@@ -56,6 +58,11 @@ export default function UserProfileScreen() {
     );
     return unsubscribe;
   }, [uid]);
+
+  const historyBuckets = useMemo(
+    () => bucketActivitiesByWeek(activities, { weeks: HISTORY_WINDOW_WEEKS }),
+    [activities],
+  );
 
   if (identity === 'loading') {
     return (
@@ -109,6 +116,18 @@ export default function UserProfileScreen() {
         <View style={styles.identityBlock}>
           <Image source={ANIMAL_ASSETS[identity.animalKey]} style={styles.avatar} />
           <Text style={styles.displayName}>{identity.displayName}</Text>
+        </View>
+
+        <View style={styles.statsBlock}>
+          <Text style={styles.countLine} testID="finished-count">
+            {t('userProfile.finishedCount', { count: activities.length })}
+          </Text>
+          <ReadingHistoryHeatmap
+            buckets={historyBuckets}
+            formatTileLabel={(b) =>
+              t('userProfile.history.weekTileLabel', { count: b.count })
+            }
+          />
         </View>
 
         {isOwnProfile ? (
@@ -211,7 +230,16 @@ const makeStyles = (colors: ThemeColors) =>
     },
     identityBlock: {
       alignItems: 'center',
+      marginBottom: 16,
+    },
+    statsBlock: {
+      alignItems: 'center',
       marginBottom: 24,
+    },
+    countLine: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      marginBottom: 10,
     },
     avatar: {
       width: 72,
