@@ -111,6 +111,13 @@ describe('BookSearchScreen', () => {
     expect(jest.mocked(searchBooks)).toHaveBeenCalledTimes(1);
   });
 
+  it('renders a barcode scan button that navigates to BarcodeScan', () => {
+    render(<BookSearchScreen />);
+    const scanButton = screen.getByRole('button', { name: 'bookSearch.scanBarcode' });
+    fireEvent.press(scanButton);
+    expect(mockNavigate).toHaveBeenCalledWith('BarcodeScan');
+  });
+
   it('does not show error after a successful search clears the previous error', async () => {
     jest.mocked(searchBooks).mockRejectedValueOnce(new Error('Books API error: 500'));
     jest.mocked(searchBooks).mockResolvedValueOnce([mockBook]);

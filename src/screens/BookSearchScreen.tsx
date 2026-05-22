@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { searchBooks, type Book } from '@/lib/books/searchBooks';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
-import { useThemedStyles, type ThemeColors } from '@/lib/theme';
+import { useThemedStyles, useTheme, type ThemeColors } from '@/lib/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -27,6 +28,7 @@ export default function BookSearchScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const styles = useThemedStyles(makeStyles);
+  const { colors } = useTheme();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Book[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,6 +81,15 @@ export default function BookSearchScreen() {
           feedback="standard"
         >
           <Text style={styles.buttonText}>{t('bookSearch.button')}</Text>
+        </PressableSurface>
+        <PressableSurface
+          style={styles.scanButton}
+          onPress={() => navigation.navigate('BarcodeScan')}
+          accessibilityRole="button"
+          accessibilityLabel={t('bookSearch.scanBarcode')}
+          feedback="standard"
+        >
+          <Ionicons name="barcode-outline" size={22} color={colors.surface} />
         </PressableSurface>
       </View>
 
@@ -138,6 +149,13 @@ const makeStyles = (colors: ThemeColors) =>
       borderRadius: 8,
       paddingHorizontal: 16,
       justifyContent: 'center',
+    },
+    scanButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     buttonDisabled: {
       opacity: 0.5,
