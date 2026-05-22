@@ -3,6 +3,7 @@ import type { Book } from '@/lib/books/searchBooks';
 export type RootStackParamList = {
   MainTabs: { screen?: keyof MainTabParamList } | undefined;
   BookSearch: undefined;
+  BarcodeScan: undefined;
   BookDetail: { book: Book };
   UserProfile: { uid: string };
   AddFriend: undefined;

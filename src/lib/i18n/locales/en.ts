@@ -34,6 +34,17 @@ const en = {
     unknownAuthor: 'Unknown author',
     searchError: 'Search failed. Please try again.',
     rateLimitError: 'Too many searches. Please wait a moment.',
+    scanBarcode: 'Scan barcode',
+  },
+  bookScan: {
+    hint: 'Point the camera at a book barcode.',
+    looking: 'Looking up the book…',
+    notFound: 'We couldn’t find this book. Try a title search instead.',
+    lookupError: 'Lookup failed. Try a title search instead.',
+    permissionTitle: 'Camera access is off',
+    permissionBody: 'Yomoyo needs camera access to scan barcodes. You can still search by title.',
+    searchByTitle: 'Search by title',
+    tryAgain: 'Try again',
   },
   bookDetail: {
     unknownAuthor: 'Unknown author',

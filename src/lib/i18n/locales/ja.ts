@@ -34,6 +34,17 @@ const ja = {
     unknownAuthor: '著者不明',
     searchError: '検索に失敗しました。もう一度お試しください。',
     rateLimitError: '検索回数が多すぎます。少し待ってからお試しください。',
+    scanBarcode: 'バーコードを読み取る',
+  },
+  bookScan: {
+    hint: 'カメラを本のバーコードに向けてください。',
+    looking: '本を検索中…',
+    notFound: 'この本は見つかりませんでした。タイトル検索をお試しください。',
+    lookupError: '検索に失敗しました。タイトル検索をお試しください。',
+    permissionTitle: 'カメラへのアクセスがオフです',
+    permissionBody: 'バーコードを読み取るにはカメラへのアクセスが必要です。タイトル検索は引き続きご利用いただけます。',
+    searchByTitle: 'タイトルで検索',
+    tryAgain: 'もう一度',
   },
   bookDetail: {
     unknownAuthor: '著者不明',

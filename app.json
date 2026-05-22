@@ -51,7 +51,13 @@
       ],
       "./plugins/withFmtConsteval",
       "./plugins/withFirebaseStaticFramework",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Yomoyo uses the camera to scan book barcodes for quick registration."
+        }
+      ]
     ],
     "extra": {
       "eas": {
