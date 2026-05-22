@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PressableSurface from '@/components/ui/PressableSurface';
@@ -12,6 +12,8 @@ import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import { bucketActivitiesByWeek, HISTORY_WINDOW_WEEKS } from '@/lib/books/readingHistory';
+import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
 import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
 import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
@@ -37,6 +39,11 @@ export default function ShelfScreen() {
     return unsubscribe;
   }, [user?.uid]);
 
+  const historyBuckets = useMemo(
+    () => bucketActivitiesByWeek(activities, { weeks: HISTORY_WINDOW_WEEKS }),
+    [activities],
+  );
+
   const handleAddBook = () => navigation.navigate('BookSearch');
 
   return (
@@ -44,6 +51,17 @@ export default function ShelfScreen() {
       <View style={styles.fixedHeader}>
         {user?.uid && <MyIdentityHeader uid={user.uid} />}
         {user?.uid && <MyHandleCard uid={user.uid} />}
+        <View style={styles.statsBlock}>
+          <Text style={styles.countLine} testID="finished-count">
+            {t('userProfile.finishedCount', { count: activities.length })}
+          </Text>
+          <ReadingHistoryHeatmap
+            buckets={historyBuckets}
+            formatTileLabel={(b) =>
+              t('userProfile.history.weekTileLabel', { count: b.count })
+            }
+          />
+        </View>
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
       </View>
       <ScrollView
@@ -102,6 +120,16 @@ const makeStyles = (colors: ThemeColors) =>
     },
     content: {
       paddingBottom: 16,
+    },
+    statsBlock: {
+      alignItems: 'center',
+      marginTop: 8,
+      marginBottom: 16,
+    },
+    countLine: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      marginBottom: 10,
     },
     sectionHeader: {
       fontSize: yomoyoTypography.screenTitleSize,

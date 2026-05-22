@@ -15,7 +15,10 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: { count?: number }) =>
+      options && typeof options.count === 'number' ? `${key}:${options.count}` : key,
+  }),
 }));
 
 jest.mock('@/hooks/useAuth', () => ({
@@ -200,5 +203,42 @@ describe('ShelfScreen', () => {
     const scroll = screen.getByTestId('shelf-books-scroll');
     expect(within(scroll).queryByTestId('my-identity-header')).toBeNull();
     expect(within(scroll).queryByTestId('my-handle-card')).toBeNull();
+  });
+
+  describe('reading stats', () => {
+    it('shows zero finished books when there are no activities', () => {
+      render(<ShelfScreen />);
+      expect(screen.getByTestId('finished-count')).toHaveTextContent(/:0\b/);
+    });
+
+    it('shows the number of finished activities', () => {
+      mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+        onUpdate([
+          finishedActivity,
+          { ...finishedActivity, id: 'a2', bookId: 'b2' },
+        ]);
+        return jest.fn();
+      });
+      render(<ShelfScreen />);
+      expect(screen.getByTestId('finished-count')).toHaveTextContent(/:2\b/);
+    });
+
+    it('renders the reading history heatmap', () => {
+      render(<ShelfScreen />);
+      expect(screen.getByTestId('reading-history-heatmap')).toBeTruthy();
+    });
+
+    it('lays the heatmap out in 3 rows of 12 tiles', () => {
+      render(<ShelfScreen />);
+      expect(screen.getAllByTestId(/^history-tile-/)).toHaveLength(36);
+      expect(screen.getAllByTestId(/^history-row-/)).toHaveLength(3);
+    });
+
+    it('places the stats block above the Finished header (outside the scroll container)', () => {
+      render(<ShelfScreen />);
+      const scroll = screen.getByTestId('shelf-books-scroll');
+      expect(within(scroll).queryByTestId('finished-count')).toBeNull();
+      expect(within(scroll).queryByTestId('reading-history-heatmap')).toBeNull();
+    });
   });
 });
