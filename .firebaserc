@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "yomoyo-d9c4a"
+    "development": "yomoyo-d9c4a",
+    "production": "yomoyo-prod"
   }
 }
