@@ -15,7 +15,19 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "519663123719-jejqumfkmtmtclsvs2va3t08nptike4a.apps.googleusercontent.com",
+        "EXPO_PUBLIC_ADMOB_IOS_APP_ID": "ca-app-pub-2350284268903026~4061380533",
+        "EXPO_PUBLIC_ADMOB_ANDROID_APP_ID": "ca-app-pub-2350284268903026~8730377571",
+        "EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY": "AIzaSyBmdb9NAyNhlLGKFSPfjZDC9up6kayG0gw",
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCo0nhkL3AWYaa_GAsutyRp8JOZThPLPxQ",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "yomoyo-prod",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "yomoyo-prod.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "519663123719",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:519663123719:web:e7bf783a4171a7614899a2"
+      }
     }
   },
   "submit": {

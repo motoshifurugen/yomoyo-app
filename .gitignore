@@ -8,7 +8,9 @@ coverage/
 .env.local
 *.log
 google-services.json
+google-services.*.json
 GoogleService-Info.plist
+GoogleService-Info.*.plist
 .DS_Store
 .pnpm-store/
 scripts/service-account.json
