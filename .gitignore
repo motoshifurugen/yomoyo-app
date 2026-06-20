@@ -14,3 +14,8 @@ GoogleService-Info.*.plist
 .DS_Store
 .pnpm-store/
 scripts/service-account.json
+
+# TAKT runtime artifacts (keep config/workflows/facets, ignore run output)
+.takt/runs/
+.takt/tasks/
+.takt/tasks.yaml
