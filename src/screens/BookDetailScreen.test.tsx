@@ -11,9 +11,12 @@ const mockBook = {
   thumbnail: 'https://example.com/cover.jpg',
 };
 
+const mockNavigate = jest.fn();
+
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useRoute: jest.fn(),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -61,6 +64,28 @@ describe('BookDetailScreen', () => {
     });
     mockMarkAsFinished.mockClear();
     mockGetAvatarIdentity.mockClear();
+    mockNavigate.mockClear();
+  });
+
+  it('does not show the view-in-shelf next action before finishing', () => {
+    render(<BookDetailScreen />);
+    expect(screen.queryByText('bookDetail.goToShelf')).toBeNull();
+  });
+
+  it('shows a view-in-shelf next action after finishing', async () => {
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
+    await waitFor(() => {
+      expect(screen.getByText('bookDetail.goToShelf')).toBeTruthy();
+    });
+  });
+
+  it('navigates to the Shelf tab when the next action is pressed', async () => {
+    render(<BookDetailScreen />);
+    fireEvent.press(screen.getByText('shelf.markAsFinished'));
+    await waitFor(() => screen.getByText('bookDetail.goToShelf'));
+    fireEvent.press(screen.getByText('bookDetail.goToShelf'));
+    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Shelf' });
   });
 
   it('renders the book title', () => {
@@ -132,7 +157,10 @@ describe('BookDetailScreen', () => {
     await waitFor(() => {
       expect(screen.getByText('shelf.finished')).toBeTruthy();
     });
-    expect(screen.getByRole('button').props.accessibilityState?.disabled).toBe(true);
+    // The finished button is the first button; a second "view in shelf"
+    // next-action button is also present after finishing.
+    const [finishedButton] = screen.getAllByRole('button');
+    expect(finishedButton.props.accessibilityState?.disabled).toBe(true);
   });
 
   it('returns to Mark as Finished label so the user can retry on failure', async () => {

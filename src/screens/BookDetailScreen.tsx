@@ -6,8 +6,9 @@ import {
   ScrollView,
 } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
@@ -18,10 +19,12 @@ import type { Presenter } from '@/lib/books/readingActivity';
 import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
 
 type RouteType = RouteProp<RootStackParamList, 'BookDetail'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export default function BookDetailScreen() {
   const { t } = useTranslation();
   const route = useRoute<RouteType>();
+  const navigation = useNavigation<NavigationProp>();
   const { book } = route.params;
   const { user } = useAuth();
   const styles = useThemedStyles(makeStyles);
@@ -69,6 +72,16 @@ export default function BookDetailScreen() {
           {hasFinished ? t('shelf.finished') : t('shelf.markAsFinished')}
         </Text>
       </PressableSurface>
+      {hasFinished ? (
+        <PressableSurface
+          style={styles.nextActionButton}
+          onPress={() => navigation.navigate('MainTabs', { screen: 'Shelf' })}
+          accessibilityRole="button"
+          feedback="standard"
+        >
+          <Text style={styles.nextActionText}>{t('bookDetail.goToShelf')}</Text>
+        </PressableSurface>
+      ) : null}
     </ScrollView>
   );
 }
@@ -113,6 +126,21 @@ const makeStyles = (colors: ThemeColors) =>
     buttonDone: { backgroundColor: colors.muted },
     buttonText: {
       color: colors.surface,
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: yomoyoTypography.buttonWeight,
+    },
+    nextActionButton: {
+      height: 52,
+      borderRadius: 14,
+      paddingHorizontal: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: colors.primary,
+      marginTop: 12,
+    },
+    nextActionText: {
+      color: colors.primary,
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,
     },

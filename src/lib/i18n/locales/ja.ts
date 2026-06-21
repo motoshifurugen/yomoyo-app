@@ -51,6 +51,7 @@ const ja = {
   },
   bookDetail: {
     unknownAuthor: '著者不明',
+    goToShelf: '本棚で見る',
   },
   shelf: {
     finished: '読み終えた本',
