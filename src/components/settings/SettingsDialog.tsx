@@ -2,7 +2,13 @@ import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
-import { setLanguage } from '@/lib/i18n';
+import {
+  setLanguage,
+  normalizeLanguage,
+  SUPPORTED_LANGUAGES,
+  LANGUAGE_LABELS,
+  type Language,
+} from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import DialogCloseButton from '@/components/ui/DialogCloseButton';
@@ -13,8 +19,6 @@ import {
   type ThemeGlass,
   type ThemeMode,
 } from '@/lib/theme';
-
-type Language = 'ja' | 'en';
 
 type Props = {
   visible: boolean;
@@ -29,10 +33,9 @@ const THEME_MODES: ReadonlyArray<{ mode: ThemeMode; labelKey: string }> = [
   { mode: 'system', labelKey: 'settings.themeSystem' },
 ];
 
-const LANGUAGES: ReadonlyArray<{ code: Language; label: string }> = [
-  { code: 'ja', label: '日本語' },
-  { code: 'en', label: 'English' },
-];
+const LANGUAGES: ReadonlyArray<{ code: Language; label: string }> = SUPPORTED_LANGUAGES.map(
+  (code) => ({ code, label: LANGUAGE_LABELS[code] }),
+);
 
 type TFn = (key: string) => string;
 
@@ -115,7 +118,7 @@ export default function SettingsDialog({ visible, onClose }: Props) {
   const { user } = useAuth();
   const { mode, setMode } = useTheme();
   const styles = useThemedStyles(makeStyles);
-  const currentLanguage = (i18n.language.split('-')[0] ?? 'en') as Language;
+  const currentLanguage = normalizeLanguage(i18n.language);
 
   const handleLanguageChange = async (lang: Language) => {
     await setLanguage(lang);

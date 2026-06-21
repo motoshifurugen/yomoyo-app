@@ -9,6 +9,9 @@ import { THEME_STORAGE_KEY } from '@/lib/theme/themeStorage';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
+  SUPPORTED_LANGUAGES: ['ja', 'en'],
+  LANGUAGE_LABELS: { ja: '日本語', en: 'English' },
+  normalizeLanguage: (code: string) => (code === 'ja' ? 'ja' : 'en'),
 }));
 
 jest.mock('@/lib/notifications/registerPushToken', () => ({
