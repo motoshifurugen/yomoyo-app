@@ -18,6 +18,7 @@ const ja = {
     modalClose: '閉じる',
     bookmarkAdd: 'ブックマークに追加',
     bookmarkRemove: 'ブックマークを外す',
+    filterLabel: 'ブックマーク',
     filterBookmarks: 'ブックマークのみ表示',
     filterAll: 'すべて表示',
   },

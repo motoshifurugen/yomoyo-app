@@ -18,6 +18,7 @@ const en = {
     modalClose: 'Close',
     bookmarkAdd: 'Save bookmark',
     bookmarkRemove: 'Remove bookmark',
+    filterLabel: 'Bookmarks',
     filterBookmarks: 'Show bookmarks only',
     filterAll: 'Show all',
   },
