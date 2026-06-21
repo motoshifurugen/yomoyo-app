@@ -20,6 +20,8 @@ const GOOGLE_SERVICES_ANDROID = IS_PROD
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
+  name: config.name ?? 'Yomoyo',
+  slug: config.slug ?? 'yomoyo',
   ios: {
     ...config.ios,
     bundleIdentifier:

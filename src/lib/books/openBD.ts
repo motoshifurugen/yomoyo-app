@@ -1,4 +1,5 @@
 import type { Book } from './searchBooks';
+import { lookupByIsbnFromGoogleBooks } from './searchBooks';
 import { resolveCoverForIsbn } from './coverFallback';
 
 const OPENBD_BASE_URL = 'https://api.openbd.jp/v1/get';
@@ -51,11 +52,13 @@ export async function lookupByIsbn(isbn: string): Promise<Book | null> {
   }
 
   const data = (await response.json()) as OpenBdRecord[];
-  if (!Array.isArray(data) || data.length === 0) return null;
+  if (!Array.isArray(data) || data.length === 0) {
+    return lookupByIsbnFromGoogleBooks(isbn);
+  }
 
   const record = data[0];
   const title = record?.summary?.title?.trim();
-  if (!title) return null;
+  if (!title) return lookupByIsbnFromGoogleBooks(isbn);
 
   let thumbnail = safeHttpsCover(record?.summary?.cover);
   if (!thumbnail) {

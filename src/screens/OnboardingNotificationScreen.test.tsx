@@ -196,8 +196,8 @@ describe('OnboardingNotificationScreen', () => {
   });
 
   it('does not log push token in production mode', async () => {
-    const originalDev = global.__DEV__;
-    global.__DEV__ = false;
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
@@ -213,7 +213,7 @@ describe('OnboardingNotificationScreen', () => {
       expect(pushTokenLogs).toHaveLength(0);
       expect(pushTokenWarns).toHaveLength(0);
     } finally {
-      global.__DEV__ = originalDev;
+      (global as any).__DEV__ = originalDev;
       logSpy.mockRestore();
       warnSpy.mockRestore();
     }

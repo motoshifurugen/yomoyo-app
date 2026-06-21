@@ -34,7 +34,7 @@ import i18n, { loadSavedLanguage } from '@/lib/i18n';
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(loadSavedLanguage).mockResolvedValue(null);
-  jest.mocked(i18n.changeLanguage).mockResolvedValue(undefined);
+  jest.mocked(i18n.changeLanguage).mockResolvedValue(undefined as any);
 });
 
 describe('App startup', () => {

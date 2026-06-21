@@ -1,0 +1,14 @@
+# TAKT project configuration for yomoyo-app
+# See ~/.takt/config.yaml for global defaults; this file overrides them.
+#
+# Provider: reuse the Claude Code CLI (existing subscription / auth).
+#   Do NOT switch to claude-sdk without setting TAKT_ANTHROPIC_API_KEY.
+provider: claude
+model: sonnet
+language: ja
+
+# Allow command-type quality gates (disabled by default for safety).
+# Required by yomoyo-dev's gates: `pnpm test`, `pnpm exec tsc --noEmit`, `pnpm lint`.
+# Only enable because the gate commands are trusted project scripts.
+workflow_command_gates:
+  custom_scripts: true

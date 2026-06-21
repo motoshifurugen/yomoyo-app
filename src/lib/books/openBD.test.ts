@@ -214,4 +214,117 @@ describe('lookupByIsbn', () => {
 
     expect(book?.thumbnail).toBeNull();
   });
+
+  // --- Google Books fallback tests ---
+
+  function makeResponse(body: unknown, ok = true, status = 200): Response {
+    return {
+      ok,
+      status,
+      json: async () => body,
+    } as unknown as Response;
+  }
+
+  it('falls back to Google Books when openBD returns [null] (no match)', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([null]))
+      .mockResolvedValueOnce(
+        makeResponse({
+          items: [
+            {
+              id: 'gb123',
+              volumeInfo: {
+                title: 'Clean Code',
+                authors: ['Robert C. Martin'],
+                imageLinks: { thumbnail: 'http://books.google.com/cover.jpg' },
+              },
+            },
+          ],
+        }),
+      ) as unknown as typeof fetch;
+
+    const book = await lookupByIsbn('9780132350884');
+
+    expect(book).toEqual({
+      id: 'isbn:9780132350884',
+      title: 'Clean Code',
+      authors: ['Robert C. Martin'],
+      thumbnail: 'https://books.google.com/cover.jpg',
+    });
+  });
+
+  it('falls back to Google Books when openBD returns [] (empty array)', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([]))
+      .mockResolvedValueOnce(
+        makeResponse({
+          items: [
+            {
+              id: 'gb456',
+              volumeInfo: {
+                title: 'The Pragmatic Programmer',
+                authors: ['David Thomas', 'Andrew Hunt'],
+              },
+            },
+          ],
+        }),
+      ) as unknown as typeof fetch;
+
+    const book = await lookupByIsbn('9780135957059');
+
+    expect(book?.title).toBe('The Pragmatic Programmer');
+  });
+
+  it('does not call Google Books when openBD returns a valid book', async () => {
+    const fetchMock = jest.fn().mockResolvedValueOnce(
+      makeResponse([
+        {
+          summary: {
+            title: 'ノルウェイの森',
+            author: '村上 春樹',
+            cover: 'https://cover.openbd.jp/x.jpg',
+          },
+        },
+      ]),
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await lookupByIsbn('9784101001456');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns null when both openBD and Google Books miss', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([null]))
+      .mockResolvedValueOnce(makeResponse({})) as unknown as typeof fetch;
+
+    const book = await lookupByIsbn('9780000000002');
+    expect(book).toBeNull();
+  });
+
+  it('returns null when openBD title is empty and Google Books also misses', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([{ summary: { title: '' } }]))
+      .mockResolvedValueOnce(makeResponse({})) as unknown as typeof fetch;
+
+    const book = await lookupByIsbn('9780000000002');
+    expect(book).toBeNull();
+  });
+
+  it('throws when the Google Books fallback HTTP response is not ok', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([null]))
+      .mockResolvedValueOnce(makeResponse(null, false, 503)) as unknown as typeof fetch;
+
+    await expect(lookupByIsbn('9780000000002')).rejects.toThrow(/503/);
+  });
+
+  it('propagates network errors from the Google Books fallback fetch', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce(makeResponse([null]))
+      .mockRejectedValueOnce(new Error('Network failure')) as unknown as typeof fetch;
+
+    await expect(lookupByIsbn('9780000000002')).rejects.toThrow('Network failure');
+  });
 });

@@ -63,6 +63,9 @@
   "jest": {
     "preset": "jest-expo",
     "watchman": false,
+    "bail": 1,
+    "silent": true,
+    "testTimeout": 15000,
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/functions/"

@@ -42,7 +42,11 @@ function setPermission(granted: boolean) {
       status: granted ? 'granted' : 'denied',
       granted,
     } as any),
-  ]);
+    jest.fn().mockResolvedValue({
+      status: granted ? 'granted' : 'denied',
+      granted,
+    } as any),
+  ] as any);
 }
 
 function fireScan(data: string) {

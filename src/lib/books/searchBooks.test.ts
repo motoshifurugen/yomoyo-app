@@ -1,4 +1,4 @@
-import { searchBooks } from './searchBooks';
+import { searchBooks, lookupByIsbnFromGoogleBooks } from './searchBooks';
 
 function makeFetchOk(body: object): Response {
   return {
@@ -138,5 +138,105 @@ describe('searchBooks', () => {
     const url = spy.mock.calls[0][0] as string;
     expect(url).not.toContain('key=');
     process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY = original;
+  });
+});
+
+describe('lookupByIsbnFromGoogleBooks', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  const CLEAN_CODE_VOLUME = {
+    id: 'gBook123',
+    volumeInfo: {
+      title: 'Clean Code',
+      authors: ['Robert C. Martin'],
+      imageLinks: { thumbnail: 'http://books.google.com/cover.jpg' },
+    },
+  };
+
+  it('returns a Book when Google Books has a match', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({ items: [CLEAN_CODE_VOLUME] }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780132350884');
+    expect(book).toEqual({
+      id: 'isbn:9780132350884',
+      title: 'Clean Code',
+      authors: ['Robert C. Martin'],
+      thumbnail: 'https://books.google.com/cover.jpg',
+    });
+  });
+
+  it('returns null when Google Books has no items', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    const book = await lookupByIsbnFromGoogleBooks('9780000000002');
+    expect(book).toBeNull();
+  });
+
+  it('returns null when the volume has no title', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({
+        items: [{ id: 'x', volumeInfo: {} }],
+      }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780000000002');
+    expect(book).toBeNull();
+  });
+
+  it('defaults authors to empty array when missing', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({
+        items: [{ id: 'x', volumeInfo: { title: 'No Authors Book' } }],
+      }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780000000002');
+    expect(book?.authors).toEqual([]);
+  });
+
+  it('sets thumbnail to null when imageLinks is missing', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({
+        items: [{ id: 'x', volumeInfo: { title: 'No Thumb', authors: ['A'] } }],
+      }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780000000002');
+    expect(book?.thumbnail).toBeNull();
+  });
+
+  it('converts http thumbnail URL to https', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({ items: [CLEAN_CODE_VOLUME] }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780132350884');
+    expect(book?.thumbnail).toBe('https://books.google.com/cover.jpg');
+  });
+
+  it('uses isbn: prefix for book id instead of Google Books internal id', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(
+      makeFetchOk({ items: [CLEAN_CODE_VOLUME] }),
+    );
+    const book = await lookupByIsbnFromGoogleBooks('9780132350884');
+    expect(book?.id).toBe('isbn:9780132350884');
+  });
+
+  it('calls the Google Books volumes endpoint with isbn: query param', async () => {
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    await lookupByIsbnFromGoogleBooks('9780132350884');
+    const url = spy.mock.calls[0][0] as string;
+    expect(url).toContain('isbn:9780132350884');
+    expect(url).toContain('googleapis.com/books');
+  });
+
+  it('throws when Google Books responds with an error status', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchError(503));
+    await expect(lookupByIsbnFromGoogleBooks('9780132350884')).rejects.toThrow(/503/);
+  });
+
+  it('propagates network errors from fetch', async () => {
+    jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Network failure'));
+    await expect(lookupByIsbnFromGoogleBooks('9780132350884')).rejects.toThrow(
+      'Network failure',
+    );
   });
 });

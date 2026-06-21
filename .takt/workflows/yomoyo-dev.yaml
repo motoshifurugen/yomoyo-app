@@ -1,0 +1,207 @@
+name: yomoyo-dev
+description: >
+  yomoyo-app の機能開発ワークフロー。既存の .claude/rules を state machine として強制する。
+  plan(計画) → TDD(RED→GREEN→REFACTOR) → code-review → security-review。
+  レビュー / セキュリティで指摘があれば実装(GREEN)へ差し戻すフィードバックループ付き。
+  コミットは takt がワークフロー完了後に隔離 worktree 上で自動作成する（push は手動）。
+
+initial_step: plan
+max_steps: 16
+interactive_mode: assistant
+
+# --- Facet section maps (paths are relative to this workflow YAML) ---
+personas:
+  planner: ../facets/personas/planner.md
+  tdd-guide: ../facets/personas/tdd-guide.md
+  code-reviewer: ../facets/personas/code-reviewer.md
+  security-reviewer: ../facets/personas/security-reviewer.md
+
+policies:
+  coding-style: ../facets/policies/coding-style.md
+  testing: ../facets/policies/testing.md
+  security: ../facets/policies/security.md
+  git-workflow: ../facets/policies/git-workflow.md
+
+knowledge:
+  yomoyo-architecture: ../facets/knowledge/yomoyo-architecture.md
+
+instructions:
+  plan: ../facets/instructions/plan.md
+  tdd-red: ../facets/instructions/tdd-red.md
+  tdd-green: ../facets/instructions/tdd-green.md
+  tdd-refactor: ../facets/instructions/tdd-refactor.md
+  review: ../facets/instructions/review.md
+  security: ../facets/instructions/security.md
+
+report_formats:
+  plan: ../facets/output-contracts/plan.md
+  tdd: ../facets/output-contracts/tdd.md
+  review: ../facets/output-contracts/review.md
+  security: ../facets/output-contracts/security.md
+
+# Default provider options applied unless a step overrides them.
+workflow_config:
+  provider_options:
+    claude:
+      effort: medium
+
+steps:
+  # 1. PLAN ─ planner agent 相当。読み取り専用で実装計画を立てる。
+  - name: plan
+    persona: planner
+    persona_name: Planner
+    policy: [coding-style, git-workflow]
+    knowledge: yomoyo-architecture
+    instruction: plan
+    edit: false
+    required_permission_mode: readonly
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, WebSearch, WebFetch]
+        effort: high
+    output_contracts:
+      report:
+        - name: 00-plan.md
+          format: plan
+    rules:
+      - condition: 計画が完成し、フェーズ・依存・リスクが整理された
+        next: tdd-red
+      - condition: ai("要件が曖昧で計画を立てられない")
+        next: ABORT
+
+  # 2a. RED ─ 失敗するテストを先に書く。
+  - name: tdd-red
+    persona: tdd-guide
+    persona_name: TDD Guide (RED)
+    policy: [testing, coding-style]
+    knowledge: yomoyo-architecture
+    instruction: tdd-red
+    edit: true
+    required_permission_mode: edit
+    pass_previous_response: true
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, Edit, Write, Bash]
+    output_contracts:
+      report:
+        - name: 01-tdd-red.md
+          format: tdd
+    quality_gates:
+      - type: command
+        name: tests-must-fail
+        command: bash -c "pnpm test || exit 0; exit 1"
+        timeout_ms: 600000
+    rules:
+      - condition: 失敗するテストを追加し、テストが期待どおり失敗することを確認した
+        next: tdd-green
+      - condition: ai("テスト不要の変更（純粋なリファクタ/設定/型のみ）であり、テストは免除される")
+        next: review
+
+  # 2b. GREEN ─ テストを通す最小実装。
+  - name: tdd-green
+    persona: tdd-guide
+    persona_name: TDD Guide (GREEN)
+    policy: [testing, coding-style]
+    knowledge: yomoyo-architecture
+    instruction: tdd-green
+    edit: true
+    required_permission_mode: edit
+    pass_previous_response: true
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, Edit, Write, Bash]
+    output_contracts:
+      report:
+        - name: 02-tdd-green.md
+          format: tdd
+    quality_gates:
+      - type: command
+        name: tests-must-pass
+        command: pnpm test
+        timeout_ms: 600000
+      - type: command
+        name: typecheck
+        command: pnpm exec tsc --noEmit
+        timeout_ms: 600000
+    rules:
+      - condition: 全テストが通過した
+        next: tdd-refactor
+      - condition: ai("実装が未完了で、さらにテスト追加と実装の往復が必要")
+        next: tdd-red
+
+  # 2c. REFACTOR ─ 振る舞いを変えずに構造を整える。
+  - name: tdd-refactor
+    persona: tdd-guide
+    persona_name: TDD Guide (REFACTOR)
+    policy: [coding-style, testing]
+    knowledge: yomoyo-architecture
+    instruction: tdd-refactor
+    edit: true
+    required_permission_mode: edit
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, Edit, Write, Bash]
+    output_contracts:
+      report:
+        - name: 03-tdd-refactor.md
+          format: tdd
+    quality_gates:
+      - type: command
+        name: tests-still-pass
+        command: pnpm test
+        timeout_ms: 600000
+      - type: command
+        name: lint
+        command: pnpm lint
+        timeout_ms: 600000
+    rules:
+      - condition: リファクタが完了し、全テストが緑のまま
+        next: review
+      - condition: ai("別の振る舞いの追加が必要で、TDDサイクルを継続すべき")
+        next: tdd-red
+
+  # 3. CODE REVIEW ─ code-reviewer agent 相当。読み取り専用。
+  - name: review
+    persona: code-reviewer
+    persona_name: Code Reviewer
+    policy: [coding-style, testing]
+    knowledge: yomoyo-architecture
+    instruction: review
+    edit: false
+    required_permission_mode: readonly
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, Bash]
+        effort: high
+    output_contracts:
+      report:
+        - name: 04-review.md
+          format: review
+    rules:
+      - condition: CRITICAL/HIGH の指摘が無く、レビュー承認
+        next: security
+      - condition: ai("CRITICAL または HIGH の指摘があり、修正が必要")
+        next: tdd-green
+
+  # 4. SECURITY REVIEW ─ security-reviewer agent 相当。読み取り専用。
+  - name: security
+    persona: security-reviewer
+    persona_name: Security Reviewer
+    policy: [security]
+    knowledge: yomoyo-architecture
+    instruction: security
+    edit: false
+    required_permission_mode: readonly
+    provider_options:
+      claude:
+        allowed_tools: [Read, Glob, Grep, Bash]
+        effort: high
+    output_contracts:
+      report:
+        - name: 05-security.md
+          format: security
+    rules:
+      - condition: セキュリティ上の CRITICAL 問題が無く、コミット可
+        next: COMPLETE
+      - condition: ai("CRITICAL なセキュリティ問題があり、修正が必要")
+        next: tdd-green
