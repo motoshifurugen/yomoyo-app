@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import RootNavigator from '@/navigation/RootNavigator';
 import i18n, { loadSavedLanguage } from '@/lib/i18n';
 import { linkingConfig } from '@/navigation/linkingConfig';
-import { initAdMob } from '@/lib/ads/initAdMob';
+import { AdConsentProvider } from '@/lib/ads/AdConsentContext';
 import { ThemeProvider, useTheme } from '@/lib/theme';
 
 function ThemedRoot() {
@@ -45,16 +45,14 @@ export default function App() {
       .catch(() => setReady(true));
   }, []);
 
-  useEffect(() => {
-    void initAdMob();
-  }, []);
-
   if (!ready) return null;
 
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <ThemedRoot />
+        <AdConsentProvider>
+          <ThemedRoot />
+        </AdConsentProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

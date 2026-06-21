@@ -15,4 +15,10 @@ describe('TimelineBannerAd', () => {
     const banner = screen.getByTestId('timeline-banner-ad');
     expect(banner.props.size).toBe('ANCHORED_ADAPTIVE_BANNER');
   });
+
+  it('requests non-personalized ads by default (privacy-safe before consent)', () => {
+    render(<TimelineBannerAd />);
+    const banner = screen.getByTestId('timeline-banner-ad');
+    expect(banner.props.requestOptions).toEqual({ requestNonPersonalizedAdsOnly: true });
+  });
 });
