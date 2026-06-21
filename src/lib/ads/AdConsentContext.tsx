@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { gatherAdConsent } from './adConsent';
+import { requestAttPermission } from './requestAttPermission';
 import { initAdMob } from './initAdMob';
 
 export type AdConsentValue = {
@@ -17,14 +18,14 @@ export function AdConsentProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    // Gather consent first, then initialize the Ads SDK — UMP must precede ads.
-    gatherAdConsent()
-      .then((nonPersonalized) => {
-        if (active) setNonPersonalized(nonPersonalized);
-      })
-      .finally(() => {
-        void initAdMob();
-      });
+    // Order matters: UMP consent first, then iOS ATT, then initialize ads.
+    // Ads are non-personalized if UMP withholds consent OR ATT is not granted.
+    (async () => {
+      const umpNonPersonalized = await gatherAdConsent();
+      const trackingGranted = await requestAttPermission();
+      if (active) setNonPersonalized(umpNonPersonalized || !trackingGranted);
+      void initAdMob();
+    })();
     return () => {
       active = false;
     };
