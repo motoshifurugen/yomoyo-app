@@ -80,6 +80,11 @@ describe('ShelfScreen', () => {
     expect(screen.getByText('shelf.emptyFinished')).toBeTruthy();
   });
 
+  it('guides the user to record their first book in the empty state', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByText('shelf.emptyTitle')).toBeTruthy();
+  });
+
   it('subscribes to activities for the current user on mount', () => {
     render(<ShelfScreen />);
     expect(mockSubscribe).toHaveBeenCalledWith('user1', expect.any(Function));

@@ -56,6 +56,7 @@ const en = {
   },
   shelf: {
     finished: 'Finished',
+    emptyTitle: 'Record your first book',
     emptyFinished: 'No finished books yet',
     addBook: 'Add a finished book',
     markAsFinished: 'Mark as Finished',
