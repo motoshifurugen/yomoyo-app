@@ -7,6 +7,7 @@ import {
   type BookmarkFilterMode,
 } from '@/lib/books/bookmarkFilterContext';
 import FeedScreen from './FeedScreen';
+import { formatBookDate } from '@/lib/books/formatBookDate';
 
 function render(
   ui: React.ReactElement,
@@ -28,7 +29,7 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({ t: (key: string) => key, i18n: { language: 'en' } }),
 }));
 
 jest.mock('react-native-safe-area-context', () => ({
@@ -325,7 +326,7 @@ describe('FeedScreen — card content', () => {
     mockGetFriendsFeed.mockResolvedValue({ items: [withThumbnailAndDate], lastDoc: null });
     render(<FeedScreen />);
     await waitFor(() => screen.getByText('Dune'));
-    const expected = new Date('2026-05-19T00:00:00Z').toLocaleDateString();
+    const expected = formatBookDate(new Date('2026-05-19T00:00:00Z'), 'en');
     expect(screen.getByTestId('activity-date-act1').props.children).toBe(expected);
   });
 

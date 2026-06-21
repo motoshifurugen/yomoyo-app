@@ -18,6 +18,7 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, options?: { count?: number }) =>
       options && typeof options.count === 'number' ? `${key}:${options.count}` : key,
+    i18n: { language: 'ja' },
   }),
 }));
 
