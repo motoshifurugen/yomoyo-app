@@ -16,6 +16,7 @@ import ActivityDetailModal from '@/components/feed/ActivityDetailModal';
 import ActivityBookmarkButton from '@/components/feed/ActivityBookmarkButton';
 import AddFriendButton from '@/components/feed/AddFriendButton';
 import EmptyState from '@/components/ui/EmptyState';
+import { formatBookDate } from '@/lib/books/formatBookDate';
 import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
@@ -44,11 +45,14 @@ const ActivityCard = React.memo(function ActivityCard({
   onPress,
   onToggleBookmark,
 }: ActivityCardProps) {
+  const { i18n } = useTranslation();
   const styles = useThemedStyles(makeStyles);
   const avatarKey = item.displayAvatar as AnimalKey | undefined;
   const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
   const displayName = item.displayName ?? item.displayLabel;
-  const dateText = item.finishedAt ? item.finishedAt.toDate().toLocaleDateString() : null;
+  const dateText = item.finishedAt
+    ? formatBookDate(item.finishedAt.toDate(), i18n.language)
+    : null;
   return (
     <View style={styles.cardWrapper}>
       <PressableSurface

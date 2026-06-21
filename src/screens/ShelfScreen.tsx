@@ -19,6 +19,7 @@ import MyHandleCard from '@/components/shelf/MyHandleCard';
 import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
 import BookListItem from '@/components/books/BookListItem';
 import EmptyState from '@/components/ui/EmptyState';
+import { formatBookDate } from '@/lib/books/formatBookDate';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -26,7 +27,7 @@ const CTA_ICON_SIZE = 20;
 const CTA_GAP_ABOVE_TAB_BAR = 12;
 
 export default function ShelfScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
   const tabBarInset = useGlassTabBarInset();
   const { user } = useAuth();
@@ -85,7 +86,11 @@ export default function ShelfScreen() {
               title={item.title}
               authors={item.authors}
               thumbnail={item.thumbnail}
-              date={item.finishedAt ? item.finishedAt.toDate().toLocaleDateString() : undefined}
+              date={
+                item.finishedAt
+                  ? formatBookDate(item.finishedAt.toDate(), i18n.language)
+                  : undefined
+              }
             />
           ))
         )}
