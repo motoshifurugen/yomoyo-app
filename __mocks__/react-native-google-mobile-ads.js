@@ -8,8 +8,8 @@ const instance = {
 };
 const mobileAds = jest.fn(() => instance);
 
-const BannerAd = ({ unitId, size }) =>
-  React.createElement(View, { testID: 'timeline-banner-ad', unitId, size });
+const BannerAd = ({ unitId, size, requestOptions }) =>
+  React.createElement(View, { testID: 'timeline-banner-ad', unitId, size, requestOptions });
 
 const BannerAdSize = {
   ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER',
@@ -24,10 +24,30 @@ const TestIds = {
   REWARDED: 'ca-app-pub-3940256099942544/5224354917',
 };
 
+const AdsConsentStatus = {
+  UNKNOWN: 'UNKNOWN',
+  REQUIRED: 'REQUIRED',
+  NOT_REQUIRED: 'NOT_REQUIRED',
+  OBTAINED: 'OBTAINED',
+};
+
+const AdsConsent = {
+  requestInfoUpdate: jest.fn(() => Promise.resolve({ status: 'NOT_REQUIRED' })),
+  loadAndShowConsentFormIfRequired: jest.fn(() =>
+    Promise.resolve({ status: 'NOT_REQUIRED' }),
+  ),
+  getConsentInfo: jest.fn(() =>
+    Promise.resolve({ status: 'NOT_REQUIRED', canRequestAds: true }),
+  ),
+  getPurposeConsents: jest.fn(() => Promise.resolve('')),
+};
+
 module.exports = {
   __esModule: true,
   default: mobileAds,
   BannerAd,
   BannerAdSize,
   TestIds,
+  AdsConsentStatus,
+  AdsConsent,
 };
