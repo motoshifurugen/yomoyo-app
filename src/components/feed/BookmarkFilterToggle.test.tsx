@@ -33,6 +33,29 @@ describe('BookmarkFilterToggle', () => {
     );
   });
 
+  it('shows a visible bookmark label so the filter is self-explanatory', () => {
+    renderWithProvider(<BookmarkFilterToggle />);
+    expect(screen.getByText('timeline.filterLabel')).toBeTruthy();
+  });
+
+  it('applies an active pill background only when bookmarks-only is selected', () => {
+    const flatten = (style: unknown) =>
+      Object.assign({}, ...(Array.isArray(style) ? style : [style]).filter(Boolean));
+    renderWithProvider(
+      <>
+        <ModeProbe />
+        <BookmarkFilterToggle />
+      </>,
+    );
+    const before = flatten(screen.getByTestId('bookmark-filter-toggle').props.style);
+    expect(before.backgroundColor).toBeUndefined();
+    act(() => {
+      fireEvent.press(screen.getByTestId('bookmark-filter-toggle'));
+    });
+    const after = flatten(screen.getByTestId('bookmark-filter-toggle').props.style);
+    expect(after.backgroundColor).toBeDefined();
+  });
+
   it('flips the filter mode when pressed', () => {
     renderWithProvider(
       <>
