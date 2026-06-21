@@ -1,5 +1,24 @@
 const BASE_URL = 'https://www.googleapis.com/books/v1/volumes';
 
+// Google Books requires a `country` (ISO 3166-1 alpha-2) param; without it the
+// API returns 403 / empty results for many regions. Default to the broadest
+// catalog (US) when the device locale carries no region subtag.
+const DEFAULT_COUNTRY = 'US';
+
+export function resolveCountryFromLocale(locale: string | undefined | null): string {
+  if (!locale) return DEFAULT_COUNTRY;
+  const region = locale.split(/[-_]/).find((part) => /^[A-Z]{2}$/.test(part));
+  return region ?? DEFAULT_COUNTRY;
+}
+
+function resolveCountryCode(): string {
+  try {
+    return resolveCountryFromLocale(Intl.DateTimeFormat().resolvedOptions().locale);
+  } catch {
+    return DEFAULT_COUNTRY;
+  }
+}
+
 export type Book = {
   id: string;
   title: string;
@@ -51,7 +70,7 @@ export async function lookupByIsbnFromGoogleBooks(isbn: string): Promise<Book | 
   const keyParam = apiKey ? `&key=${encodeURIComponent(apiKey)}` : '';
   // URLSearchParams encodes ':' as '%3A', which breaks the "isbn:<isbn>" query.
   // Use string concatenation to preserve the literal colon.
-  const url = `${BASE_URL}?q=isbn:${isbn}${keyParam}`;
+  const url = `${BASE_URL}?q=isbn:${isbn}&country=${resolveCountryCode()}${keyParam}`;
 
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Books API error: ${response.status}`);
@@ -72,7 +91,7 @@ export async function lookupByIsbnFromGoogleBooks(isbn: string): Promise<Book | 
 }
 
 export async function searchBooks(query: string): Promise<Book[]> {
-  const params = new URLSearchParams({ q: query });
+  const params = new URLSearchParams({ q: query, country: resolveCountryCode() });
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY;
   if (apiKey) params.append('key', apiKey);
 

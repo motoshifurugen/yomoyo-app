@@ -1,4 +1,8 @@
-import { searchBooks, lookupByIsbnFromGoogleBooks } from './searchBooks';
+import {
+  searchBooks,
+  lookupByIsbnFromGoogleBooks,
+  resolveCountryFromLocale,
+} from './searchBooks';
 
 function makeFetchOk(body: object): Response {
   return {
@@ -139,6 +143,34 @@ describe('searchBooks', () => {
     expect(url).not.toContain('key=');
     process.env.EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY = original;
   });
+
+  it('includes a country param in the fetch URL', async () => {
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    await searchBooks('gatsby');
+    const url = spy.mock.calls[0][0] as string;
+    expect(url).toMatch(/[?&]country=[A-Z]{2}\b/);
+  });
+});
+
+describe('resolveCountryFromLocale', () => {
+  it('extracts the region subtag from a full locale', () => {
+    expect(resolveCountryFromLocale('en-US')).toBe('US');
+    expect(resolveCountryFromLocale('ja-JP')).toBe('JP');
+  });
+
+  it('skips script subtags and returns the region', () => {
+    expect(resolveCountryFromLocale('zh-Hant-TW')).toBe('TW');
+  });
+
+  it('falls back to US when the locale has no region subtag', () => {
+    expect(resolveCountryFromLocale('ja')).toBe('US');
+  });
+
+  it('falls back to US for empty or nullish input', () => {
+    expect(resolveCountryFromLocale('')).toBe('US');
+    expect(resolveCountryFromLocale(undefined)).toBe('US');
+    expect(resolveCountryFromLocale(null)).toBe('US');
+  });
 });
 
 describe('lookupByIsbnFromGoogleBooks', () => {
@@ -226,6 +258,13 @@ describe('lookupByIsbnFromGoogleBooks', () => {
     const url = spy.mock.calls[0][0] as string;
     expect(url).toContain('isbn:9780132350884');
     expect(url).toContain('googleapis.com/books');
+  });
+
+  it('includes a country param in the fetch URL', async () => {
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(makeFetchOk({}));
+    await lookupByIsbnFromGoogleBooks('9780132350884');
+    const url = spy.mock.calls[0][0] as string;
+    expect(url).toMatch(/[?&]country=[A-Z]{2}\b/);
   });
 
   it('throws when Google Books responds with an error status', async () => {
