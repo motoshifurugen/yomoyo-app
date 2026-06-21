@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import ScreenContainer from '@/components/layout/ScreenContainer';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
 import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
@@ -17,6 +17,7 @@ import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
 import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
 import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
+import BookListItem from '@/components/books/BookListItem';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -74,24 +75,13 @@ export default function ShelfScreen() {
           <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
         ) : (
           activities.map((item) => (
-            <View key={item.id} style={styles.card}>
-              {item.thumbnail ? (
-                <Image
-                  source={{ uri: item.thumbnail }}
-                  style={styles.thumbnail}
-                  accessibilityLabel={item.title}
-                />
-              ) : (
-                <View style={[styles.thumbnail, styles.thumbnailPlaceholder]} />
-              )}
-              <View style={styles.cardInfo}>
-                <Text style={styles.bookTitle}>{item.title}</Text>
-                <Text style={styles.author}>{item.authors.join(', ')}</Text>
-                {item.finishedAt && (
-                  <Text style={styles.date}>{item.finishedAt.toDate().toLocaleDateString()}</Text>
-                )}
-              </View>
-            </View>
+            <BookListItem
+              key={item.id}
+              title={item.title}
+              authors={item.authors}
+              thumbnail={item.thumbnail}
+              date={item.finishedAt ? item.finishedAt.toDate().toLocaleDateString() : undefined}
+            />
           ))
         )}
       </ScrollView>
@@ -113,18 +103,18 @@ export default function ShelfScreen() {
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     fixedHeader: {
-      paddingTop: 16,
+      paddingTop: spacing.lg,
     },
     scroll: {
       flex: 1,
     },
     content: {
-      paddingBottom: 16,
+      paddingBottom: spacing.lg,
     },
     statsBlock: {
       alignItems: 'center',
-      marginTop: 8,
-      marginBottom: 16,
+      marginTop: spacing.sm,
+      marginBottom: spacing.lg,
     },
     countLine: {
       fontSize: 14,
@@ -135,52 +125,12 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenTitleSize,
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
-      marginBottom: 12,
+      marginBottom: spacing.md,
     },
     emptyText: {
       fontSize: yomoyoTypography.screenBodySize,
       color: colors.muted,
-      marginBottom: 8,
-    },
-    card: {
-      flexDirection: 'row',
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 12,
-      marginBottom: 12,
-      shadowColor: colors.text,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    thumbnail: {
-      width: 52,
-      height: 72,
-      borderRadius: 6,
-      marginRight: 12,
-    },
-    thumbnailPlaceholder: {
-      backgroundColor: colors.border,
-    },
-    cardInfo: {
-      flex: 1,
-      justifyContent: 'center',
-    },
-    bookTitle: {
-      fontSize: yomoyoTypography.screenBodySize,
-      fontWeight: yomoyoTypography.buttonWeight,
-      color: colors.text,
-      marginBottom: 4,
-    },
-    author: {
-      fontSize: 14,
-      color: colors.secondaryText,
-      marginBottom: 4,
-    },
-    date: {
-      fontSize: 13,
-      color: colors.muted,
+      marginBottom: spacing.sm,
     },
     cta: {
       flexDirection: 'row',
@@ -190,7 +140,7 @@ const makeStyles = (colors: ThemeColors) =>
       borderRadius: 14,
       paddingVertical: 14,
       paddingHorizontal: 20,
-      gap: 8,
+      gap: spacing.sm,
     },
     ctaText: {
       color: colors.surface,

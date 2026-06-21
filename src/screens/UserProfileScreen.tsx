@@ -14,9 +14,10 @@ import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
 import { bucketActivitiesByWeek, HISTORY_WINDOW_WEEKS } from '@/lib/books/readingHistory';
 import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
+import BookListItem from '@/components/books/BookListItem';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -165,21 +166,12 @@ export default function UserProfileScreen() {
           <Text style={styles.emptyText}>{t('userProfile.emptyBooks')}</Text>
         ) : (
           activities.map((item) => (
-            <View key={item.id} style={styles.card}>
-              {item.thumbnail ? (
-                <Image
-                  source={{ uri: item.thumbnail }}
-                  style={styles.thumbnail}
-                  accessibilityLabel={item.title}
-                />
-              ) : (
-                <View style={[styles.thumbnail, styles.thumbnailPlaceholder]} />
-              )}
-              <View style={styles.cardInfo}>
-                <Text style={styles.bookTitle}>{item.title}</Text>
-                <Text style={styles.author}>{item.authors.join(', ')}</Text>
-              </View>
-            </View>
+            <BookListItem
+              key={item.id}
+              title={item.title}
+              authors={item.authors}
+              thumbnail={item.thumbnail}
+            />
           ))
         )}
       </ScrollView>
@@ -190,9 +182,9 @@ export default function UserProfileScreen() {
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     navButton: {
-      paddingHorizontal: 16,
-      paddingBottom: 8,
-      marginLeft: 8,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: spacing.sm,
+      marginLeft: spacing.sm,
       alignSelf: 'flex-start',
     },
     navButtonText: {
@@ -201,23 +193,23 @@ const makeStyles = (colors: ThemeColors) =>
     },
     ownProfileBlock: {
       alignItems: 'center',
-      marginBottom: 32,
+      marginBottom: spacing.xxl,
     },
     ownPageNote: {
       fontSize: yomoyoTypography.screenBodySize,
       color: colors.secondaryText,
-      marginBottom: 16,
+      marginBottom: spacing.lg,
     },
     ownActionsRow: {
       flexDirection: 'row',
-      gap: 12,
+      gap: spacing.md,
     },
     shelfButton: {
       borderRadius: 20,
       borderWidth: 1,
       borderColor: colors.border,
       paddingVertical: 10,
-      paddingHorizontal: 24,
+      paddingHorizontal: spacing.xl,
     },
     shelfButtonText: {
       fontSize: yomoyoTypography.screenBodySize,
@@ -225,16 +217,16 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.text,
     },
     content: {
-      paddingTop: 16,
-      paddingBottom: 24,
+      paddingTop: spacing.lg,
+      paddingBottom: spacing.xl,
     },
     identityBlock: {
       alignItems: 'center',
-      marginBottom: 16,
+      marginBottom: spacing.lg,
     },
     statsBlock: {
       alignItems: 'center',
-      marginBottom: 24,
+      marginBottom: spacing.xl,
     },
     countLine: {
       fontSize: 14,
@@ -245,7 +237,7 @@ const makeStyles = (colors: ThemeColors) =>
       width: 72,
       height: 72,
       borderRadius: 36,
-      marginBottom: 12,
+      marginBottom: spacing.md,
     },
     displayName: {
       fontSize: yomoyoTypography.screenTitleSize,
@@ -259,7 +251,7 @@ const makeStyles = (colors: ThemeColors) =>
       borderColor: colors.primary,
       paddingVertical: 10,
       paddingHorizontal: 28,
-      marginBottom: 32,
+      marginBottom: spacing.xxl,
     },
     followButtonActive: {
       backgroundColor: colors.primary,
@@ -276,7 +268,7 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: 14,
       fontWeight: '600',
       color: colors.secondaryText,
-      marginBottom: 12,
+      marginBottom: spacing.md,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
     },
@@ -284,45 +276,10 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenBodySize,
       color: colors.muted,
     },
-    card: {
-      flexDirection: 'row',
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 12,
-      marginBottom: 12,
-      shadowColor: colors.text,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    thumbnail: {
-      width: 52,
-      height: 72,
-      borderRadius: 6,
-      marginRight: 12,
-    },
-    thumbnailPlaceholder: {
-      backgroundColor: colors.border,
-    },
-    cardInfo: {
-      flex: 1,
-      justifyContent: 'center',
-    },
-    bookTitle: {
-      fontSize: yomoyoTypography.screenBodySize,
-      fontWeight: yomoyoTypography.buttonWeight,
-      color: colors.text,
-      marginBottom: 4,
-    },
-    author: {
-      fontSize: 14,
-      color: colors.secondaryText,
-    },
     notFound: {
       fontSize: yomoyoTypography.screenBodySize,
       color: colors.muted,
       textAlign: 'center',
-      marginTop: 48,
+      marginTop: spacing.xxxl,
     },
   });

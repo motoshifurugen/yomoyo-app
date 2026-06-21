@@ -4,18 +4,18 @@ import {
   Text,
   TextInput,
   FlatList,
-  Image,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PressableSurface from '@/components/ui/PressableSurface';
+import BookListItem from '@/components/books/BookListItem';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { searchBooks, type Book } from '@/lib/books/searchBooks';
 import type { RootStackParamList } from '@/navigation/types';
-import { yomoyoTypography } from '@/constants/yomoyoTheme';
+import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
 import { useThemedStyles, useTheme, type ThemeColors } from '@/lib/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -106,25 +106,15 @@ export default function BookSearchScreen() {
       <FlatList
         data={results ?? []}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <PressableSurface
-            style={styles.resultItem}
+          <BookListItem
+            title={item.title}
+            authors={item.authors}
+            thumbnail={item.thumbnail}
             onPress={() => handleSelect(item)}
-            accessibilityRole="button"
-            feedback="soft"
-          >
-            {item.thumbnail ? (
-              <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
-            ) : (
-              <View style={styles.thumbnailPlaceholder} />
-            )}
-            <View style={styles.bookInfo}>
-              <Text style={styles.bookTitle}>{item.title}</Text>
-              <Text style={styles.bookAuthor}>
-                {item.authors.length > 0 ? item.authors.join(', ') : t('bookSearch.unknownAuthor')}
-              </Text>
-            </View>
-          </PressableSurface>
+            unknownAuthorLabel={t('bookSearch.unknownAuthor')}
+          />
         )}
       />
     </View>
@@ -134,26 +124,26 @@ export default function BookSearchScreen() {
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
-    searchRow: { flexDirection: 'row', padding: 16, gap: 8 },
+    searchRow: { flexDirection: 'row', padding: spacing.lg, gap: spacing.sm },
     input: {
       flex: 1,
       borderWidth: 1,
       borderColor: colors.border,
       borderRadius: 8,
-      paddingHorizontal: 12,
+      paddingHorizontal: spacing.md,
       paddingVertical: 10,
       fontSize: yomoyoTypography.screenBodySize,
     },
     button: {
       backgroundColor: colors.primary,
       borderRadius: 8,
-      paddingHorizontal: 16,
+      paddingHorizontal: spacing.lg,
       justifyContent: 'center',
     },
     scanButton: {
       backgroundColor: colors.primary,
       borderRadius: 8,
-      paddingHorizontal: 12,
+      paddingHorizontal: spacing.md,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -165,7 +155,7 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenBodySize,
       fontWeight: yomoyoTypography.buttonWeight,
     },
-    loading: { marginTop: 24 },
+    loading: { marginTop: spacing.xl },
     errorText: {
       textAlign: 'center',
       marginTop: 40,
@@ -178,20 +168,8 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.muted,
       fontSize: yomoyoTypography.screenBodySize,
     },
-    resultItem: {
-      flexDirection: 'row',
-      padding: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+    listContent: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
     },
-    thumbnail: { width: 50, height: 72, borderRadius: 4, backgroundColor: colors.border },
-    thumbnailPlaceholder: { width: 50, height: 72, borderRadius: 4, backgroundColor: colors.border },
-    bookInfo: { flex: 1, marginLeft: 12, justifyContent: 'center' },
-    bookTitle: {
-      fontSize: 15,
-      fontWeight: yomoyoTypography.buttonWeight,
-      marginBottom: 4,
-      color: colors.text,
-    },
-    bookAuthor: { fontSize: 13, color: colors.secondaryText },
   });
