@@ -7,6 +7,10 @@ import {
   darkColors,
   lightGlass,
   darkGlass,
+  spacing,
+  fontSize,
+  fontWeight,
+  lineHeight,
 } from './yomoyoTheme';
 
 const COLOR_KEYS = [
@@ -190,5 +194,84 @@ describe('yomoyoSpacing', () => {
 
   it('has correct button border radius', () => {
     expect(yomoyoSpacing.buttonRadius).toBe(14);
+  });
+});
+
+describe('spacing scale (#109 shared baseline)', () => {
+  it('exposes a 4pt-based scale with documented steps', () => {
+    expect(spacing).toEqual({
+      none: 0,
+      xs: 4,
+      sm: 8,
+      md: 12,
+      lg: 16,
+      xl: 24,
+      xxl: 32,
+      xxxl: 48,
+    });
+  });
+
+  it('every step is a non-negative multiple of 4', () => {
+    Object.values(spacing).forEach((value) => {
+      expect(value % 4).toBe(0);
+      expect(value).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  it('steps increase monotonically', () => {
+    const values = Object.values(spacing);
+    const sorted = [...values].sort((a, b) => a - b);
+    expect(values).toEqual(sorted);
+  });
+});
+
+describe('typography primitive scales (#109 shared baseline)', () => {
+  it('fontSize scale exposes documented sizes', () => {
+    expect(fontSize).toEqual({
+      caption: 14,
+      body: 16,
+      bodyLg: 18,
+      title: 24,
+      display: 28,
+    });
+  });
+
+  it('fontWeight scale exposes the four brand weights', () => {
+    expect(fontWeight).toEqual({
+      regular: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+    });
+  });
+
+  it('lineHeight scale exposes body line heights', () => {
+    expect(lineHeight).toEqual({ body: 24, bodyLg: 26 });
+  });
+});
+
+describe('existing tokens derive from the shared baseline (no value drift)', () => {
+  it('yomoyoSpacing.horizontalPadding uses the xxl step', () => {
+    expect(yomoyoSpacing.horizontalPadding).toBe(spacing.xxl);
+  });
+
+  it('yomoyoTypography sizes map onto the font scale', () => {
+    expect(yomoyoTypography.titleSize).toBe(fontSize.display);
+    expect(yomoyoTypography.screenTitleSize).toBe(fontSize.title);
+    expect(yomoyoTypography.bodySize).toBe(fontSize.bodyLg);
+    expect(yomoyoTypography.screenBodySize).toBe(fontSize.body);
+    expect(yomoyoTypography.errorSize).toBe(fontSize.caption);
+  });
+
+  it('yomoyoTypography line heights map onto the lineHeight scale', () => {
+    expect(yomoyoTypography.bodyLineHeight).toBe(lineHeight.bodyLg);
+    expect(yomoyoTypography.screenBodyLineHeight).toBe(lineHeight.body);
+  });
+
+  it('yomoyoTypography weights map onto the fontWeight scale', () => {
+    expect(yomoyoTypography.titleWeight).toBe(fontWeight.bold);
+    expect(yomoyoTypography.bodyWeight).toBe(fontWeight.regular);
+    expect(yomoyoTypography.buttonWeight).toBe(fontWeight.semibold);
+    expect(yomoyoTypography.secondaryActionWeight).toBe(fontWeight.medium);
   });
 });
