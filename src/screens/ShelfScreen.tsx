@@ -18,6 +18,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
 import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
 import BookListItem from '@/components/books/BookListItem';
+import EmptyState from '@/components/ui/EmptyState';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -72,7 +73,11 @@ export default function ShelfScreen() {
         showsVerticalScrollIndicator={false}
       >
         {activities.length === 0 ? (
-          <Text style={styles.emptyText}>{t('shelf.emptyFinished')}</Text>
+          <EmptyState
+            icon="book-outline"
+            title={t('shelf.emptyTitle')}
+            message={t('shelf.emptyFinished')}
+          />
         ) : (
           activities.map((item) => (
             <BookListItem
@@ -109,6 +114,7 @@ const makeStyles = (colors: ThemeColors) =>
       flex: 1,
     },
     content: {
+      flexGrow: 1,
       paddingBottom: spacing.lg,
     },
     statsBlock: {
@@ -126,11 +132,6 @@ const makeStyles = (colors: ThemeColors) =>
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
       marginBottom: spacing.md,
-    },
-    emptyText: {
-      fontSize: yomoyoTypography.screenBodySize,
-      color: colors.muted,
-      marginBottom: spacing.sm,
     },
     cta: {
       flexDirection: 'row',
