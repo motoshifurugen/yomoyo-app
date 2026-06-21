@@ -1,10 +1,12 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, Platform } from 'react-native';
 import { render, screen, waitFor } from '@testing-library/react-native';
 import { AdConsentProvider, useAdConsent } from './AdConsentContext';
 import { AdsConsent } from 'react-native-google-mobile-ads';
+import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 
 const mockAdsConsent = AdsConsent as jest.Mocked<typeof AdsConsent>;
+const mockRequestTracking = requestTrackingPermissionsAsync as jest.Mock;
 
 function Probe() {
   const { requestNonPersonalizedAdsOnly } = useAdConsent();
@@ -46,5 +48,20 @@ describe('AdConsentContext', () => {
       expect(mockAdsConsent.requestInfoUpdate).toHaveBeenCalled();
     });
     expect(screen.getByTestId('npa').props.children).toBe('true');
+  });
+
+  it('forces non-personalized ads when ATT tracking is denied even if UMP allows it', async () => {
+    Object.defineProperty(Platform, 'OS', { value: 'ios', configurable: true });
+    mockAdsConsent.getConsentInfo.mockResolvedValue({ status: 'NOT_REQUIRED' });
+    mockAdsConsent.getPurposeConsents.mockResolvedValue('');
+    mockRequestTracking.mockResolvedValue({ status: 'denied', granted: false });
+    render(
+      <AdConsentProvider>
+        <Probe />
+      </AdConsentProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('npa').props.children).toBe('true');
+    });
   });
 });
