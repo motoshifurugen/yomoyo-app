@@ -51,6 +51,7 @@ const en = {
   },
   bookDetail: {
     unknownAuthor: 'Unknown author',
+    goToShelf: 'View in shelf',
   },
   shelf: {
     finished: 'Finished',
