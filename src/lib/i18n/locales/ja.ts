@@ -8,8 +8,11 @@ const ja = {
   },
   timeline: {
     finishedReading: '読み終えました',
+    emptyTitle: '友達とつながろう',
     emptyBody: '友達の読了した記録が表示されます。',
+    emptyBookmarksTitle: 'ブックマークはまだありません',
     emptyBookmarks: 'ブックマークはまだありません。気になる本のしおりアイコンを押して保存できます。',
+    loadErrorTitle: '読み込めませんでした',
     loadErrorBody: '読み込みに失敗しました。もう一度お試しください。',
     modalViewProfile: 'プロフィールを見る',
     modalClose: '閉じる',

@@ -8,8 +8,11 @@ const en = {
   },
   timeline: {
     finishedReading: 'Finished reading',
+    emptyTitle: 'Connect with friends',
     emptyBody: 'Reading records from your friends will appear here.',
+    emptyBookmarksTitle: 'No bookmarks yet',
     emptyBookmarks: 'No bookmarks yet. Tap the bookmark icon on a card to save it.',
+    loadErrorTitle: "Couldn't load",
     loadErrorBody: 'Something went wrong. Please try again.',
     modalViewProfile: 'View profile',
     modalClose: 'Close',
