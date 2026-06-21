@@ -229,6 +229,17 @@ describe('SettingsDialog — logout', () => {
     });
     expect(screen.queryByText('settings.logoutError')).toBeNull();
   });
+
+  it('clears the logout error when the dialog is closed', async () => {
+    mockedSignOut.mockRejectedValueOnce(new Error('boom'));
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-logout'));
+    await waitFor(() => {
+      expect(screen.getByText('settings.logoutError')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('settings-dialog-close'));
+    expect(screen.queryByText('settings.logoutError')).toBeNull();
+  });
 });
 
 describe('SettingsDialog — close behavior', () => {

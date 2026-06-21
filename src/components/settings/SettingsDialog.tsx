@@ -167,12 +167,17 @@ export default function SettingsDialog({ visible, onClose }: Props) {
     }
   };
 
+  const handleClose = () => {
+    setLogoutError(null);
+    onClose();
+  };
+
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <PressableSurface
         testID="settings-dialog-backdrop"
         style={styles.backdrop}
-        onPress={onClose}
+        onPress={handleClose}
         accessibilityRole="button"
         feedback="soft"
       >
@@ -190,7 +195,7 @@ export default function SettingsDialog({ visible, onClose }: Props) {
           <DialogCloseButton
             testID="settings-dialog-close"
             label={t('settings.close')}
-            onPress={onClose}
+            onPress={handleClose}
             style={styles.closeButton}
           />
         </Pressable>
