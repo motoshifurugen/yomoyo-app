@@ -61,8 +61,22 @@ jest.mock('@/components/ui/GlassTabBar', () => ({
 
 jest.mock('@/screens/FeedScreen', () => () => null);
 jest.mock('@/screens/ShelfScreen', () => () => null);
-jest.mock('@/components/feed/AddFriendButton', () => () => null);
-jest.mock('@/components/settings/SettingsLauncher', () => () => null);
+jest.mock('@/components/feed/AddFriendButton', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () => React.createElement(View, { testID: 'add-friend-button-mock' }),
+  };
+});
+jest.mock('@/components/settings/SettingsLauncher', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () => React.createElement(View, { testID: 'settings-launcher-mock' }),
+  };
+});
 jest.mock('@/components/feed/BookmarkFilterToggle', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -78,23 +92,9 @@ beforeEach(() => {
   capturedScreenOptions = null;
 });
 
-describe('MainTabNavigator — header right gutter', () => {
-  it('applies an 8pt right gutter to the Timeline screen header', () => {
-    render(
-      <ThemeProvider>
-        <MainTabNavigator />
-      </ThemeProvider>,
-    );
-    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
-    expect(timeline).toBeDefined();
-    expect(timeline?.options).toEqual(
-      expect.objectContaining({
-        headerRightContainerStyle: { paddingRight: 8 },
-      }),
-    );
-  });
-
-  it('does not configure a header right gutter for the Shelf screen', () => {
+describe('MainTabNavigator — Shelf hosts the connect + settings actions', () => {
+  it('places AddFriend and Settings in the Shelf headerRight', () => {
+    const { render: rtlRender } = require('@testing-library/react-native');
     render(
       <ThemeProvider>
         <MainTabNavigator />
@@ -102,8 +102,40 @@ describe('MainTabNavigator — header right gutter', () => {
     );
     const shelf = capturedScreens.find((s) => s.name === 'Shelf');
     expect(shelf).toBeDefined();
-    expect(shelf?.options).not.toHaveProperty('headerRightContainerStyle');
-    expect(shelf?.options).not.toHaveProperty('headerRight');
+    const headerRight = (shelf?.options as Record<string, unknown>).headerRight as
+      | ((props?: unknown) => React.ReactElement)
+      | undefined;
+    expect(typeof headerRight).toBe('function');
+    const tree = rtlRender(<ThemeProvider>{headerRight!({})}</ThemeProvider>);
+    expect(tree.getByTestId('add-friend-button-mock')).toBeTruthy();
+    expect(tree.getByTestId('settings-launcher-mock')).toBeTruthy();
+    tree.unmount();
+  });
+
+  it('applies an 8pt right gutter to the Shelf screen header', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const shelf = capturedScreens.find((s) => s.name === 'Shelf');
+    expect(shelf?.options).toEqual(
+      expect.objectContaining({
+        headerRightContainerStyle: { paddingRight: 8 },
+      }),
+    );
+  });
+
+  it('keeps the Timeline screen free of header right actions (1 screen, 1 purpose)', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
+    expect(timeline).toBeDefined();
+    expect(timeline?.options).not.toHaveProperty('headerRight');
+    expect(timeline?.options).not.toHaveProperty('headerRightContainerStyle');
   });
 });
 

@@ -44,13 +44,6 @@ export default function MainTabNavigator() {
           title: t('tabs.timeline'),
           headerLeftContainerStyle: { paddingLeft: 8 },
           headerLeft: () => <BookmarkFilterToggle />,
-          headerRightContainerStyle: { paddingRight: 8 },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <AddFriendButton />
-              <SettingsLauncher />
-            </View>
-          ),
         }}
       />
       <Tab.Screen
@@ -58,6 +51,13 @@ export default function MainTabNavigator() {
         component={ShelfScreen}
         options={{
           title: t('tabs.shelf'),
+          headerRightContainerStyle: { paddingRight: 8 },
+          headerRight: () => (
+            <View style={styles.headerRight}>
+              <AddFriendButton />
+              <SettingsLauncher />
+            </View>
+          ),
         }}
       />
     </Tab.Navigator>
