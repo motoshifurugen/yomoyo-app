@@ -45,27 +45,66 @@ export const darkGlass = {
 export const yomoyoColors = lightColors;
 export const yomoyoGlass = lightGlass;
 
+// --- Shared baseline (#109) ---
+// A single source of truth for spacing and type so every screen can lay out
+// on the same rhythm. Semantic tokens below (yomoyoTypography / yomoyoSpacing)
+// derive from these primitives instead of repeating magic numbers.
+
+// 4pt-based spacing scale. Use these steps for padding, margins, and gaps so
+// whitespace stays consistent and "breathes" the same across screens.
+export const spacing = {
+  none: 0,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+  xxxl: 48,
+} as const;
+
+// Type scale primitives. Semantic typography tokens map onto these sizes.
+export const fontSize = {
+  caption: 14,
+  body: 16,
+  bodyLg: 18,
+  title: 24,
+  display: 28,
+} as const;
+
+export const fontWeight = {
+  regular: '400',
+  medium: '500',
+  semibold: '600',
+  bold: '700',
+} as const;
+
+export const lineHeight = {
+  body: 24,
+  bodyLg: 26,
+} as const;
+
 export const yomoyoTypography = {
-  titleSize: 28,
-  titleWeight: '700' as const,
-  bodySize: 18,
-  bodyLineHeight: 26,
-  bodyWeight: '400' as const,
-  buttonSize: 18,
-  buttonWeight: '600' as const,
+  titleSize: fontSize.display,
+  titleWeight: fontWeight.bold,
+  bodySize: fontSize.bodyLg,
+  bodyLineHeight: lineHeight.bodyLg,
+  bodyWeight: fontWeight.regular,
+  buttonSize: fontSize.bodyLg,
+  buttonWeight: fontWeight.semibold,
   secondaryActionSize: 17,
-  secondaryActionWeight: '500' as const,
-  subtitleSize: 18,
-  subtitleWeight: '400' as const,
-  errorSize: 14,
-  screenTitleSize: 24,
-  screenBodySize: 16,
-  screenBodyLineHeight: 24,
-  headerTitleSize: 18,
+  secondaryActionWeight: fontWeight.medium,
+  subtitleSize: fontSize.bodyLg,
+  subtitleWeight: fontWeight.regular,
+  errorSize: fontSize.caption,
+  screenTitleSize: fontSize.title,
+  screenBodySize: fontSize.body,
+  screenBodyLineHeight: lineHeight.body,
+  headerTitleSize: fontSize.bodyLg,
 } as const;
 
 export const yomoyoSpacing = {
-  horizontalPadding: 32,
+  horizontalPadding: spacing.xxl,
   buttonHeight: 56,
   buttonRadius: 14,
 } as const;
