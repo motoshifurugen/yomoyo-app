@@ -15,6 +15,7 @@ import ScreenContainer from '@/components/layout/ScreenContainer';
 import ActivityDetailModal from '@/components/feed/ActivityDetailModal';
 import ActivityBookmarkButton from '@/components/feed/ActivityBookmarkButton';
 import AddFriendButton from '@/components/feed/AddFriendButton';
+import EmptyState from '@/components/ui/EmptyState';
 import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
@@ -189,16 +190,20 @@ export default function FeedScreen() {
   const renderEmpty = () => {
     if (mode === 'bookmarks') {
       return (
-        <View style={styles.center}>
-          <Text style={styles.emptyBody}>{t('timeline.emptyBookmarks')}</Text>
-        </View>
+        <EmptyState
+          icon="bookmark-outline"
+          title={t('timeline.emptyBookmarksTitle')}
+          message={t('timeline.emptyBookmarks')}
+        />
       );
     }
     return (
-      <View style={styles.center}>
-        <Text style={styles.emptyBody}>{t('timeline.emptyBody')}</Text>
-        <AddFriendButton variant="inline" />
-      </View>
+      <EmptyState
+        icon="people-outline"
+        title={t('timeline.emptyTitle')}
+        message={t('timeline.emptyBody')}
+        action={<AddFriendButton variant="inline" />}
+      />
     );
   };
 
@@ -209,9 +214,11 @@ export default function FeedScreen() {
           <ActivityIndicator color={colors.primary} />
         </View>
       ) : hasError ? (
-        <View style={styles.center}>
-          <Text style={styles.emptyBody}>{t('timeline.loadErrorBody')}</Text>
-        </View>
+        <EmptyState
+          icon="cloud-offline-outline"
+          title={t('timeline.loadErrorTitle')}
+          message={t('timeline.loadErrorBody')}
+        />
       ) : items.length === 0 ? (
         renderEmpty()
       ) : (
@@ -244,12 +251,6 @@ const makeStyles = (colors: ThemeColors) =>
       alignItems: 'center',
       justifyContent: 'center',
       paddingHorizontal: 32,
-    },
-    emptyBody: {
-      fontSize: yomoyoTypography.screenBodySize,
-      lineHeight: yomoyoTypography.screenBodyLineHeight,
-      color: colors.secondaryText,
-      textAlign: 'center',
     },
     list: { paddingBottom: 16 },
     loader: { marginVertical: 16 },
