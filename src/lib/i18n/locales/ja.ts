@@ -56,6 +56,8 @@ const ja = {
   },
   shelf: {
     finished: '読み終えた本',
+    finishedCountInline_one: '（{{count}}冊）',
+    finishedCountInline_other: '（{{count}}冊）',
     emptyTitle: '最初の1冊を記録しよう',
     emptyFinished: '読み終えた本はまだありません',
     addBook: '本を追加',

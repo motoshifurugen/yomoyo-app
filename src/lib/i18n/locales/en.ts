@@ -56,6 +56,8 @@ const en = {
   },
   shelf: {
     finished: 'Finished',
+    finishedCountInline_one: '({{count}})',
+    finishedCountInline_other: '({{count}})',
     emptyTitle: 'Record your first book',
     emptyFinished: 'No finished books yet',
     addBook: 'Add a finished book',

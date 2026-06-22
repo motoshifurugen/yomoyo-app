@@ -85,7 +85,7 @@ export default function MyIdentityHeader({ uid }: Props) {
             feedback="standard"
             style={styles.nameButton}
           >
-            <Text style={styles.displayName} numberOfLines={1}>
+            <Text style={styles.displayName} numberOfLines={2}>
               {identity.displayName}
             </Text>
           </PressableSurface>
