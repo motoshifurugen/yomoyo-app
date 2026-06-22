@@ -1,18 +1,9 @@
-import { getAuth, signOut as firebaseSignOut } from '@react-native-firebase/auth';
 import { signOutJsSdk } from './jsSdkBridge';
 
+// Auth lives entirely on the Firebase JS SDK (see google.ts / apple.ts), so
+// signing out is a single JS SDK operation.
 export async function signOut(): Promise<void> {
-  // Sign out the JS SDK regardless of native outcome so that, on failure,
-  // the app does not retain a stale JS SDK session that the rules would honor.
-  const nativeResult = await Promise.allSettled([firebaseSignOut(getAuth())]);
-  const jsResult = await Promise.allSettled([signOutJsSdk()]);
-  const failure =
-    nativeResult[0].status === 'rejected'
-      ? nativeResult[0].reason
-      : jsResult[0].status === 'rejected'
-      ? jsResult[0].reason
-      : null;
-  if (failure) throw failure;
+  await signOutJsSdk();
 }
 
 export { signInWithGoogle } from './google';

@@ -1,8 +1,6 @@
-import { signOut as firebaseSignOut } from '@react-native-firebase/auth';
 import { signOut } from '@/lib/auth';
 import { signOutJsSdk } from '@/lib/auth/jsSdkBridge';
 
-jest.mock('@react-native-firebase/auth');
 jest.mock('@/lib/auth/jsSdkBridge', () => ({
   signOutJsSdk: jest.fn().mockResolvedValue(undefined),
 }));
@@ -10,21 +8,18 @@ jest.mock('@/lib/auth/jsSdkBridge', () => ({
 describe('signOut', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (signOutJsSdk as jest.Mock).mockResolvedValue(undefined);
   });
 
-  it('signs out of native and JS SDK auth', async () => {
-    jest.mocked(firebaseSignOut).mockResolvedValue(undefined);
-
+  it('signs out of the JS SDK', async () => {
     await signOut();
 
-    expect(jest.mocked(firebaseSignOut)).toHaveBeenCalledTimes(1);
     expect(signOutJsSdk).toHaveBeenCalledTimes(1);
   });
 
-  it('still signs out JS SDK even if native sign-out fails', async () => {
-    jest.mocked(firebaseSignOut).mockRejectedValueOnce(new Error('native fail'));
+  it('rethrows when JS SDK sign-out fails', async () => {
+    (signOutJsSdk as jest.Mock).mockRejectedValueOnce(new Error('signout failed'));
 
-    await expect(signOut()).rejects.toThrow('native fail');
-    expect(signOutJsSdk).toHaveBeenCalledTimes(1);
+    await expect(signOut()).rejects.toThrow('signout failed');
   });
 });

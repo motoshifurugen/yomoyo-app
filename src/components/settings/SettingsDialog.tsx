@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
+import { signOut } from '@/lib/auth';
 import {
   setLanguage,
   normalizeLanguage,
@@ -113,12 +114,40 @@ function LanguageSection({
   );
 }
 
+function LogoutSection({
+  styles,
+  t,
+  error,
+  onLogout,
+}: {
+  styles: Styles;
+  t: TFn;
+  error: string | null;
+  onLogout: () => void;
+}) {
+  return (
+    <View>
+      {error ? <Text style={styles.logoutError}>{error}</Text> : null}
+      <PressableSurface
+        testID="settings-dialog-logout"
+        style={styles.logoutButton}
+        onPress={onLogout}
+        accessibilityRole="button"
+        feedback="standard"
+      >
+        <Text style={styles.logoutText}>{t('settings.logout')}</Text>
+      </PressableSurface>
+    </View>
+  );
+}
+
 export default function SettingsDialog({ visible, onClose }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { mode, setMode } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const currentLanguage = normalizeLanguage(i18n.language);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   const handleLanguageChange = async (lang: Language) => {
     await setLanguage(lang);
@@ -127,12 +156,28 @@ export default function SettingsDialog({ visible, onClose }: Props) {
     }
   };
 
+  const handleLogout = async () => {
+    setLogoutError(null);
+    try {
+      await signOut();
+      // On success, useAuth() detects user=null and RootNavigator swaps to the
+      // Login screen, unmounting this dialog. No manual navigation needed.
+    } catch {
+      setLogoutError(t('settings.logoutError'));
+    }
+  };
+
+  const handleClose = () => {
+    setLogoutError(null);
+    onClose();
+  };
+
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <PressableSurface
         testID="settings-dialog-backdrop"
         style={styles.backdrop}
-        onPress={onClose}
+        onPress={handleClose}
         accessibilityRole="button"
         feedback="soft"
       >
@@ -145,11 +190,12 @@ export default function SettingsDialog({ visible, onClose }: Props) {
               current={currentLanguage}
               onSelect={handleLanguageChange}
             />
+            <LogoutSection styles={styles} t={t} error={logoutError} onLogout={handleLogout} />
           </View>
           <DialogCloseButton
             testID="settings-dialog-close"
             label={t('settings.close')}
-            onPress={onClose}
+            onPress={handleClose}
             style={styles.closeButton}
           />
         </Pressable>
@@ -209,5 +255,25 @@ const makeStyles = (colors: ThemeColors, glass: ThemeGlass) =>
     },
     closeButton: {
       marginTop: 16,
+    },
+    logoutButton: {
+      height: 52,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: glass.border,
+      backgroundColor: glass.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    logoutText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.error,
+    },
+    logoutError: {
+      fontSize: 14,
+      color: colors.error,
+      marginBottom: 12,
+      textAlign: 'center',
     },
   });

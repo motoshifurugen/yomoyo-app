@@ -6,6 +6,7 @@ import SettingsDialog from './SettingsDialog';
 import { setLanguage } from '@/lib/i18n';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import { THEME_STORAGE_KEY } from '@/lib/theme/themeStorage';
+import { signOut } from '@/lib/auth';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
@@ -28,6 +29,12 @@ jest.mock('react-i18next', () => ({
 jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { uid: 'user1' }, loading: false }),
 }));
+
+jest.mock('@/lib/auth', () => ({
+  signOut: jest.fn().mockResolvedValue(undefined),
+}));
+
+const mockedSignOut = signOut as jest.Mock;
 
 const mockedRegisterPushToken = registerPushTokenIfPermitted as jest.Mock;
 
@@ -183,6 +190,55 @@ describe('SettingsDialog — theme section', () => {
     await waitFor(() => {
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(THEME_STORAGE_KEY, 'system');
     });
+  });
+});
+
+describe('SettingsDialog — logout', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedSignOut.mockResolvedValue(undefined);
+  });
+
+  it('renders a logout button when visible', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByTestId('settings-dialog-logout')).toBeTruthy();
+  });
+
+  it('calls signOut when the logout button is pressed', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-logout'));
+    await waitFor(() => {
+      expect(mockedSignOut).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('shows an error message when signOut fails', async () => {
+    mockedSignOut.mockRejectedValueOnce(new Error('boom'));
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-logout'));
+    await waitFor(() => {
+      expect(screen.getByText('settings.logoutError')).toBeTruthy();
+    });
+  });
+
+  it('does not show an error message on successful logout', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-logout'));
+    await waitFor(() => {
+      expect(mockedSignOut).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.queryByText('settings.logoutError')).toBeNull();
+  });
+
+  it('clears the logout error when the dialog is closed', async () => {
+    mockedSignOut.mockRejectedValueOnce(new Error('boom'));
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-logout'));
+    await waitFor(() => {
+      expect(screen.getByText('settings.logoutError')).toBeTruthy();
+    });
+    fireEvent.press(screen.getByTestId('settings-dialog-close'));
+    expect(screen.queryByText('settings.logoutError')).toBeNull();
   });
 });
 

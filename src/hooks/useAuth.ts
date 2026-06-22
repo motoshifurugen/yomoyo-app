@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  getAuth as getNativeAuth,
-  onAuthStateChanged as nativeOnAuthStateChanged,
-} from '@react-native-firebase/auth';
-import { onAuthStateChanged as jsOnAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { jsSdkAuth } from '@/lib/firebase';
 import type { AuthUser } from '@/types/auth';
 
@@ -12,25 +8,19 @@ type AuthState = {
   loading: boolean;
 };
 
+// Auth is owned entirely by the Firebase JS SDK (the same client Firestore uses),
+// so observing it is the single source of truth for sign-in state.
 export function useAuth(): AuthState {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [nativeReady, setNativeReady] = useState(false);
-  const [jsReady, setJsReady] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = nativeOnAuthStateChanged(getNativeAuth(), (newUser) => {
+    const unsubscribe = onAuthStateChanged(jsSdkAuth, (newUser) => {
       setUser(newUser);
-      setNativeReady(true);
+      setReady(true);
     });
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    const unsubscribe = jsOnAuthStateChanged(jsSdkAuth, () => {
-      setJsReady(true);
-    });
-    return unsubscribe;
-  }, []);
-
-  return { user, loading: !(nativeReady && jsReady) };
+  return { user, loading: !ready };
 }

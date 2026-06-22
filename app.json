@@ -49,6 +49,7 @@
       ],
       "./plugins/withFmtConsteval",
       "./plugins/withFirebaseStaticFramework",
+      "./plugins/withAppleSignInEntitlement",
       "expo-notifications",
       [
         "expo-camera",

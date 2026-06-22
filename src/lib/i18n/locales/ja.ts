@@ -78,6 +78,8 @@ const ja = {
     themeSystem: 'システム',
     openSettings: '設定を開く',
     close: '閉じる',
+    logout: 'ログアウト',
+    logoutError: 'ログアウトに失敗しました。もう一度お試しください。',
   },
   userProfile: {
     follow: 'おたよりを受け取る',

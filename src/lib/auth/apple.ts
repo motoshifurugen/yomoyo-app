@@ -1,37 +1,25 @@
-import {
-  getAuth,
-  signInWithCredential,
-  signOut,
-  AppleAuthProvider,
-} from '@react-native-firebase/auth';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { bridgeAppleCredential } from './jsSdkBridge';
+import { assertProviderAllowed, setBoundProvider } from './deviceAccount';
 
-// iOS only — Apple Sign-In requires Apple Developer entitlement to run.
+// iOS only — Apple Sign-In requires the Apple Developer entitlement to run.
+//
+// The Apple identity token is single-use: it may only be exchanged with Firebase
+// once. We therefore exchange it ONLY on the Firebase JS SDK (which Firestore
+// uses). The native OS flow (appleAuth.performRequest) just yields the token.
 export async function signInWithApple(): Promise<void> {
-  const appleAuthResponse = await appleAuth.performRequest({
+  // Enforce one account per device before any OS prompt or credential exchange.
+  await assertProviderAllowed('apple');
+
+  const { identityToken, nonce } = await appleAuth.performRequest({
     requestedOperation: appleAuth.Operation.LOGIN,
     requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
   });
 
-  const { identityToken, nonce } = appleAuthResponse;
   if (!identityToken) {
     throw new Error('Apple sign-in failed: no identity token');
   }
 
-  const credential = AppleAuthProvider.credential(identityToken, nonce);
-  await signInWithCredential(getAuth(), credential);
-
-  try {
-    await bridgeAppleCredential(identityToken, nonce);
-  } catch (err) {
-    // Roll back native sign-in so the app never enters a partially signed-in
-    // state where Firestore queries would fail with permission-denied.
-    try {
-      await signOut(getAuth());
-    } catch {
-      // Best-effort rollback. If sign-out also fails, the bridge error wins.
-    }
-    throw err;
-  }
+  await bridgeAppleCredential(identityToken, nonce);
+  await setBoundProvider('apple');
 }
