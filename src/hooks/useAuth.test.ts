@@ -86,6 +86,51 @@ describe('useAuth', () => {
     expect(result.current.user).toEqual(nativeUser);
   });
 
+  it('does not expose a user until the JS SDK is also authenticated', async () => {
+    jest.mocked(nativeOnAuthStateChanged).mockReturnValue(jest.fn());
+    (jsOnAuthStateChanged as jest.Mock).mockReturnValue(jest.fn());
+
+    const native = captureCb(nativeOnAuthStateChanged as unknown as jest.Mock);
+    const js = captureCb(jsOnAuthStateChanged as jest.Mock);
+
+    const { result } = renderHook(() => useAuth());
+
+    // Fresh sign-in: the native client authenticates first while the JS SDK
+    // bridge is still pending. Exposing the user now would let Firestore queries
+    // fire before request.auth is set (permission-denied race).
+    await act(async () => {
+      native.fire({ uid: 'abc' });
+      js.fire(null);
+    });
+    expect(result.current.user).toBeNull();
+
+    // Bridge completes: the JS SDK (which Firestore uses) is now authenticated.
+    await act(async () => {
+      js.fire({ uid: 'abc' });
+    });
+    expect(result.current.user).toEqual({ uid: 'abc' });
+  });
+
+  it('clears the user as soon as the JS SDK signs out', async () => {
+    jest.mocked(nativeOnAuthStateChanged).mockReturnValue(jest.fn());
+    (jsOnAuthStateChanged as jest.Mock).mockReturnValue(jest.fn());
+
+    const native = captureCb(nativeOnAuthStateChanged as unknown as jest.Mock);
+    const js = captureCb(jsOnAuthStateChanged as jest.Mock);
+
+    const { result } = renderHook(() => useAuth());
+    await act(async () => {
+      native.fire({ uid: 'abc' });
+      js.fire({ uid: 'abc' });
+    });
+    expect(result.current.user).toEqual({ uid: 'abc' });
+
+    await act(async () => {
+      js.fire(null);
+    });
+    expect(result.current.user).toBeNull();
+  });
+
   it('unsubscribes from both auth listeners on unmount', () => {
     const nativeUnsub = jest.fn();
     const jsUnsub = jest.fn();

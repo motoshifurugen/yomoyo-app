@@ -13,24 +13,34 @@ type AuthState = {
 };
 
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [nativeUser, setNativeUser] = useState<AuthUser | null>(null);
+  const [jsUser, setJsUser] = useState<unknown>(null);
   const [nativeReady, setNativeReady] = useState(false);
   const [jsReady, setJsReady] = useState(false);
 
   useEffect(() => {
     const unsubscribe = nativeOnAuthStateChanged(getNativeAuth(), (newUser) => {
-      setUser(newUser);
+      setNativeUser(newUser);
       setNativeReady(true);
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    const unsubscribe = jsOnAuthStateChanged(jsSdkAuth, () => {
+    const unsubscribe = jsOnAuthStateChanged(jsSdkAuth, (newUser) => {
+      setJsUser(newUser);
       setJsReady(true);
     });
     return unsubscribe;
   }, []);
+
+  // Firestore access goes through the JS SDK, so the app is only truly
+  // authenticated once BOTH clients have a user. On a fresh sign-in the native
+  // client resolves first while the JS SDK bridge is still pending; gating the
+  // user on the JS SDK here makes navigation wait for the bridge so Firestore
+  // queries never fire before request.auth is set (permission-denied race).
+  // The native and JS uids are the same identity, so we surface the native user.
+  const user = nativeUser && jsUser ? nativeUser : null;
 
   return { user, loading: !(nativeReady && jsReady) };
 }
