@@ -1,5 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { bridgeGoogleCredential } from './jsSdkBridge';
+import { assertProviderAllowed, setBoundProvider } from './deviceAccount';
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -9,6 +10,9 @@ GoogleSignin.configure({
 // credential exchange happens ONLY on the JS SDK (which Firestore uses), so a
 // single client owns the session. See src/lib/auth/apple.ts for the rationale.
 export async function signInWithGoogle(): Promise<void> {
+  // Enforce one account per device before any OS prompt or credential exchange.
+  await assertProviderAllowed('google');
+
   const response = await GoogleSignin.signIn();
 
   if (response.type === 'cancelled') {
@@ -21,4 +25,5 @@ export async function signInWithGoogle(): Promise<void> {
   }
 
   await bridgeGoogleCredential(idToken);
+  await setBoundProvider('google');
 }
