@@ -7,13 +7,25 @@ Prefer the Firebase JS SDK (`firebase` npm package) for all data access.
 Use native RNFirebase modules only where the native OS layer is genuinely required.
 
 ### What uses native RNFirebase (do not change without explicit approval)
-- `@react-native-firebase/app` — native Firebase SDK bootstrap
-- `@react-native-firebase/auth` — required for Google Sign-In and Apple Sign-In credential exchange
-- `@react-native-google-signin/google-signin` — native Google Sign-In OS flow
-- `@invertase/react-native-apple-authentication` — native Apple Sign-In OS API
+- `@react-native-firebase/app` — native Firebase SDK bootstrap (kept; pods stay)
+- `@react-native-google-signin/google-signin` — native Google Sign-In OS flow (provides the OS idToken only)
+- `@invertase/react-native-apple-authentication` — native Apple Sign-In OS API (provides the OS identityToken only)
+
+### Auth runs entirely on the Firebase JS SDK
+All Firebase authentication — Google and Apple — is performed on the Firebase JS SDK
+(`firebase/auth`), not on native `@react-native-firebase/auth`. The native OS sign-in
+libraries above only yield the OS token; the JS SDK performs the single Firebase
+credential exchange (`src/lib/auth/jsSdkBridge.ts`, observed via `src/hooks/useAuth.ts`).
+
+**Do NOT exchange the same provider credential against both native RNFirebase auth and
+the JS SDK.** Apple identity tokens are single-use; a double exchange makes the second
+call fail with `auth/missing-or-invalid-nonce` ("Duplicate credential received") and
+breaks Apple Sign-In. Google tolerates it, Apple does not. One client (the JS SDK) owns
+the session, which also keeps Firestore's `request.auth` in sync without a bridge race.
 
 ### What must NOT use RNFirebase native modules
 - Firestore — uses `firebase/firestore` from the JS SDK (`src/lib/books/readingActivity.ts`)
+- Auth — uses `firebase/auth` from the JS SDK (see above)
 - Any future data access layer — default to the JS SDK
 
 ### Do not add new RNFirebase native modules without explicit approval

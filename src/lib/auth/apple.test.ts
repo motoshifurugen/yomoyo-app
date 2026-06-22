@@ -1,13 +1,7 @@
-import {
-  signInWithCredential,
-  signOut,
-  AppleAuthProvider,
-} from '@react-native-firebase/auth';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 import { signInWithApple } from '@/lib/auth/apple';
 import { bridgeAppleCredential } from '@/lib/auth/jsSdkBridge';
 
-jest.mock('@react-native-firebase/auth');
 jest.mock('@invertase/react-native-apple-authentication');
 jest.mock('@/lib/auth/jsSdkBridge', () => ({
   bridgeAppleCredential: jest.fn().mockResolvedValue(undefined),
@@ -16,18 +10,16 @@ jest.mock('@/lib/auth/jsSdkBridge', () => ({
 describe('signInWithApple', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (bridgeAppleCredential as jest.Mock).mockResolvedValue(undefined);
   });
 
-  it('signs in natively and bridges the same identity token to the JS SDK', async () => {
+  it('exchanges the Apple identity token with the JS SDK only (single exchange)', async () => {
     const mockToken = 'mock-identity-token';
     const mockNonce = 'mock-nonce';
     (appleAuth.performRequest as jest.Mock).mockResolvedValue({
       identityToken: mockToken,
       nonce: mockNonce,
     });
-    const mockCredential = { providerId: 'apple.com' };
-    jest.mocked(AppleAuthProvider.credential).mockReturnValue(mockCredential as any);
-    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
 
     await signInWithApple();
 
@@ -35,8 +27,6 @@ describe('signInWithApple', () => {
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
-    expect(jest.mocked(AppleAuthProvider.credential)).toHaveBeenCalledWith(mockToken, mockNonce);
-    expect(jest.mocked(signInWithCredential)).toHaveBeenCalledWith(expect.anything(), mockCredential);
     expect(bridgeAppleCredential).toHaveBeenCalledWith(mockToken, mockNonce);
   });
 
@@ -49,17 +39,13 @@ describe('signInWithApple', () => {
     await expect(signInWithApple()).rejects.toThrow('Apple sign-in failed: no identity token');
   });
 
-  it('rolls back native sign-in and rethrows when the JS SDK bridge fails', async () => {
+  it('propagates the error when the JS SDK sign-in fails (no rollback to swallow it)', async () => {
     (appleAuth.performRequest as jest.Mock).mockResolvedValue({
       identityToken: 'tok',
       nonce: 'n',
     });
-    jest.mocked(AppleAuthProvider.credential).mockReturnValue({} as any);
-    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
     (bridgeAppleCredential as jest.Mock).mockRejectedValueOnce(new Error('jsdk down'));
-    jest.mocked(signOut).mockResolvedValue(undefined);
 
     await expect(signInWithApple()).rejects.toThrow('jsdk down');
-    expect(jest.mocked(signOut)).toHaveBeenCalledTimes(1);
   });
 });

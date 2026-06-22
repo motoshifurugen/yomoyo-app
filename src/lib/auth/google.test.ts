@@ -1,13 +1,7 @@
-import {
-  signInWithCredential,
-  signOut,
-  GoogleAuthProvider,
-} from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { bridgeGoogleCredential } from '@/lib/auth/jsSdkBridge';
 
-jest.mock('@react-native-firebase/auth');
 jest.mock('@react-native-google-signin/google-signin');
 jest.mock('@/lib/auth/jsSdkBridge', () => ({
   bridgeGoogleCredential: jest.fn().mockResolvedValue(undefined),
@@ -16,23 +10,19 @@ jest.mock('@/lib/auth/jsSdkBridge', () => ({
 describe('signInWithGoogle', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (bridgeGoogleCredential as jest.Mock).mockResolvedValue(undefined);
   });
 
-  it('signs in natively and bridges the same idToken to the JS SDK', async () => {
+  it('exchanges the Google idToken with the JS SDK only (single exchange)', async () => {
     const mockIdToken = 'mock-google-id-token';
     (GoogleSignin.signIn as jest.Mock).mockResolvedValue({
       type: 'success',
       data: { idToken: mockIdToken },
     });
-    const mockCredential = { providerId: 'google.com' };
-    jest.mocked(GoogleAuthProvider.credential).mockReturnValue(mockCredential as any);
-    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
 
     await signInWithGoogle();
 
     expect(GoogleSignin.signIn).toHaveBeenCalled();
-    expect(jest.mocked(GoogleAuthProvider.credential)).toHaveBeenCalledWith(mockIdToken);
-    expect(jest.mocked(signInWithCredential)).toHaveBeenCalledWith(expect.anything(), mockCredential);
     expect(bridgeGoogleCredential).toHaveBeenCalledWith(mockIdToken);
   });
 
@@ -51,17 +41,13 @@ describe('signInWithGoogle', () => {
     await expect(signInWithGoogle()).rejects.toThrow('Google sign-in failed: no id token');
   });
 
-  it('rolls back native sign-in and rethrows when the JS SDK bridge fails', async () => {
+  it('propagates the error when the JS SDK sign-in fails (no rollback to swallow it)', async () => {
     (GoogleSignin.signIn as jest.Mock).mockResolvedValue({
       type: 'success',
       data: { idToken: 'tok' },
     });
-    jest.mocked(GoogleAuthProvider.credential).mockReturnValue({} as any);
-    jest.mocked(signInWithCredential).mockResolvedValue({ user: {} } as any);
     (bridgeGoogleCredential as jest.Mock).mockRejectedValueOnce(new Error('jsdk down'));
-    jest.mocked(signOut).mockResolvedValue(undefined);
 
     await expect(signInWithGoogle()).rejects.toThrow('jsdk down');
-    expect(jest.mocked(signOut)).toHaveBeenCalledTimes(1);
   });
 });

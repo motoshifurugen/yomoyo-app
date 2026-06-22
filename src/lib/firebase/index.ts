@@ -1,5 +1,3 @@
-export { getAuth } from '@react-native-firebase/auth';
-
 import { initializeApp, getApps } from 'firebase/app';
 // `getReactNativePersistence` is exported at runtime from firebase/auth's
 // React Native build (selected by Metro via the package's `react-native`
