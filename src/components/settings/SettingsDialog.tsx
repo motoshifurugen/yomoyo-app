@@ -12,7 +12,6 @@ import {
 } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
-import DialogCloseButton from '@/components/ui/DialogCloseButton';
 import {
   useTheme,
   useThemedStyles,
@@ -192,12 +191,6 @@ export default function SettingsDialog({ visible, onClose }: Props) {
             />
             <LogoutSection styles={styles} t={t} error={logoutError} onLogout={handleLogout} />
           </View>
-          <DialogCloseButton
-            testID="settings-dialog-close"
-            label={t('settings.close')}
-            onPress={handleClose}
-            style={styles.closeButton}
-          />
         </Pressable>
       </PressableSurface>
     </Modal>
@@ -252,9 +245,6 @@ const makeStyles = (colors: ThemeColors, glass: ThemeGlass) =>
     pillTextActive: {
       color: colors.primary,
       fontWeight: '600',
-    },
-    closeButton: {
-      marginTop: 16,
     },
     logoutButton: {
       height: 52,

@@ -79,7 +79,6 @@ const en = {
     themeDark: 'Dark',
     themeSystem: 'System',
     openSettings: 'Open settings',
-    close: 'Close',
     logout: 'Log out',
     logoutError: 'Logout failed. Please try again.',
   },
