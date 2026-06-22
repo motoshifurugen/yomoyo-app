@@ -88,6 +88,8 @@ const en = {
     notFound: 'This page does not exist.',
     emptyBooks: 'No finished books yet',
     ownPageNote: 'This is your page',
+    followSuccess: "You'll now see {{name}}'s reading on your Timeline.",
+    backToTimeline: 'Back to Timeline',
     finishedCount_one: '{{count}} book finished',
     finishedCount_other: '{{count}} books finished',
     history: {

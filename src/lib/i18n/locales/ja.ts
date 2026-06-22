@@ -88,6 +88,8 @@ const ja = {
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
+    followSuccess: 'これから{{name}}さんの読書記録がタイムラインに届きます。',
+    backToTimeline: 'タイムラインに戻る',
     finishedCount_one: '{{count}}冊読み終えました',
     finishedCount_other: '{{count}}冊読み終えました',
     history: {
