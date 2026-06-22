@@ -14,6 +14,9 @@ import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 export default function LoginScreen() {
   const styles = useThemedStyles(makeStyles);
   const [signInError, setSignInError] = useState<string | null>(null);
+  // TEMP DIAGNOSTIC — surfaces the real Apple/Firebase error code on screen so
+  // we can pinpoint the cause. Remove once Apple sign-in is fixed.
+  const [appleDiag, setAppleDiag] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
     setSignInError(null);
@@ -27,11 +30,16 @@ export default function LoginScreen() {
 
   const handleAppleSignIn = async () => {
     setSignInError(null);
+    setAppleDiag(null);
     try {
       await signInWithApple();
     } catch (e) {
       if (e && typeof e === 'object' && 'code' in e && (e as any).code === appleAuth.Error.CANCELED) return;
       setSignInError('Sign-in failed. Please try again.');
+      // TEMP DIAGNOSTIC — remove once Apple sign-in is fixed.
+      const code = e && typeof e === 'object' && 'code' in e ? String((e as any).code) : 'no-code';
+      const msg = e instanceof Error ? e.message : String(e);
+      setAppleDiag(`DEBUG: ${code} | ${msg}`);
     }
   };
 
@@ -40,6 +48,11 @@ export default function LoginScreen() {
       <AuthLogoBlock />
 
       {signInError ? <Text style={styles.error}>{signInError}</Text> : null}
+      {appleDiag ? (
+        <Text testID="apple-diagnostic" style={styles.error} selectable>
+          {appleDiag}
+        </Text>
+      ) : null}
 
       <View style={styles.buttons}>
         <GoogleSignInButton onPress={handleGoogleSignIn} />
