@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Share } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { getUserHandle } from '@/lib/users/handles';
 
-const SHARED_CONFIRMATION_MS = 2000;
+const COPIED_CONFIRMATION_MS = 2000;
 
 type Props = {
   uid: string;
@@ -16,7 +17,7 @@ export default function MyHandleCard({ uid }: Props) {
   const { t } = useTranslation();
   const styles = useThemedStyles(makeStyles);
   const [handle, setHandle] = useState<string | null>(null);
-  const [shared, setShared] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     getUserHandle(uid)
@@ -25,15 +26,15 @@ export default function MyHandleCard({ uid }: Props) {
   }, [uid]);
 
   useEffect(() => {
-    if (!shared) return;
-    const id = setTimeout(() => setShared(false), SHARED_CONFIRMATION_MS);
+    if (!copied) return;
+    const id = setTimeout(() => setCopied(false), COPIED_CONFIRMATION_MS);
     return () => clearTimeout(id);
-  }, [shared]);
+  }, [copied]);
 
-  const handleShare = () => {
+  const handleCopy = () => {
     if (!handle) return;
-    Share.share({ message: handle })
-      .then(() => setShared(true))
+    Clipboard.setStringAsync(handle)
+      .then(() => setCopied(true))
       .catch(() => {});
   };
 
@@ -47,17 +48,17 @@ export default function MyHandleCard({ uid }: Props) {
           <Text style={styles.handlePlaceholder}>—</Text>
         )}
         <PressableSurface
-          testID="share-handle-button"
-          style={[styles.shareButton, !handle && styles.shareButtonDisabled]}
-          onPress={handleShare}
+          testID="copy-handle-button"
+          style={[styles.copyButton, !handle && styles.copyButtonDisabled]}
+          onPress={handleCopy}
           disabled={!handle}
           accessibilityRole="button"
           feedback="standard"
         >
-          <Text style={styles.shareText}>{t('shelf.shareId')}</Text>
+          <Text style={styles.copyText}>{t('shelf.copyId')}</Text>
         </PressableSurface>
       </View>
-      {shared && <Text style={styles.sharedText}>{t('shelf.idShared')}</Text>}
+      {copied && <Text style={styles.copiedText}>{t('shelf.idCopied')}</Text>}
     </View>
   );
 }
@@ -87,19 +88,19 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenBodySize,
       color: colors.muted,
     },
-    shareButton: {
+    copyButton: {
       paddingVertical: 4,
       paddingHorizontal: 8,
     },
-    shareButtonDisabled: {
+    copyButtonDisabled: {
       opacity: 0.5,
     },
-    shareText: {
+    copyText: {
       fontSize: 14,
       fontWeight: '500',
       color: colors.primary,
     },
-    sharedText: {
+    copiedText: {
       fontSize: 12,
       color: colors.muted,
       marginTop: 4,

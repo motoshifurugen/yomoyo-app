@@ -46,10 +46,10 @@ describe('SettingsLauncher', () => {
     expect(screen.getByText('settings.languageTitle')).toBeTruthy();
   });
 
-  it('closes the dialog when the close control is pressed', () => {
+  it('closes the dialog when the backdrop is pressed', () => {
     render(<SettingsLauncher />);
     fireEvent.press(screen.getByTestId('settings-button'));
-    fireEvent.press(screen.getByTestId('settings-dialog-close'));
+    fireEvent.press(screen.getByTestId('settings-dialog-backdrop'));
     expect(screen.queryByText('settings.languageTitle')).toBeNull();
   });
 });

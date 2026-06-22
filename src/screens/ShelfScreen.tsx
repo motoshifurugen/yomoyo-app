@@ -52,12 +52,10 @@ export default function ShelfScreen() {
   return (
     <ScreenContainer>
       <View style={styles.fixedHeader}>
-        {user?.uid && <MyIdentityHeader uid={user.uid} />}
-        {user?.uid && <MyHandleCard uid={user.uid} />}
-        <View style={styles.statsBlock}>
-          <Text style={styles.countLine} testID="finished-count">
-            {t('userProfile.finishedCount', { count: activities.length })}
-          </Text>
+        <View style={styles.identityRow}>
+          <View style={styles.identityLeft}>
+            {user?.uid && <MyIdentityHeader uid={user.uid} />}
+          </View>
           <ReadingHistoryHeatmap
             buckets={historyBuckets}
             formatTileLabel={(b) =>
@@ -65,7 +63,13 @@ export default function ShelfScreen() {
             }
           />
         </View>
-        <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
+        {user?.uid && <MyHandleCard uid={user.uid} />}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
+          <Text style={styles.countLine} testID="finished-count">
+            {t('shelf.finishedCountInline', { count: activities.length })}
+          </Text>
+        </View>
       </View>
       <ScrollView
         testID="shelf-books-scroll"
@@ -122,21 +126,30 @@ const makeStyles = (colors: ThemeColors) =>
       flexGrow: 1,
       paddingBottom: spacing.lg,
     },
-    statsBlock: {
+    identityRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginTop: spacing.sm,
-      marginBottom: spacing.lg,
+      justifyContent: 'space-between',
+      marginBottom: spacing.sm,
     },
-    countLine: {
-      fontSize: 14,
-      color: colors.secondaryText,
-      marginBottom: 10,
+    identityLeft: {
+      flex: 1,
+      marginRight: spacing.md,
+    },
+    sectionHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      marginBottom: spacing.md,
     },
     sectionHeader: {
       fontSize: yomoyoTypography.screenTitleSize,
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
-      marginBottom: spacing.md,
+    },
+    countLine: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      marginLeft: spacing.xs,
     },
     cta: {
       flexDirection: 'row',

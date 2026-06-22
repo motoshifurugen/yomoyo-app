@@ -9,9 +9,9 @@ type Props = {
 };
 
 const ROWS = 3;
-const TILE_SIZE = 12;
-const TILE_GAP = 3;
-const TILE_RADIUS = 3;
+const TILE_SIZE = 9;
+const TILE_GAP = 2;
+const TILE_RADIUS = 2;
 const OPACITY_BANDS = [0.1, 0.35, 0.65, 1] as const;
 
 function opacityForCount(count: number): number {

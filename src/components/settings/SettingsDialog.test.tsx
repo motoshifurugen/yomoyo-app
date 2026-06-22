@@ -237,7 +237,7 @@ describe('SettingsDialog — logout', () => {
     await waitFor(() => {
       expect(screen.getByText('settings.logoutError')).toBeTruthy();
     });
-    fireEvent.press(screen.getByTestId('settings-dialog-close'));
+    fireEvent.press(screen.getByTestId('settings-dialog-backdrop'));
     expect(screen.queryByText('settings.logoutError')).toBeNull();
   });
 });
@@ -245,13 +245,6 @@ describe('SettingsDialog — logout', () => {
 describe('SettingsDialog — close behavior', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it('calls onClose when the close button is pressed', () => {
-    const onClose = jest.fn();
-    render(<SettingsDialog visible={true} onClose={onClose} />);
-    fireEvent.press(screen.getByTestId('settings-dialog-close'));
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('calls onClose when the backdrop is pressed', () => {

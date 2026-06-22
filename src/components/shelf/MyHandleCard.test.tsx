@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, fireEvent, waitFor, act } from '@testing-library/react-native';
-import { Share } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import MyHandleCard from './MyHandleCard';
 import { getUserHandle } from '@/lib/users/handles';
@@ -14,13 +14,13 @@ jest.mock('react-i18next', () => ({
 }));
 
 const mockedGetUserHandle = getUserHandle as jest.Mock;
-
-jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
+const mockedSetString = Clipboard.setStringAsync as jest.Mock;
 
 describe('MyHandleCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedGetUserHandle.mockResolvedValue('quietfox');
+    mockedSetString.mockResolvedValue(true);
   });
 
   it('renders the your-ID section title', () => {
@@ -38,32 +38,32 @@ describe('MyHandleCard', () => {
     expect(await screen.findByText('quietfox')).toBeTruthy();
   });
 
-  it('renders a share-ID button', async () => {
+  it('renders a copy-ID button', async () => {
     render(<MyHandleCard uid="user1" />);
-    expect(await screen.findByText('shelf.shareId')).toBeTruthy();
+    expect(await screen.findByText('shelf.copyId')).toBeTruthy();
   });
 
-  it('calls Share.share with the handle as the message when pressed', async () => {
+  it('copies the handle to the clipboard when pressed', async () => {
     render(<MyHandleCard uid="user1" />);
     await screen.findByText('quietfox');
-    fireEvent.press(screen.getByTestId('share-handle-button'));
+    fireEvent.press(screen.getByTestId('copy-handle-button'));
     await waitFor(() => {
-      expect(Share.share).toHaveBeenCalledWith({ message: 'quietfox' });
+      expect(Clipboard.setStringAsync).toHaveBeenCalledWith('quietfox');
     });
   });
 
-  it('shows the shared confirmation after pressing share', async () => {
+  it('shows the copied confirmation after pressing copy', async () => {
     render(<MyHandleCard uid="user1" />);
     await screen.findByText('quietfox');
-    fireEvent.press(screen.getByTestId('share-handle-button'));
+    fireEvent.press(screen.getByTestId('copy-handle-button'));
     await waitFor(() => {
-      expect(screen.getByText('shelf.idShared')).toBeTruthy();
+      expect(screen.getByText('shelf.idCopied')).toBeTruthy();
     });
   });
 
-  it('does not show the shared confirmation initially', () => {
+  it('does not show the copied confirmation initially', () => {
     render(<MyHandleCard uid="user1" />);
-    expect(screen.queryByText('shelf.idShared')).toBeNull();
+    expect(screen.queryByText('shelf.idCopied')).toBeNull();
   });
 
   it('does not crash when getUserHandle returns null', async () => {
@@ -73,27 +73,27 @@ describe('MyHandleCard', () => {
     expect(screen.queryByText('quietfox')).toBeNull();
   });
 
-  it('does not invoke Share when handle is unavailable', async () => {
+  it('does not copy when handle is unavailable', async () => {
     mockedGetUserHandle.mockResolvedValueOnce(null);
     render(<MyHandleCard uid="user1" />);
     await waitFor(() => expect(mockedGetUserHandle).toHaveBeenCalled());
-    fireEvent.press(screen.getByTestId('share-handle-button'));
-    expect(Share.share).not.toHaveBeenCalled();
+    fireEvent.press(screen.getByTestId('copy-handle-button'));
+    expect(Clipboard.setStringAsync).not.toHaveBeenCalled();
   });
 
-  it('hides the shared confirmation after a short delay', async () => {
+  it('hides the copied confirmation after a short delay', async () => {
     jest.useFakeTimers();
     try {
       render(<MyHandleCard uid="user1" />);
       await screen.findByText('quietfox');
-      fireEvent.press(screen.getByTestId('share-handle-button'));
+      fireEvent.press(screen.getByTestId('copy-handle-button'));
       await waitFor(() => {
-        expect(screen.getByText('shelf.idShared')).toBeTruthy();
+        expect(screen.getByText('shelf.idCopied')).toBeTruthy();
       });
       act(() => {
         jest.advanceTimersByTime(2500);
       });
-      expect(screen.queryByText('shelf.idShared')).toBeNull();
+      expect(screen.queryByText('shelf.idCopied')).toBeNull();
     } finally {
       jest.useRealTimers();
     }
