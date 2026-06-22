@@ -57,9 +57,9 @@ export default function OnboardingAvatarScreen() {
       ]}
     >
       <OnboardingProgress
-        currentStep={2}
-        totalSteps={3}
-        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
+        currentStep={1}
+        totalSteps={2}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 1, total: 2 })}
       />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.heading}>{t('onboarding.avatarHeading')}</Text>

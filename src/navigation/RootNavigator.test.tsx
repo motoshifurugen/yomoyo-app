@@ -27,8 +27,8 @@ jest.mock('@/navigation/OnboardingNavigator', () => {
   };
 });
 
-jest.mock('@/lib/onboarding', () => ({
-  checkFirstLaunch: jest.fn(),
+jest.mock('@/lib/users/avatarIdentity', () => ({
+  getAvatarIdentity: jest.fn(),
 }));
 
 jest.mock('@/lib/notifications/registerPushToken', () => ({
@@ -39,9 +39,11 @@ jest.mock('@/lib/users/handles', () => ({
   ensureHandle: jest.fn().mockResolvedValue('quietfox'),
 }));
 
-import { checkFirstLaunch } from '@/lib/onboarding';
+import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import { ensureHandle } from '@/lib/users/handles';
+
+const profile = { animalKey: 'fox', displayName: 'Reader', finalizedAt: null };
 
 function renderWithNav() {
   return render(
@@ -54,26 +56,37 @@ function renderWithNav() {
 describe('RootNavigator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(checkFirstLaunch).mockResolvedValue(false);
+    jest.mocked(getAvatarIdentity).mockResolvedValue(profile as any);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('shows LoginScreen when onboarding is done and user is null', async () => {
+  it('shows LoginScreen when user is null', async () => {
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
     renderWithNav();
     expect(await screen.findByText('LoginScreen')).toBeTruthy();
   });
 
-  it('shows AppNavigator when onboarding is done and user is authenticated', async () => {
+  it('shows AppNavigator when the user already has a profile', async () => {
+    jest.mocked(getAvatarIdentity).mockResolvedValue(profile as any);
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: { uid: 'abc123' } as any,
       loading: false,
     });
     renderWithNav();
     expect(await screen.findByText('AppNavigator')).toBeTruthy();
+  });
+
+  it('shows OnboardingNavigator when the signed-in user has no profile', async () => {
+    jest.mocked(getAvatarIdentity).mockResolvedValue(null);
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'newuser' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    expect(await screen.findByText('OnboardingNavigator')).toBeTruthy();
   });
 
   it('shows nothing while auth state is loading', async () => {
@@ -85,24 +98,31 @@ describe('RootNavigator', () => {
     });
   });
 
-  it('shows OnboardingNavigator on first launch', async () => {
-    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
-    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
-    renderWithNav();
-    expect(await screen.findByText('OnboardingNavigator')).toBeTruthy();
-  });
-
-  it('shows OnboardingNavigator on first launch even when user is already signed in', async () => {
-    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
+  it('shows nothing (no flash) while the profile check is in flight', async () => {
+    jest.mocked(getAvatarIdentity).mockReturnValue(new Promise(() => {}) as any);
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: { uid: 'abc123' } as any,
       loading: false,
     });
     renderWithNav();
-    expect(await screen.findByText('OnboardingNavigator')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.queryByText('AppNavigator')).toBeNull();
+      expect(screen.queryByText('OnboardingNavigator')).toBeNull();
+      expect(screen.queryByText('LoginScreen')).toBeNull();
+    });
   });
 
-  it('registers the push token on startup when user is authenticated and onboarding is done', async () => {
+  it('fails open to AppNavigator when the profile check errors', async () => {
+    jest.mocked(getAvatarIdentity).mockRejectedValue(new Error('firestore down'));
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    expect(await screen.findByText('AppNavigator')).toBeTruthy();
+  });
+
+  it('registers the push token once the profile is ready', async () => {
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: { uid: 'abc123' } as any,
       loading: false,
@@ -113,17 +133,17 @@ describe('RootNavigator', () => {
     );
   });
 
-  it('does not register the push token on startup when user is signed out', async () => {
+  it('does not register the push token when the user is signed out', async () => {
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
     renderWithNav();
     await screen.findByText('LoginScreen');
     expect(registerPushTokenIfPermitted).not.toHaveBeenCalled();
   });
 
-  it('does not register the push token while onboarding is still active', async () => {
-    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
+  it('does not register the push token while profile setup is still needed', async () => {
+    jest.mocked(getAvatarIdentity).mockResolvedValue(null);
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
-      user: { uid: 'abc123' } as any,
+      user: { uid: 'newuser' } as any,
       loading: false,
     });
     renderWithNav();
@@ -131,7 +151,7 @@ describe('RootNavigator', () => {
     expect(registerPushTokenIfPermitted).not.toHaveBeenCalled();
   });
 
-  it('ensures a handle on startup when user is authenticated and onboarding is done', async () => {
+  it('ensures a handle once the profile is ready', async () => {
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: { uid: 'abc123' } as any,
       loading: false,
@@ -140,17 +160,10 @@ describe('RootNavigator', () => {
     await waitFor(() => expect(ensureHandle).toHaveBeenCalledWith('abc123'));
   });
 
-  it('does not ensure a handle on startup when user is signed out', async () => {
-    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({ user: null, loading: false });
-    renderWithNav();
-    await screen.findByText('LoginScreen');
-    expect(ensureHandle).not.toHaveBeenCalled();
-  });
-
-  it('does not ensure a handle while onboarding is still active', async () => {
-    jest.mocked(checkFirstLaunch).mockResolvedValue(true);
+  it('does not ensure a handle while profile setup is still needed', async () => {
+    jest.mocked(getAvatarIdentity).mockResolvedValue(null);
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
-      user: { uid: 'abc123' } as any,
+      user: { uid: 'newuser' } as any,
       loading: false,
     });
     renderWithNav();

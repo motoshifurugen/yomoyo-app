@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { markOnboardingDone } from '@/lib/onboarding';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
@@ -49,11 +48,6 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
     } catch {
       // finalization failure should not block onboarding completion
     }
-    try {
-      await markOnboardingDone();
-    } catch {
-      // storage failure should not block onboarding completion
-    }
     onComplete();
   };
 
@@ -62,11 +56,6 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
       if (user) await finalizeAvatarIdentity(user.uid);
     } catch {
       // finalization failure should not block onboarding completion
-    }
-    try {
-      await markOnboardingDone();
-    } catch {
-      // storage failure should not block onboarding completion
     }
     onComplete();
   };
@@ -79,9 +68,9 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
       ]}
     >
       <OnboardingProgress
-        currentStep={3}
-        totalSteps={3}
-        accessibilityLabel={t('onboarding.progressLabel', { current: 3, total: 3 })}
+        currentStep={2}
+        totalSteps={2}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 2 })}
       />
       <View style={styles.content}>
         <View style={styles.videoFrame}>

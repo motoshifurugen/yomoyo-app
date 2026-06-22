@@ -3,7 +3,6 @@ import { screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import OnboardingNotificationScreen from './OnboardingNotificationScreen';
 import * as Notifications from 'expo-notifications';
-import { markOnboardingDone } from '@/lib/onboarding';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { useVideoPlayer } from 'expo-video';
 
@@ -12,10 +11,6 @@ jest.mock('expo-video');
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
-}));
-
-jest.mock('@/lib/onboarding', () => ({
-  markOnboardingDone: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@/lib/users/avatarIdentity', () => ({
@@ -47,16 +42,13 @@ describe('OnboardingNotificationScreen', () => {
     expect(screen.getByText('onboarding.notificationHeading')).toBeTruthy();
   });
 
-  it('renders a 3-step progress indicator at step 3 (all filled)', () => {
+  it('renders a 2-step progress indicator at step 2 (all filled)', () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(2);
     expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
       expect.objectContaining({ selected: true }),
     );
     expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
-      expect.objectContaining({ selected: true }),
-    );
-    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
       expect.objectContaining({ selected: true }),
     );
   });
@@ -84,17 +76,15 @@ describe('OnboardingNotificationScreen', () => {
     );
   });
 
-  it('marks onboarding done and calls onComplete after allow', async () => {
+  it('calls onComplete after allow', async () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(markOnboardingDone).toHaveBeenCalled());
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
   });
 
-  it('marks onboarding done and calls onComplete after skip', async () => {
+  it('calls onComplete after skip', async () => {
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
-    await waitFor(() => expect(markOnboardingDone).toHaveBeenCalled());
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
   });
 
@@ -137,24 +127,6 @@ describe('OnboardingNotificationScreen', () => {
     );
     render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
-  });
-
-  it('still completes onboarding if markOnboardingDone throws during allow', async () => {
-    (markOnboardingDone as jest.Mock).mockRejectedValueOnce(
-      new Error('storage error')
-    );
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
-  });
-
-  it('still completes onboarding if markOnboardingDone throws during skip', async () => {
-    (markOnboardingDone as jest.Mock).mockRejectedValueOnce(
-      new Error('storage error')
-    );
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    fireEvent.press(screen.getByText('onboarding.skipLink'));
     await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
   });
 
