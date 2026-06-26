@@ -3,11 +3,17 @@ import { screen, fireEvent, waitFor } from '@testing-library/react-native';
 import { renderWithTheme as render } from '@/lib/theme/testUtils';
 import OnboardingNotificationScreen from './OnboardingNotificationScreen';
 import * as Notifications from 'expo-notifications';
+import { useNavigation } from '@react-navigation/native';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { useVideoPlayer } from 'expo-video';
 
 jest.mock('expo-notifications');
 jest.mock('expo-video');
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: jest.fn(),
+}));
 
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -29,109 +35,116 @@ jest.mock('@/lib/i18n', () => ({
   getCurrentLanguage: jest.fn(() => 'en'),
 }));
 
-const mockOnComplete = jest.fn();
+const mockNavigate = jest.fn();
 
 describe('OnboardingNotificationScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockOnComplete.mockClear();
+    jest.mocked(useNavigation).mockReturnValue({ navigate: mockNavigate } as any);
   });
 
   it('renders the notification heading key', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     expect(screen.getByText('onboarding.notificationHeading')).toBeTruthy();
   });
 
-  it('renders a 2-step progress indicator at step 2 (all filled)', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(2);
+  it('renders a 3-step progress indicator at step 2 (first two filled)', () => {
+    render(<OnboardingNotificationScreen />);
+    expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
     expect(screen.getByTestId('onboarding-progress-segment-0').props.accessibilityState).toEqual(
       expect.objectContaining({ selected: true }),
     );
     expect(screen.getByTestId('onboarding-progress-segment-1').props.accessibilityState).toEqual(
       expect.objectContaining({ selected: true }),
     );
+    expect(screen.getByTestId('onboarding-progress-segment-2').props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: false }),
+    );
   });
 
   it('renders the notification body key', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     expect(screen.getByText('onboarding.notificationBody')).toBeTruthy();
   });
 
+  it('renders the receive use-case highlights', () => {
+    render(<OnboardingNotificationScreen />);
+    expect(screen.getByText('onboarding.receiveHighlightNotify')).toBeTruthy();
+    expect(screen.getByText('onboarding.receiveHighlightConnect')).toBeTruthy();
+  });
+
   it('renders an allow button', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     expect(screen.getByText('onboarding.allowButton')).toBeTruthy();
   });
 
   it('renders a skip option', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     expect(screen.getByText('onboarding.skipLink')).toBeTruthy();
   });
 
   it('requests notification permission when allow is pressed', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() =>
-      expect(Notifications.requestPermissionsAsync).toHaveBeenCalled()
-    );
+    await waitFor(() => expect(Notifications.requestPermissionsAsync).toHaveBeenCalled());
   });
 
-  it('calls onComplete after allow', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+  it('navigates to the sending step after allow', async () => {
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
-  it('calls onComplete after skip', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+  it('navigates to the sending step after skip', async () => {
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
   it('finalizes avatar identity when allow is pressed', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
     await waitFor(() => expect(finalizeAvatarIdentity).toHaveBeenCalledWith('user1'));
   });
 
   it('finalizes avatar identity when skip is pressed', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
     await waitFor(() => expect(finalizeAvatarIdentity).toHaveBeenCalledWith('user1'));
   });
 
-  it('still completes onboarding if finalizeAvatarIdentity throws during allow', async () => {
+  it('still advances if finalizeAvatarIdentity throws during allow', async () => {
     (finalizeAvatarIdentity as jest.Mock).mockRejectedValueOnce(new Error('network error'));
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
-  it('still completes onboarding if finalizeAvatarIdentity throws during skip', async () => {
+  it('still advances if finalizeAvatarIdentity throws during skip', async () => {
     (finalizeAvatarIdentity as jest.Mock).mockRejectedValueOnce(new Error('network error'));
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
   it('does not request permission when skip is pressed', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.skipLink'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
     expect(Notifications.requestPermissionsAsync).not.toHaveBeenCalled();
   });
 
-  it('still completes onboarding if requestPermissionsAsync throws', async () => {
+  it('still advances if requestPermissionsAsync throws', async () => {
     (Notifications.requestPermissionsAsync as jest.Mock).mockRejectedValueOnce(
-      new Error('permission error')
+      new Error('permission error'),
     );
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
   it('fetches expo push token when permission is granted', async () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
     await waitFor(() => expect(Notifications.getExpoPushTokenAsync).toHaveBeenCalled());
   });
@@ -140,28 +153,28 @@ describe('OnboardingNotificationScreen', () => {
     (Notifications.requestPermissionsAsync as jest.Mock).mockResolvedValueOnce({
       status: 'denied',
     });
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
     expect(Notifications.getExpoPushTokenAsync).not.toHaveBeenCalled();
   });
 
-  it('still completes onboarding if getExpoPushTokenAsync throws', async () => {
+  it('still advances if getExpoPushTokenAsync throws', async () => {
     (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(
-      new Error('token error')
+      new Error('token error'),
     );
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
   });
 
   it('logs push token to console in dev mode', async () => {
     const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     fireEvent.press(screen.getByText('onboarding.allowButton'));
-    await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
     const pushTokenCalls = spy.mock.calls.filter(
-      ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+      ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]'),
     );
     expect(pushTokenCalls.length).toBeGreaterThan(0);
     spy.mockRestore();
@@ -173,14 +186,14 @@ describe('OnboardingNotificationScreen', () => {
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      render(<OnboardingNotificationScreen />);
       fireEvent.press(screen.getByText('onboarding.allowButton'));
-      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
       const pushTokenLogs = logSpy.mock.calls.filter(
-        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]'),
       );
       const pushTokenWarns = warnSpy.mock.calls.filter(
-        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]'),
       );
       expect(pushTokenLogs).toHaveLength(0);
       expect(pushTokenWarns).toHaveLength(0);
@@ -193,15 +206,15 @@ describe('OnboardingNotificationScreen', () => {
 
   it('logs a warning when token fetch fails in dev mode', async () => {
     (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(
-      new Error('token error')
+      new Error('token error'),
     );
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      render(<OnboardingNotificationScreen />);
       fireEvent.press(screen.getByText('onboarding.allowButton'));
-      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
       const pushTokenWarns = spy.mock.calls.filter(
-        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]')
+        ([msg]) => typeof msg === 'string' && msg.startsWith('[PushToken]'),
       );
       expect(pushTokenWarns.length).toBeGreaterThan(0);
     } finally {
@@ -216,11 +229,11 @@ describe('OnboardingNotificationScreen', () => {
     (Notifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValueOnce(noProjectIdError);
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+      render(<OnboardingNotificationScreen />);
       fireEvent.press(screen.getByText('onboarding.allowButton'));
-      await waitFor(() => expect(mockOnComplete).toHaveBeenCalled());
+      await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('OnboardingSending'));
       const projectIdWarns = spy.mock.calls.filter(
-        ([msg]) => typeof msg === 'string' && msg.includes('eas init')
+        ([msg]) => typeof msg === 'string' && msg.includes('eas init'),
       );
       expect(projectIdWarns.length).toBeGreaterThan(0);
     } finally {
@@ -229,12 +242,12 @@ describe('OnboardingNotificationScreen', () => {
   });
 
   it('renders a video element', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     expect(screen.getByTestId('notification-video')).toBeTruthy();
   });
 
   it('renders a soft placeholder behind the video so the area is never empty', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
+    render(<OnboardingNotificationScreen />);
     // Placeholder is intentionally hidden from a11y tree, so opt into hidden elements.
     expect(
       screen.getByTestId('notification-video-placeholder', { includeHiddenElements: true }),
@@ -242,11 +255,8 @@ describe('OnboardingNotificationScreen', () => {
   });
 
   it('creates a video player with autoplay, loop, and mute', () => {
-    render(<OnboardingNotificationScreen onComplete={mockOnComplete} />);
-    expect(useVideoPlayer).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.any(Function)
-    );
+    render(<OnboardingNotificationScreen />);
+    expect(useVideoPlayer).toHaveBeenCalledWith(expect.anything(), expect.any(Function));
     const setup = (useVideoPlayer as jest.Mock).mock.calls[0][1];
     const mockPlayer = { loop: false, muted: false, play: jest.fn() };
     setup(mockPlayer);

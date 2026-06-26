@@ -17,4 +17,5 @@ export type MainTabParamList = {
 export type OnboardingStackParamList = {
   OnboardingAvatar: undefined;
   OnboardingNotification: undefined;
+  OnboardingSending: undefined;
 };

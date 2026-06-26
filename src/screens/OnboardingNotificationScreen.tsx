@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
@@ -10,16 +12,17 @@ import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
+import UseCaseHighlight from '@/components/onboarding/UseCaseHighlight';
+import type { OnboardingStackParamList } from '@/navigation/types';
 import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
 import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 
-type Props = {
-  onComplete: () => void;
-};
+type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'OnboardingNotification'>;
 
 const videoSource = require('../../assets/videos/notification_loop.mp4');
 
-export default function OnboardingNotificationScreen({ onComplete }: Props) {
+export default function OnboardingNotificationScreen() {
+  const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
@@ -32,6 +35,17 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
     p.play();
   });
 
+  // Finalizing here (not on the final step) keeps the identity saved even if the
+  // user abandons onboarding on the following "sending" concept screen.
+  const finalizeAndContinue = async () => {
+    try {
+      if (user) await finalizeAvatarIdentity(user.uid);
+    } catch {
+      // finalization failure should not block onboarding progress
+    }
+    navigation.navigate('OnboardingSending');
+  };
+
   const handleAllow = async () => {
     try {
       const { status } = await Notifications.requestPermissionsAsync();
@@ -41,23 +55,13 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
         console.log('[PushToken] Permission not granted — push token skipped.');
       }
     } catch {
-      // permission request failure should not block onboarding completion
+      // permission request failure should not block onboarding progress
     }
-    try {
-      if (user) await finalizeAvatarIdentity(user.uid);
-    } catch {
-      // finalization failure should not block onboarding completion
-    }
-    onComplete();
+    await finalizeAndContinue();
   };
 
   const handleSkip = async () => {
-    try {
-      if (user) await finalizeAvatarIdentity(user.uid);
-    } catch {
-      // finalization failure should not block onboarding completion
-    }
-    onComplete();
+    await finalizeAndContinue();
   };
 
   return (
@@ -69,8 +73,8 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
     >
       <OnboardingProgress
         currentStep={2}
-        totalSteps={2}
-        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 2 })}
+        totalSteps={3}
+        accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
       />
       <View style={styles.content}>
         <View style={styles.videoFrame}>
@@ -94,6 +98,18 @@ export default function OnboardingNotificationScreen({ onComplete }: Props) {
         </View>
         <Text style={styles.heading}>{t('onboarding.notificationHeading')}</Text>
         <Text style={styles.body}>{t('onboarding.notificationBody')}</Text>
+        <View style={styles.highlights}>
+          <UseCaseHighlight
+            testID="receive-highlight-notify"
+            icon="notifications-outline"
+            label={t('onboarding.receiveHighlightNotify')}
+          />
+          <UseCaseHighlight
+            testID="receive-highlight-connect"
+            icon="person-add-outline"
+            label={t('onboarding.receiveHighlightConnect')}
+          />
+        </View>
       </View>
       <View style={styles.actions}>
         <PressableSurface
@@ -157,6 +173,11 @@ const makeStyles = (colors: ThemeColors) =>
       lineHeight: yomoyoTypography.bodyLineHeight,
       color: colors.secondaryText,
       textAlign: 'center',
+    },
+    highlights: {
+      alignSelf: 'stretch',
+      gap: 18,
+      marginTop: 32,
     },
     actions: {
       alignItems: 'center',
