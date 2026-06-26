@@ -19,6 +19,9 @@ export async function enrichActivityAvatars(
 
   const missingUserIds = new Set<string>();
   for (const item of items) {
+    // Anonymized (deleted) authors have no user document to resolve; their
+    // identity is already scrubbed on the activity, so skip the lookup.
+    if (item.authorDeleted) continue;
     if (!cache.has(item.userId)) {
       missingUserIds.add(item.userId);
     }
@@ -43,6 +46,7 @@ export async function enrichActivityAvatars(
   }
 
   return items.map((item) => {
+    if (item.authorDeleted) return item;
     const resolved = cache.get(item.userId) ?? null;
     if (resolved === null) return item;
     return {

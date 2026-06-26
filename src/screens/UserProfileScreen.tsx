@@ -37,6 +37,7 @@ export default function UserProfileScreen() {
   const [identity, setIdentity] = useState<IdentityState>('loading');
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
   const [following, setFollowing] = useState(false);
+  const [justFollowed, setJustFollowed] = useState(false);
 
   const isOwnProfile = user?.uid === uid;
 
@@ -93,12 +94,23 @@ export default function UserProfileScreen() {
     if (!user) return;
     if (following) {
       setFollowing(false);
+      setJustFollowed(false);
       unfollowUser(user.uid, uid).catch(() => setFollowing(true));
     } else {
       setFollowing(true);
-      followUser(user.uid, uid).catch(() => setFollowing(false));
+      setJustFollowed(true);
+      followUser(user.uid, uid).catch(() => {
+        setFollowing(false);
+        setJustFollowed(false);
+      });
     }
   };
+
+  const handleBackToTimeline = () => {
+    navigation.navigate('MainTabs', { screen: 'Timeline' });
+  };
+
+  const showFollowSuccess = !isOwnProfile && following && justFollowed;
 
   return (
     <ScreenContainer>
@@ -147,17 +159,38 @@ export default function UserProfileScreen() {
             </View>
           </View>
         ) : (
-          <PressableSurface
-            style={[styles.followButton, following && styles.followButtonActive]}
-            onPress={handleFollowToggle}
-            accessibilityRole="button"
-            testID={following ? 'unfollow-button' : 'follow-button'}
-            feedback="confirming"
-          >
-            <Text style={[styles.followButtonText, following && styles.followButtonTextActive]}>
-              {following ? t('userProfile.unfollow') : t('userProfile.follow')}
-            </Text>
-          </PressableSurface>
+          <>
+            {showFollowSuccess && (
+              <View testID="follow-success-block" style={styles.successBlock}>
+                <Text style={styles.successMessage}>
+                  {t('userProfile.followSuccess', { name: identity.displayName })}
+                </Text>
+                <PressableSurface
+                  style={styles.backToTimelineButton}
+                  onPress={handleBackToTimeline}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('userProfile.backToTimeline')}
+                  testID="back-to-timeline-button"
+                  feedback="confirming"
+                >
+                  <Text style={styles.backToTimelineText}>
+                    {t('userProfile.backToTimeline')}
+                  </Text>
+                </PressableSurface>
+              </View>
+            )}
+            <PressableSurface
+              style={[styles.followButton, following && styles.followButtonActive]}
+              onPress={handleFollowToggle}
+              accessibilityRole="button"
+              testID={following ? 'unfollow-button' : 'follow-button'}
+              feedback="confirming"
+            >
+              <Text style={[styles.followButtonText, following && styles.followButtonTextActive]}>
+                {following ? t('userProfile.unfollow') : t('userProfile.follow')}
+              </Text>
+            </PressableSurface>
+          </>
         )}
 
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
@@ -243,6 +276,38 @@ const makeStyles = (colors: ThemeColors) =>
       fontSize: yomoyoTypography.screenTitleSize,
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
+    },
+    successBlock: {
+      alignSelf: 'stretch',
+      marginHorizontal: spacing.xl,
+      marginBottom: spacing.lg,
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      borderRadius: 12,
+      backgroundColor: colors.surface,
+      alignItems: 'center',
+      shadowColor: colors.text,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    successMessage: {
+      fontSize: yomoyoTypography.screenBodySize,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: spacing.md,
+    },
+    backToTimelineButton: {
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+      paddingVertical: 10,
+      paddingHorizontal: spacing.xl,
+    },
+    backToTimelineText: {
+      fontSize: yomoyoTypography.screenBodySize,
+      fontWeight: '600',
+      color: colors.surface,
     },
     followButton: {
       alignSelf: 'center',

@@ -7,6 +7,7 @@ import { setLanguage } from '@/lib/i18n';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import { THEME_STORAGE_KEY } from '@/lib/theme/themeStorage';
 import { signOut } from '@/lib/auth';
+import { deleteAccount } from '@/lib/account/deleteAccount';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
@@ -34,7 +35,12 @@ jest.mock('@/lib/auth', () => ({
   signOut: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock('@/lib/account/deleteAccount', () => ({
+  deleteAccount: jest.fn().mockResolvedValue(undefined),
+}));
+
 const mockedSignOut = signOut as jest.Mock;
+const mockedDeleteAccount = deleteAccount as jest.Mock;
 
 const mockedRegisterPushToken = registerPushTokenIfPermitted as jest.Mock;
 
@@ -239,6 +245,60 @@ describe('SettingsDialog — logout', () => {
     });
     fireEvent.press(screen.getByTestId('settings-dialog-backdrop'));
     expect(screen.queryByText('settings.logoutError')).toBeNull();
+  });
+});
+
+describe('SettingsDialog — delete account', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedDeleteAccount.mockResolvedValue(undefined);
+  });
+
+  it('renders the delete-account button when visible', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByTestId('settings-dialog-delete-account')).toBeTruthy();
+  });
+
+  it('does not call deleteAccount on the first press (requires confirmation)', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-account'));
+    expect(mockedDeleteAccount).not.toHaveBeenCalled();
+  });
+
+  it('shows the confirmation step after pressing delete', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-account'));
+    expect(screen.getByText('settings.deleteAccountConfirmTitle')).toBeTruthy();
+    expect(screen.getByTestId('settings-dialog-delete-confirm')).toBeTruthy();
+    expect(screen.getByTestId('settings-dialog-delete-cancel')).toBeTruthy();
+  });
+
+  it('calls deleteAccount when the confirmation is accepted', async () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-account'));
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-confirm'));
+    await waitFor(() => {
+      expect(mockedDeleteAccount).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('returns to the trigger button when the confirmation is cancelled', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-account'));
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-cancel'));
+    expect(screen.queryByTestId('settings-dialog-delete-confirm')).toBeNull();
+    expect(screen.getByTestId('settings-dialog-delete-account')).toBeTruthy();
+    expect(mockedDeleteAccount).not.toHaveBeenCalled();
+  });
+
+  it('shows an error message when deleteAccount fails', async () => {
+    mockedDeleteAccount.mockRejectedValueOnce(new Error('boom'));
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-account'));
+    fireEvent.press(screen.getByTestId('settings-dialog-delete-confirm'));
+    await waitFor(() => {
+      expect(screen.getByText('settings.deleteAccountError')).toBeTruthy();
+    });
   });
 });
 

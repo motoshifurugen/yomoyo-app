@@ -3,6 +3,7 @@ import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
 import { signOut } from '@/lib/auth';
+import { deleteAccount } from '@/lib/account/deleteAccount';
 import {
   setLanguage,
   normalizeLanguage,
@@ -140,6 +141,75 @@ function LogoutSection({
   );
 }
 
+function DeleteAccountSection({
+  styles,
+  t,
+  confirming,
+  deleting,
+  error,
+  onPress,
+  onConfirm,
+  onCancel,
+}: {
+  styles: Styles;
+  t: TFn;
+  confirming: boolean;
+  deleting: boolean;
+  error: string | null;
+  onPress: () => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  if (!confirming) {
+    return (
+      <PressableSurface
+        testID="settings-dialog-delete-account"
+        style={styles.deleteButton}
+        onPress={onPress}
+        accessibilityRole="button"
+        feedback="standard"
+      >
+        <Text style={styles.deleteText}>{t('settings.deleteAccount')}</Text>
+      </PressableSurface>
+    );
+  }
+  return (
+    <View style={styles.deleteConfirm}>
+      <Text style={styles.deleteConfirmTitle}>
+        {t('settings.deleteAccountConfirmTitle')}
+      </Text>
+      <Text style={styles.deleteConfirmMessage}>
+        {t('settings.deleteAccountConfirmMessage')}
+      </Text>
+      {error ? <Text style={styles.logoutError}>{error}</Text> : null}
+      <View style={styles.row}>
+        <PressableSurface
+          testID="settings-dialog-delete-cancel"
+          style={styles.pillOption}
+          onPress={onCancel}
+          disabled={deleting}
+          accessibilityRole="button"
+          feedback="standard"
+        >
+          <Text style={styles.pillText}>{t('settings.deleteAccountCancel')}</Text>
+        </PressableSurface>
+        <PressableSurface
+          testID="settings-dialog-delete-confirm"
+          style={[styles.deleteConfirmButton, deleting && styles.deleteConfirmButtonDisabled]}
+          onPress={onConfirm}
+          disabled={deleting}
+          accessibilityRole="button"
+          feedback="standard"
+        >
+          <Text style={styles.deleteConfirmButtonText}>
+            {t('settings.deleteAccountConfirm')}
+          </Text>
+        </PressableSurface>
+      </View>
+    </View>
+  );
+}
+
 export default function SettingsDialog({ visible, onClose }: Props) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -147,6 +217,9 @@ export default function SettingsDialog({ visible, onClose }: Props) {
   const styles = useThemedStyles(makeStyles);
   const currentLanguage = normalizeLanguage(i18n.language);
   const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleLanguageChange = async (lang: Language) => {
     await setLanguage(lang);
@@ -166,8 +239,36 @@ export default function SettingsDialog({ visible, onClose }: Props) {
     }
   };
 
+  const handleDeletePress = () => {
+    setDeleteError(null);
+    setConfirmingDelete(true);
+  };
+
+  const handleCancelDelete = () => {
+    if (deleting) return;
+    setConfirmingDelete(false);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      // On success, deleteAccount() signs out; useAuth() detects user=null and
+      // RootNavigator swaps to the Login screen, unmounting this dialog.
+    } catch {
+      setDeleteError(t('settings.deleteAccountError'));
+      setDeleting(false);
+    }
+  };
+
   const handleClose = () => {
+    if (deleting) return;
     setLogoutError(null);
+    setConfirmingDelete(false);
+    setDeleteError(null);
     onClose();
   };
 
@@ -190,6 +291,16 @@ export default function SettingsDialog({ visible, onClose }: Props) {
               onSelect={handleLanguageChange}
             />
             <LogoutSection styles={styles} t={t} error={logoutError} onLogout={handleLogout} />
+            <DeleteAccountSection
+              styles={styles}
+              t={t}
+              confirming={confirmingDelete}
+              deleting={deleting}
+              error={deleteError}
+              onPress={handleDeletePress}
+              onConfirm={handleConfirmDelete}
+              onCancel={handleCancelDelete}
+            />
           </View>
         </Pressable>
       </PressableSurface>
@@ -265,5 +376,47 @@ const makeStyles = (colors: ThemeColors, glass: ThemeGlass) =>
       color: colors.error,
       marginBottom: 12,
       textAlign: 'center',
+    },
+    deleteButton: {
+      height: 52,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    deleteText: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: colors.error,
+    },
+    deleteConfirm: {
+      gap: 12,
+    },
+    deleteConfirmTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      textAlign: 'center',
+    },
+    deleteConfirmMessage: {
+      fontSize: 14,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    deleteConfirmButton: {
+      flex: 1,
+      height: 52,
+      borderRadius: 16,
+      backgroundColor: colors.error,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    deleteConfirmButtonDisabled: {
+      opacity: 0.5,
+    },
+    deleteConfirmButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.surface,
     },
   });

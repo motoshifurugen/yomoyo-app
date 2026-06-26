@@ -6,6 +6,7 @@ import { initializeApp, getApps } from 'firebase/app';
 // only the loaded instance registers the auth Component with FirebaseApp.
 // @ts-expect-error: getReactNativePersistence is untyped in firebase v10
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Values from GoogleService-Info.plist / google-services.json.
@@ -28,3 +29,6 @@ export const firebaseApp =
 export const jsSdkAuth = initializeAuth(firebaseApp, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
+
+// Callable Cloud Functions live in asia-northeast1 (see functions/src/index.ts).
+export const jsSdkFunctions = getFunctions(firebaseApp, 'asia-northeast1');

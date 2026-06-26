@@ -8,6 +8,7 @@ const en = {
   },
   timeline: {
     finishedReading: 'Finished reading',
+    deletedUser: 'Deleted user',
     emptyTitle: 'Connect with friends',
     emptyBody: 'Reading records from your friends will appear here.',
     emptyBookmarksTitle: 'No bookmarks yet',
@@ -81,6 +82,13 @@ const en = {
     openSettings: 'Open settings',
     logout: 'Log out',
     logoutError: 'Logout failed. Please try again.',
+    deleteAccount: 'Delete account',
+    deleteAccountConfirmTitle: 'Delete your account?',
+    deleteAccountConfirmMessage:
+      'Your account and related data (profile, follows, notification settings) will be permanently deleted and cannot be recovered. Your finished-reading records remain, shown anonymously.',
+    deleteAccountConfirm: 'Delete',
+    deleteAccountCancel: 'Cancel',
+    deleteAccountError: 'Failed to delete your account. Please try again.',
   },
   userProfile: {
     follow: 'Receive updates',
@@ -88,6 +96,8 @@ const en = {
     notFound: 'This page does not exist.',
     emptyBooks: 'No finished books yet',
     ownPageNote: 'This is your page',
+    followSuccess: "You'll now see {{name}}'s reading on your Timeline.",
+    backToTimeline: 'Back to Timeline',
     finishedCount_one: '{{count}} book finished',
     finishedCount_other: '{{count}} books finished',
     history: {

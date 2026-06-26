@@ -16,6 +16,7 @@ import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import { resolveAuthorName } from '@/lib/books/readingActivity';
 
 type Props = {
   activity: ReadingActivity | null;
@@ -36,8 +37,11 @@ export default function ActivityDetailModal({
   if (!activity) return null;
 
   const avatarKey = activity.displayAvatar as AnimalKey | undefined;
-  const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
-  const displayName = activity.displayName ?? activity.displayLabel;
+  const avatarSource =
+    !activity.authorDeleted && avatarKey && ANIMAL_ASSETS[avatarKey]
+      ? ANIMAL_ASSETS[avatarKey]
+      : null;
+  const displayName = resolveAuthorName(activity, t('timeline.deletedUser'));
   const authorLine =
     activity.authors.length > 0 ? activity.authors.join(', ') : t('bookDetail.unknownAuthor');
 
@@ -88,15 +92,17 @@ export default function ActivityDetailModal({
               </View>
             </View>
 
-            <PressableSurface
-              testID="modal-view-profile-button"
-              style={styles.viewProfileButton}
-              onPress={() => onViewProfile(activity.userId)}
-              accessibilityRole="button"
-              feedback="standard"
-            >
-              <Text style={styles.viewProfileText}>{t('timeline.modalViewProfile')}</Text>
-            </PressableSurface>
+            {!activity.authorDeleted && (
+              <PressableSurface
+                testID="modal-view-profile-button"
+                style={styles.viewProfileButton}
+                onPress={() => onViewProfile(activity.userId)}
+                accessibilityRole="button"
+                feedback="standard"
+              >
+                <Text style={styles.viewProfileText}>{t('timeline.modalViewProfile')}</Text>
+              </PressableSurface>
+            )}
 
             <DialogCloseButton
               testID="modal-close-button"

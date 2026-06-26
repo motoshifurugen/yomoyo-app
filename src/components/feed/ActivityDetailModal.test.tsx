@@ -132,6 +132,26 @@ describe('ActivityDetailModal', () => {
     expect(onViewProfile).toHaveBeenCalledWith('user2');
   });
 
+  it('shows the deleted-user label and hides View profile for a deleted author', () => {
+    const onViewProfile = jest.fn();
+    const deleted = {
+      ...baseActivity,
+      authorDeleted: true,
+      displayName: '',
+      displayAvatar: null,
+    };
+    render(
+      <ActivityDetailModal
+        activity={deleted as ReadingActivity}
+        visible={true}
+        onClose={jest.fn()}
+        onViewProfile={onViewProfile}
+      />,
+    );
+    expect(screen.getByText('timeline.deletedUser')).toBeTruthy();
+    expect(screen.queryByTestId('modal-view-profile-button')).toBeNull();
+  });
+
   it('handles activities with no authors gracefully', () => {
     const noAuthors = { ...baseActivity, authors: [] };
     render(

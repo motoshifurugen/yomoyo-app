@@ -8,6 +8,7 @@ const ja = {
   },
   timeline: {
     finishedReading: '読み終えました',
+    deletedUser: '退会したユーザー',
     emptyTitle: '友達とつながろう',
     emptyBody: '友達の読了した記録が表示されます。',
     emptyBookmarksTitle: 'ブックマークはまだありません',
@@ -81,6 +82,13 @@ const ja = {
     openSettings: '設定を開く',
     logout: 'ログアウト',
     logoutError: 'ログアウトに失敗しました。もう一度お試しください。',
+    deleteAccount: 'アカウントを削除',
+    deleteAccountConfirmTitle: '本当に削除しますか？',
+    deleteAccountConfirmMessage:
+      'アカウントと関連データ（プロフィール・フォロー・通知設定）は完全に削除され、元に戻せません。読み終えた記録は匿名で残ります。',
+    deleteAccountConfirm: '削除する',
+    deleteAccountCancel: 'キャンセル',
+    deleteAccountError: '削除に失敗しました。もう一度お試しください。',
   },
   userProfile: {
     follow: 'おたよりを受け取る',
@@ -88,6 +96,8 @@ const ja = {
     notFound: 'このページは存在しません',
     emptyBooks: '読了した本はまだありません',
     ownPageNote: 'これはあなたのページです',
+    followSuccess: 'これから{{name}}さんの読書記録がタイムラインに届きます。',
+    backToTimeline: 'タイムラインに戻る',
     finishedCount_one: '{{count}}冊読み終えました',
     finishedCount_other: '{{count}}冊読み終えました',
     history: {

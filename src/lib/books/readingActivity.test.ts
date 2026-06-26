@@ -1,4 +1,8 @@
-import { markAsFinished, subscribeToReadingActivities } from './readingActivity';
+import {
+  markAsFinished,
+  subscribeToReadingActivities,
+  resolveAuthorName,
+} from './readingActivity';
 import type { Book } from './searchBooks';
 
 import {
@@ -222,5 +226,29 @@ describe('subscribeToReadingActivities', () => {
   it('returns the unsubscribe function', () => {
     const unsubscribe = subscribeToReadingActivities('user1', jest.fn());
     expect(typeof unsubscribe).toBe('function');
+  });
+});
+
+describe('resolveAuthorName', () => {
+  it('returns the deleted label when the author deleted their account', () => {
+    const name = resolveAuthorName(
+      { displayName: 'Foxy', authorDeleted: true },
+      '退会したユーザー',
+    );
+    expect(name).toBe('退会したユーザー');
+  });
+
+  it('returns the display name for an active author', () => {
+    const name = resolveAuthorName({ displayName: 'Foxy' }, '退会したユーザー');
+    expect(name).toBe('Foxy');
+  });
+
+  it('falls back to the legacy displayLabel when displayName is absent', () => {
+    const name = resolveAuthorName({ displayLabel: 'Legacy' }, '退会したユーザー');
+    expect(name).toBe('Legacy');
+  });
+
+  it('returns null when no name is available', () => {
+    expect(resolveAuthorName({}, '退会したユーザー')).toBeNull();
   });
 });
