@@ -15,7 +15,13 @@ type Props = {
 // Sign-in itself lives in LoginScreen, so onboarding starts at the avatar step.
 export default function OnboardingNavigator({ onComplete }: Props) {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'fade',
+        animationDuration: 400,
+      }}
+    >
       <Stack.Screen name="OnboardingAvatar" component={OnboardingAvatarScreen} />
       <Stack.Screen name="OnboardingNotification" component={OnboardingNotificationScreen} />
       <Stack.Screen name="OnboardingSending">

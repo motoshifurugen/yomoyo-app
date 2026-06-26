@@ -4,6 +4,7 @@ import AppNavigator from './AppNavigator';
 import OnboardingNavigator from './OnboardingNavigator';
 import LoginScreen from '@/screens/LoginScreen';
 import { useAuth } from '@/hooks/useAuth';
+import { alwaysShowOnboarding } from '@/lib/onboarding/alwaysShowOnboarding';
 import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushToken';
 import { ensureHandle } from '@/lib/users/handles';
@@ -36,7 +37,11 @@ export default function RootNavigator() {
     getAvatarIdentity(uid)
       .then((identity) => {
         if (cancelled) return;
-        setProfileState(identity === null ? 'needs-setup' : 'ready');
+        if (alwaysShowOnboarding || identity === null) {
+          setProfileState('needs-setup');
+          return;
+        }
+        setProfileState('ready');
       })
       .catch(() => {
         // Fail open: a transient Firestore error must not trap an onboarded

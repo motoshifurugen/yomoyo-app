@@ -35,25 +35,30 @@ export default function OnboardingSendingScreen({ onComplete }: Props) {
         accessibilityLabel={t('onboarding.progressLabel', { current: 3, total: 3 })}
       />
       <View style={styles.content}>
-        <View
-          style={styles.iconFrame}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          <Ionicons name="paper-plane-outline" size={64} color={colors.primary} />
+        <View style={styles.hero}>
+          <View
+            style={styles.iconFrame}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            <Ionicons name="paper-plane-outline" size={64} color={colors.primary} />
+          </View>
+          <Text style={styles.heading}>{t('onboarding.sendHeading')}</Text>
         </View>
-        <Text style={styles.heading}>{t('onboarding.sendHeading')}</Text>
-        <View style={styles.highlights}>
-          <UseCaseHighlight
-            testID="send-highlight-share-id"
-            icon="share-outline"
-            label={t('onboarding.sendHighlightShareId')}
-          />
-          <UseCaseHighlight
-            testID="send-highlight-record"
-            icon="book-outline"
-            label={t('onboarding.sendHighlightRecord')}
-          />
+        <View style={styles.stepsSection}>
+          <Text style={styles.body}>{t('onboarding.sendBody')}</Text>
+          <View style={styles.highlights}>
+            <UseCaseHighlight
+              testID="send-highlight-share-id"
+              icon="share-outline"
+              label={t('onboarding.sendHighlightShareId')}
+            />
+            <UseCaseHighlight
+              testID="send-highlight-record"
+              icon="book-outline"
+              label={t('onboarding.sendHighlightRecord')}
+            />
+          </View>
         </View>
       </View>
       <View style={styles.actions}>
@@ -82,6 +87,9 @@ const makeStyles = (colors: ThemeColors) =>
       flex: 1,
       justifyContent: 'center',
     },
+    hero: {
+      alignItems: 'center',
+    },
     iconFrame: {
       width: 180,
       height: 180,
@@ -89,7 +97,6 @@ const makeStyles = (colors: ThemeColors) =>
       backgroundColor: colors.surface,
       alignItems: 'center',
       justifyContent: 'center',
-      alignSelf: 'center',
       marginBottom: 40,
     },
     heading: {
@@ -97,7 +104,18 @@ const makeStyles = (colors: ThemeColors) =>
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
       textAlign: 'center',
-      marginBottom: 32,
+    },
+    stepsSection: {
+      alignSelf: 'stretch',
+      marginTop: 32,
+    },
+    body: {
+      fontSize: yomoyoTypography.bodySize,
+      fontWeight: yomoyoTypography.bodyWeight,
+      lineHeight: yomoyoTypography.bodyLineHeight,
+      color: colors.secondaryText,
+      textAlign: 'center',
+      marginBottom: 18,
     },
     highlights: {
       gap: 18,

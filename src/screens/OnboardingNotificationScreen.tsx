@@ -77,38 +77,42 @@ export default function OnboardingNotificationScreen() {
         accessibilityLabel={t('onboarding.progressLabel', { current: 2, total: 3 })}
       />
       <View style={styles.content}>
-        <View style={styles.videoFrame}>
-          <View
-            testID="notification-video-placeholder"
-            pointerEvents="none"
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={styles.placeholder}
-          >
-            <Ionicons name="notifications-outline" size={64} color={colors.muted} />
+        <View style={styles.hero}>
+          <View style={styles.videoFrame}>
+            <View
+              testID="notification-video-placeholder"
+              pointerEvents="none"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={styles.placeholder}
+            >
+              <Ionicons name="notifications-outline" size={64} color={colors.muted} />
+            </View>
+            <VideoView
+              accessible={false}
+              testID="notification-video"
+              player={player}
+              style={styles.video}
+              contentFit="contain"
+              nativeControls={false}
+            />
           </View>
-          <VideoView
-            accessible={false}
-            testID="notification-video"
-            player={player}
-            style={styles.video}
-            contentFit="contain"
-            nativeControls={false}
-          />
+          <Text style={styles.heading}>{t('onboarding.notificationHeading')}</Text>
         </View>
-        <Text style={styles.heading}>{t('onboarding.notificationHeading')}</Text>
-        <Text style={styles.body}>{t('onboarding.notificationBody')}</Text>
-        <View style={styles.highlights}>
-          <UseCaseHighlight
-            testID="receive-highlight-notify"
-            icon="notifications-outline"
-            label={t('onboarding.receiveHighlightNotify')}
-          />
-          <UseCaseHighlight
-            testID="receive-highlight-connect"
-            icon="person-add-outline"
-            label={t('onboarding.receiveHighlightConnect')}
-          />
+        <View style={styles.stepsSection}>
+          <Text style={styles.body}>{t('onboarding.notificationBody')}</Text>
+          <View style={styles.highlights}>
+            <UseCaseHighlight
+              testID="receive-highlight-notify"
+              icon="notifications-outline"
+              label={t('onboarding.receiveHighlightNotify')}
+            />
+            <UseCaseHighlight
+              testID="receive-highlight-connect"
+              icon="person-add-outline"
+              label={t('onboarding.receiveHighlightConnect')}
+            />
+          </View>
         </View>
       </View>
       <View style={styles.actions}>
@@ -137,8 +141,10 @@ const makeStyles = (colors: ThemeColors) =>
     },
     content: {
       flex: 1,
-      alignItems: 'center',
       justifyContent: 'center',
+    },
+    hero: {
+      alignItems: 'center',
     },
     videoFrame: {
       width: 180,
@@ -165,7 +171,10 @@ const makeStyles = (colors: ThemeColors) =>
       fontWeight: yomoyoTypography.titleWeight,
       color: colors.text,
       textAlign: 'center',
-      marginBottom: 18,
+    },
+    stepsSection: {
+      alignSelf: 'stretch',
+      marginTop: 32,
     },
     body: {
       fontSize: yomoyoTypography.bodySize,
@@ -173,11 +182,11 @@ const makeStyles = (colors: ThemeColors) =>
       lineHeight: yomoyoTypography.bodyLineHeight,
       color: colors.secondaryText,
       textAlign: 'center',
+      marginBottom: 18,
     },
     highlights: {
       alignSelf: 'stretch',
       gap: 18,
-      marginTop: 32,
     },
     actions: {
       alignItems: 'center',

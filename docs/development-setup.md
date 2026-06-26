@@ -26,6 +26,7 @@ cp .env.example .env
 - `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — Google Cloud Console → Credentials → OAuth 2.0 → Web application
 - `EXPO_PUBLIC_GOOGLE_BOOKS_API_KEY` — Google Cloud Console → Credentials → API key
 - `EXPO_PUBLIC_FIREBASE_*` — Firebase Console → Project settings → Your apps → `GoogleService-Info.plist`
+- `EXPO_PUBLIC_ALWAYS_SHOW_ONBOARDING=true` — （任意）検証用。ログインのたびにオンボーディングチュートリアルを表示
 
 ### 3. FirebaseのConfigファイルを設置
 
@@ -48,6 +49,24 @@ cd ios && pod install && cd ..
 ```sh
 pnpm run ios
 ```
+
+---
+
+## オンボーディングの再表示（検証用）
+
+通常、オンボーディング（アバター → 通知 → 送る側の説明）は **初回サインイン時のみ** 表示されます。UI を繰り返し確認したい場合は `.env` に以下を追加してください。
+
+```
+EXPO_PUBLIC_ALWAYS_SHOW_ONBOARDING=true
+```
+
+反映には Metro のキャッシュクリアが必要です。
+
+```sh
+pnpm run start --clear
+```
+
+サインインするたび（アプリ再起動を含む）にチュートリアルが表示されます。検証が終わったら `.env` から削除するか `false` に戻してください。
 
 ---
 

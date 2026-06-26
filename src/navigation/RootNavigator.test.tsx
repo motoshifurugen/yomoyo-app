@@ -27,6 +27,14 @@ jest.mock('@/navigation/OnboardingNavigator', () => {
   };
 });
 
+const mockAlwaysShowOnboardingForTests = { value: false };
+
+jest.mock('@/lib/onboarding/alwaysShowOnboarding', () => ({
+  get alwaysShowOnboarding() {
+    return mockAlwaysShowOnboardingForTests.value;
+  },
+}));
+
 jest.mock('@/lib/users/avatarIdentity', () => ({
   getAvatarIdentity: jest.fn(),
 }));
@@ -56,6 +64,7 @@ function renderWithNav() {
 describe('RootNavigator', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAlwaysShowOnboardingForTests.value = false;
     jest.mocked(getAvatarIdentity).mockResolvedValue(profile as any);
   });
 
@@ -83,6 +92,17 @@ describe('RootNavigator', () => {
     jest.mocked(getAvatarIdentity).mockResolvedValue(null);
     jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
       user: { uid: 'newuser' } as any,
+      loading: false,
+    });
+    renderWithNav();
+    expect(await screen.findByText('OnboardingNavigator')).toBeTruthy();
+  });
+
+  it('shows OnboardingNavigator on every login when alwaysShowOnboarding is enabled', async () => {
+    mockAlwaysShowOnboardingForTests.value = true;
+    jest.mocked(getAvatarIdentity).mockResolvedValue(profile as any);
+    jest.spyOn(useAuthModule, 'useAuth').mockReturnValue({
+      user: { uid: 'abc123' } as any,
       loading: false,
     });
     renderWithNav();

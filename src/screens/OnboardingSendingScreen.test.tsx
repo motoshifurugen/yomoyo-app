@@ -23,6 +23,11 @@ describe('OnboardingSendingScreen', () => {
     expect(screen.getByText('onboarding.sendHeading')).toBeTruthy();
   });
 
+  it('renders the sending body key', () => {
+    render(<OnboardingSendingScreen onComplete={mockOnComplete} />);
+    expect(screen.getByText('onboarding.sendBody')).toBeTruthy();
+  });
+
   it('renders a 3-step progress indicator at step 3 (all filled)', () => {
     render(<OnboardingSendingScreen onComplete={mockOnComplete} />);
     expect(screen.getAllByTestId(/onboarding-progress-segment-/)).toHaveLength(3);
