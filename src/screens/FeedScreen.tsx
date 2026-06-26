@@ -24,6 +24,7 @@ import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
+import { resolveAuthorName } from '@/lib/books/readingActivity';
 import { useBookmarkFilter } from '@/lib/books/bookmarkFilterContext';
 import type { RootStackParamList } from '@/navigation/types';
 import { interleaveAds, type FeedRow } from '@/lib/ads/interleaveAds';
@@ -45,11 +46,14 @@ const ActivityCard = React.memo(function ActivityCard({
   onPress,
   onToggleBookmark,
 }: ActivityCardProps) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const styles = useThemedStyles(makeStyles);
   const avatarKey = item.displayAvatar as AnimalKey | undefined;
-  const avatarSource = avatarKey && ANIMAL_ASSETS[avatarKey] ? ANIMAL_ASSETS[avatarKey] : null;
-  const displayName = item.displayName ?? item.displayLabel;
+  const avatarSource =
+    !item.authorDeleted && avatarKey && ANIMAL_ASSETS[avatarKey]
+      ? ANIMAL_ASSETS[avatarKey]
+      : null;
+  const displayName = resolveAuthorName(item, t('timeline.deletedUser'));
   const dateText = item.finishedAt
     ? formatBookDate(item.finishedAt.toDate(), i18n.language)
     : null;

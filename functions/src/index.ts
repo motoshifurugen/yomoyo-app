@@ -1,8 +1,10 @@
+import { getAuth } from 'firebase-admin/auth';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v2';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
+import { deleteUserData } from './deleteAccount';
 import { sendExpoPush } from './expoPush';
 import { resolveRecipients } from './recipients';
 
@@ -151,6 +153,28 @@ export const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
         error: err instanceof Error ? err.message : String(err),
       });
       throw new HttpsError('internal', 'Failed to resolve recipients.');
+    }
+  },
+);
+
+export const deleteAccount = onCall(
+  { region: REGION, invoker: 'public' },
+  async (req) => {
+    if (!req.auth) {
+      throw new HttpsError('unauthenticated', 'Sign-in required.');
+    }
+    const uid = req.auth.uid;
+
+    try {
+      const result = await deleteUserData(getFirestore(), getAuth(), uid);
+      logger.info('deleteAccount completed', { uid, ...result });
+      return { ok: true as const };
+    } catch (err) {
+      logger.error('deleteAccount failed', {
+        uid,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw new HttpsError('internal', 'Failed to delete account.');
     }
   },
 );
