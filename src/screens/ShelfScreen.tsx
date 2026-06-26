@@ -18,6 +18,7 @@ import type { RootStackParamList } from '@/navigation/types';
 import MyHandleCard from '@/components/shelf/MyHandleCard';
 import MyIdentityHeader from '@/components/shelf/MyIdentityHeader';
 import BookListItem from '@/components/books/BookListItem';
+import BookListSkeleton from '@/components/books/BookListSkeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatBookDate } from '@/lib/books/formatBookDate';
 
@@ -34,11 +35,23 @@ export default function ShelfScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const uid = user?.uid;
-    if (!uid) return;
-    const unsubscribe = subscribeToReadingActivities(uid, setActivities);
+    if (!uid) {
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    const unsubscribe = subscribeToReadingActivities(
+      uid,
+      (items) => {
+        setActivities(items);
+        setIsLoading(false);
+      },
+      () => setIsLoading(false),
+    );
     return unsubscribe;
   }, [user?.uid]);
 
@@ -77,7 +90,9 @@ export default function ShelfScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {activities.length === 0 ? (
+        {isLoading ? (
+          <BookListSkeleton />
+        ) : activities.length === 0 ? (
           <EmptyState
             icon="book-outline"
             title={t('shelf.emptyTitle')}

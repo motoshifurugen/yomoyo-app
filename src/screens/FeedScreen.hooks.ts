@@ -60,7 +60,9 @@ export function useFeedState(): FeedState {
   const [items, setItems] = useState<ReadingActivity[]>([]);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const [followingUids, setFollowingUids] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // Start in the loading state so the first paint shows the skeleton rather
+  // than briefly flashing the empty state before the load effect runs.
+  const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
@@ -71,7 +73,10 @@ export function useFeedState(): FeedState {
 
   useEffect(() => {
     const uid = user?.uid;
-    if (!uid) return;
+    if (!uid) {
+      setIsLoading(false);
+      return;
+    }
     let cancelled = false;
     setIsLoading(true);
     setHasError(false);

@@ -143,9 +143,20 @@ describe('UserProfileScreen — book list', () => {
   });
 
   it('shows empty state when no finished books', async () => {
+    mockSubscribe.mockImplementation((_uid: string, onUpdate: Function) => {
+      onUpdate([]);
+      return jest.fn();
+    });
+    render(<UserProfileScreen />);
+    await screen.findByText('userProfile.emptyBooks');
+    expect(screen.getByText('userProfile.emptyBooks')).toBeTruthy();
+  });
+
+  it('shows a loading skeleton until the first activities snapshot arrives', async () => {
     render(<UserProfileScreen />);
     await screen.findByText('Quiet Fox');
-    expect(screen.getByText('userProfile.emptyBooks')).toBeTruthy();
+    expect(screen.getByTestId('book-list-skeleton')).toBeTruthy();
+    expect(screen.queryByText('userProfile.emptyBooks')).toBeNull();
   });
 
   it('hides empty state when books exist', async () => {

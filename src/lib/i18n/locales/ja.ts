@@ -1,6 +1,7 @@
 const ja = {
   common: {
     back: '戻る',
+    loading: '読み込み中',
   },
   tabs: {
     timeline: 'タイムライン',

@@ -20,7 +20,8 @@ import { formatBookDate } from '@/lib/books/formatBookDate';
 import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
 import { yomoyoTypography } from '@/constants/yomoyoTheme';
-import { useTheme, useThemedStyles, type ThemeColors } from '@/lib/theme';
+import { useThemedStyles, type ThemeColors } from '@/lib/theme';
+import FeedSkeleton from '@/components/feed/FeedSkeleton';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
 import type { ReadingActivity } from '@/lib/books/readingActivity';
@@ -132,7 +133,6 @@ export default function FeedScreen() {
     toggleBookmark,
   } = useFeedState();
   const { mode } = useBookmarkFilter();
-  const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
 
   const [selectedActivity, setSelectedActivity] = useState<ReadingActivity | null>(null);
@@ -214,9 +214,7 @@ export default function FeedScreen() {
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator color={colors.primary} />
-        </View>
+        <FeedSkeleton />
       ) : hasError ? (
         <EmptyState
           icon="cloud-offline-outline"
@@ -250,12 +248,6 @@ export default function FeedScreen() {
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    center: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 32,
-    },
     list: { paddingBottom: 16 },
     loader: { marginVertical: 16 },
     adSlot: { marginBottom: 12, alignItems: 'center' },

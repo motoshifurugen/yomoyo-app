@@ -1,6 +1,7 @@
 const en = {
   common: {
     back: 'Go back',
+    loading: 'Loading',
   },
   tabs: {
     timeline: 'Timeline',
