@@ -15,6 +15,7 @@ import type { ReadingActivity } from '@/lib/books/readingActivity';
 import { bucketActivitiesByWeek, HISTORY_WINDOW_WEEKS } from '@/lib/books/readingHistory';
 import ReadingHistoryHeatmap from '@/components/profile/ReadingHistoryHeatmap';
 import BookListItem from '@/components/books/BookListItem';
+import BookListSkeleton from '@/components/books/BookListSkeleton';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
 import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
@@ -36,6 +37,7 @@ export default function UserProfileScreen() {
 
   const [identity, setIdentity] = useState<IdentityState>('loading');
   const [activities, setActivities] = useState<ReadingActivity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
   const [following, setFollowing] = useState(false);
   const [justFollowed, setJustFollowed] = useState(false);
 
@@ -53,10 +55,14 @@ export default function UserProfileScreen() {
   }, [user?.uid, uid, isOwnProfile]);
 
   useEffect(() => {
+    setActivitiesLoading(true);
     const unsubscribe = subscribeToReadingActivities(
       uid,
-      setActivities,
-      () => {},
+      (items) => {
+        setActivities(items);
+        setActivitiesLoading(false);
+      },
+      () => setActivitiesLoading(false),
     );
     return unsubscribe;
   }, [uid]);
@@ -195,7 +201,9 @@ export default function UserProfileScreen() {
 
         <Text style={styles.sectionHeader}>{t('shelf.finished')}</Text>
 
-        {activities.length === 0 ? (
+        {activitiesLoading ? (
+          <BookListSkeleton count={3} />
+        ) : activities.length === 0 ? (
           <Text style={styles.emptyText}>{t('userProfile.emptyBooks')}</Text>
         ) : (
           activities.map((item) => (

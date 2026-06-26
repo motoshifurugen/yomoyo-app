@@ -77,18 +77,36 @@ describe('ShelfScreen', () => {
   });
 
   it('shows empty Finished state when no finished books exist', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([]);
+      return jest.fn();
+    });
     render(<ShelfScreen />);
     expect(screen.getByText('shelf.emptyFinished')).toBeTruthy();
   });
 
   it('guides the user to record their first book in the empty state', () => {
+    mockSubscribe.mockImplementation((_userId: string, onUpdate: Function) => {
+      onUpdate([]);
+      return jest.fn();
+    });
     render(<ShelfScreen />);
     expect(screen.getByText('shelf.emptyTitle')).toBeTruthy();
   });
 
+  it('shows a loading skeleton until the first snapshot arrives', () => {
+    render(<ShelfScreen />);
+    expect(screen.getByTestId('book-list-skeleton')).toBeTruthy();
+    expect(screen.queryByText('shelf.emptyFinished')).toBeNull();
+  });
+
   it('subscribes to activities for the current user on mount', () => {
     render(<ShelfScreen />);
-    expect(mockSubscribe).toHaveBeenCalledWith('user1', expect.any(Function));
+    expect(mockSubscribe).toHaveBeenCalledWith(
+      'user1',
+      expect.any(Function),
+      expect.any(Function),
+    );
   });
 
   it('renders book title when finished activities exist', () => {
