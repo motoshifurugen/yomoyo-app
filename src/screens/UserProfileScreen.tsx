@@ -18,6 +18,8 @@ import BookListItem from '@/components/books/BookListItem';
 import BookListSkeleton from '@/components/books/BookListSkeleton';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
 import type { RootStackParamList } from '@/navigation/types';
+import { closeToMainTabs } from '@/navigation/closeToMainTabs';
+import { dismissRootModal } from '@/navigation/dismissRootModal';
 import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 
@@ -28,7 +30,7 @@ type Route = RouteProp<RootStackParamList, 'UserProfile'>;
 type IdentityState = AvatarIdentity | null | 'loading';
 
 export default function UserProfileScreen() {
-  const { params: { uid } } = useRoute<Route>();
+  const { params: { uid, fromAddFriend = false } } = useRoute<Route>();
   const { user } = useAuth();
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp>();
@@ -92,7 +94,7 @@ export default function UserProfileScreen() {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate('MainTabs', undefined);
+      closeToMainTabs(navigation, 'Timeline');
     }
   };
 
@@ -102,6 +104,10 @@ export default function UserProfileScreen() {
       setFollowing(false);
       setJustFollowed(false);
       unfollowUser(user.uid, uid).catch(() => setFollowing(true));
+    } else if (fromAddFriend) {
+      followUser(user.uid, uid)
+        .then(() => dismissRootModal(navigation))
+        .catch(() => {});
     } else {
       setFollowing(true);
       setJustFollowed(true);
@@ -113,10 +119,10 @@ export default function UserProfileScreen() {
   };
 
   const handleBackToTimeline = () => {
-    navigation.navigate('MainTabs', { screen: 'Timeline' });
+    closeToMainTabs(navigation, 'Timeline');
   };
 
-  const showFollowSuccess = !isOwnProfile && following && justFollowed;
+  const showFollowSuccess = !fromAddFriend && !isOwnProfile && following && justFollowed;
 
   return (
     <ScreenContainer>

@@ -92,8 +92,42 @@ beforeEach(() => {
   capturedScreenOptions = null;
 });
 
-describe('MainTabNavigator — Shelf hosts the connect + settings actions', () => {
-  it('places AddFriend and Settings in the Shelf headerRight', () => {
+describe('MainTabNavigator — Timeline header actions', () => {
+  it('places AddFriend in the Timeline headerRight', () => {
+    const { render: rtlRender } = require('@testing-library/react-native');
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
+    expect(timeline).toBeDefined();
+    const headerRight = (timeline?.options as Record<string, unknown>).headerRight as
+      | ((props?: unknown) => React.ReactElement)
+      | undefined;
+    expect(typeof headerRight).toBe('function');
+    const tree = rtlRender(<ThemeProvider>{headerRight!({})}</ThemeProvider>);
+    expect(tree.getByTestId('add-friend-button-mock')).toBeTruthy();
+    tree.unmount();
+  });
+
+  it('applies an 8pt right gutter to the Timeline screen header', () => {
+    render(
+      <ThemeProvider>
+        <MainTabNavigator />
+      </ThemeProvider>,
+    );
+    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
+    expect(timeline?.options).toEqual(
+      expect.objectContaining({
+        headerRightContainerStyle: { paddingRight: 8 },
+      }),
+    );
+  });
+});
+
+describe('MainTabNavigator — Shelf hosts settings', () => {
+  it('places Settings in the Shelf headerRight only', () => {
     const { render: rtlRender } = require('@testing-library/react-native');
     render(
       <ThemeProvider>
@@ -107,8 +141,8 @@ describe('MainTabNavigator — Shelf hosts the connect + settings actions', () =
       | undefined;
     expect(typeof headerRight).toBe('function');
     const tree = rtlRender(<ThemeProvider>{headerRight!({})}</ThemeProvider>);
-    expect(tree.getByTestId('add-friend-button-mock')).toBeTruthy();
     expect(tree.getByTestId('settings-launcher-mock')).toBeTruthy();
+    expect(tree.queryByTestId('add-friend-button-mock')).toBeNull();
     tree.unmount();
   });
 
@@ -126,16 +160,15 @@ describe('MainTabNavigator — Shelf hosts the connect + settings actions', () =
     );
   });
 
-  it('keeps the Timeline screen free of header right actions (1 screen, 1 purpose)', () => {
+  it('keeps the Shelf screen free of header left actions', () => {
     render(
       <ThemeProvider>
         <MainTabNavigator />
       </ThemeProvider>,
     );
-    const timeline = capturedScreens.find((s) => s.name === 'Timeline');
-    expect(timeline).toBeDefined();
-    expect(timeline?.options).not.toHaveProperty('headerRight');
-    expect(timeline?.options).not.toHaveProperty('headerRightContainerStyle');
+    const shelf = capturedScreens.find((s) => s.name === 'Shelf');
+    expect(shelf?.options).not.toHaveProperty('headerLeft');
+    expect(shelf?.options).not.toHaveProperty('headerLeftContainerStyle');
   });
 });
 

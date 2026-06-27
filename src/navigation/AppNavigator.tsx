@@ -5,7 +5,7 @@ import BookSearchScreen from '@/screens/BookSearchScreen';
 import BarcodeScanScreen from '@/screens/BarcodeScanScreen';
 import BookDetailScreen from '@/screens/BookDetailScreen';
 import UserProfileScreen from '@/screens/UserProfileScreen';
-import AddFriendScreen from '@/screens/AddFriendScreen';
+import AddFriendModalNavigator from './AddFriendModalNavigator';
 import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -21,8 +21,8 @@ export default function AppNavigator() {
       <Stack.Screen name="BookDetail" component={BookDetailScreen} options={{ title: 'Book Detail' }} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen
-        name="AddFriend"
-        component={AddFriendScreen}
+        name="AddFriendFlow"
+        component={AddFriendModalNavigator}
         options={{ headerShown: false, presentation: 'modal' }}
       />
     </Stack.Navigator>

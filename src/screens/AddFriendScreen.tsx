@@ -19,9 +19,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { findUidByHandle } from '@/lib/users/handles';
 import { getAvatarIdentity, ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
-import type { RootStackParamList } from '@/navigation/types';
+import type { AddFriendStackParamList } from '@/navigation/types';
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type NavigationProp = NativeStackNavigationProp<AddFriendStackParamList, 'AddFriend'>;
 
 type SearchState =
   | { kind: 'idle' }
@@ -68,7 +68,7 @@ export default function AddFriendScreen() {
 
   const handleViewProfile = () => {
     if (state.kind !== 'match') return;
-    navigation.navigate('UserProfile', { uid: state.uid });
+    navigation.navigate('UserProfile', { uid: state.uid, fromAddFriend: true });
   };
 
   return (

@@ -58,7 +58,7 @@ export default function FeedSkeleton({ count = DEFAULT_COUNT }: FeedSkeletonProp
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    list: { paddingBottom: spacing.lg },
+    list: { paddingTop: spacing.xl, paddingBottom: spacing.lg },
     card: {
       backgroundColor: colors.surface,
       borderRadius: 12,

@@ -17,10 +17,12 @@ import { enrichActivityAvatars, type AvatarCache } from '@/lib/books/enrichActiv
 export type FeedState = {
   items: ReadingActivity[];
   isLoading: boolean;
+  isRefreshing: boolean;
   isLoadingMore: boolean;
   hasError: boolean;
   bookmarkedIds: Set<string>;
   handleLoadMore: () => void;
+  handleRefresh: () => void;
   toggleBookmark: (activityId: string) => Promise<void>;
 };
 
@@ -63,6 +65,7 @@ export function useFeedState(): FeedState {
   // Start in the loading state so the first paint shows the skeleton rather
   // than briefly flashing the empty state before the load effect runs.
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
@@ -70,6 +73,17 @@ export function useFeedState(): FeedState {
   const mountedRef = useRef(true);
 
   useEffect(() => () => { mountedRef.current = false; }, []);
+
+  const fetchFeed = useCallback(async (uid: string) => {
+    const loader = mode === 'bookmarks' ? loadBookmarkedFeed : loadAllFeed;
+    const result = await loader(uid);
+    const enriched = await enrichActivityAvatars(
+      result.items,
+      avatarCacheRef.current,
+      getAvatarIdentity,
+    );
+    return { ...result, items: enriched };
+  }, [mode]);
 
   useEffect(() => {
     const uid = user?.uid;
@@ -83,19 +97,12 @@ export function useFeedState(): FeedState {
     setItems([]);
     setLastDoc(null);
 
-    const loader = mode === 'bookmarks' ? loadBookmarkedFeed : loadAllFeed;
-    loader(uid)
-      .then(async (result) => {
+    fetchFeed(uid)
+      .then((result) => {
         if (cancelled || !mountedRef.current) return;
         setFollowingUids(result.uids);
         setBookmarkedIds(result.ids);
-        const enriched = await enrichActivityAvatars(
-          result.items,
-          avatarCacheRef.current,
-          getAvatarIdentity,
-        );
-        if (cancelled || !mountedRef.current) return;
-        setItems(enriched);
+        setItems(result.items);
         setLastDoc(result.lastDoc);
       })
       .catch((err: unknown) => {
@@ -112,10 +119,36 @@ export function useFeedState(): FeedState {
     return () => {
       cancelled = true;
     };
-  }, [user?.uid, mode]);
+  }, [user?.uid, mode, fetchFeed]);
+
+  const handleRefresh = useCallback(() => {
+    const uid = user?.uid;
+    if (!uid || isRefreshing || isLoading) return;
+    const hadItems = items.length > 0;
+    setIsRefreshing(true);
+    setHasError(false);
+
+    fetchFeed(uid)
+      .then((result) => {
+        if (!mountedRef.current) return;
+        setFollowingUids(result.uids);
+        setBookmarkedIds(result.ids);
+        setItems(result.items);
+        setLastDoc(result.lastDoc);
+      })
+      .catch((err: unknown) => {
+        logError('[FeedScreen] feed refresh failed', err);
+        if (!mountedRef.current) return;
+        if (!hadItems) setHasError(true);
+      })
+      .finally(() => {
+        if (!mountedRef.current) return;
+        setIsRefreshing(false);
+      });
+  }, [user?.uid, isRefreshing, isLoading, items.length, fetchFeed]);
 
   const handleLoadMore = useCallback(() => {
-    if (isLoadingMore || !lastDoc) return;
+    if (isLoadingMore || isRefreshing || !lastDoc) return;
     const uid = user?.uid;
     if (!uid) return;
     setIsLoadingMore(true);
@@ -142,7 +175,7 @@ export function useFeedState(): FeedState {
         if (!mountedRef.current) return;
         setIsLoadingMore(false);
       });
-  }, [isLoadingMore, lastDoc, followingUids, mode, user?.uid]);
+  }, [isLoadingMore, isRefreshing, lastDoc, followingUids, mode, user?.uid]);
 
   const toggleBookmark = useCallback(async (activityId: string) => {
     const uid = user?.uid;
@@ -191,10 +224,12 @@ export function useFeedState(): FeedState {
   return {
     items,
     isLoading,
+    isRefreshing,
     isLoadingMore,
     hasError,
     bookmarkedIds,
     handleLoadMore,
+    handleRefresh,
     toggleBookmark,
   };
 }

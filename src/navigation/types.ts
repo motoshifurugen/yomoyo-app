@@ -1,12 +1,17 @@
 import type { Book } from '@/lib/books/searchBooks';
 
+export type AddFriendStackParamList = {
+  AddFriend: undefined;
+  UserProfile: { uid: string; fromAddFriend?: boolean };
+};
+
 export type RootStackParamList = {
   MainTabs: { screen?: keyof MainTabParamList } | undefined;
   BookSearch: undefined;
   BarcodeScan: undefined;
   BookDetail: { book: Book };
-  UserProfile: { uid: string };
-  AddFriend: undefined;
+  UserProfile: { uid: string; fromAddFriend?: boolean };
+  AddFriendFlow: undefined;
 };
 
 export type MainTabParamList = {

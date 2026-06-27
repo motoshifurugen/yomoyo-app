@@ -70,6 +70,7 @@ function Probe() {
       <Text testID="items">{state.items.map((i) => i.id).join(',')}</Text>
       <Text testID="ids">{Array.from(state.bookmarkedIds).join(',')}</Text>
       <Text testID="loading">{String(state.isLoading)}</Text>
+      <Text testID="refreshing">{String(state.isRefreshing)}</Text>
       <Text testID="error">{String(state.hasError)}</Text>
       <Pressable testID="switch-bookmarks" onPress={() => filter.setMode('bookmarks')}>
         <Text>switch</Text>
@@ -79,6 +80,9 @@ function Probe() {
       </Pressable>
       <Pressable testID="toggle-act1" onPress={() => state.toggleBookmark('act1')}>
         <Text>toggle</Text>
+      </Pressable>
+      <Pressable testID="refresh" onPress={() => state.handleRefresh()}>
+        <Text>refresh</Text>
       </Pressable>
     </View>
   );
@@ -117,6 +121,25 @@ describe('useFeedState — all mode (default)', () => {
     renderProbe();
     await waitFor(() => expect(mockGetFriendsFeed).toHaveBeenCalled());
     expect(mockGetBookmarkedActivities).not.toHaveBeenCalled();
+  });
+
+  it('reloads the feed when handleRefresh is called', async () => {
+    mockGetFriendsFeed
+      .mockResolvedValueOnce({ items: [activity('a1')], lastDoc: null })
+      .mockResolvedValueOnce({ items: [activity('a1'), activity('a2')], lastDoc: null });
+    renderProbe();
+    await waitFor(() =>
+      expect(screen.getByTestId('items').props.children).toBe('a1'),
+    );
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId('refresh'));
+    });
+    await waitFor(() => {
+      expect(mockGetFriendsFeed).toHaveBeenCalledTimes(2);
+      expect(screen.getByTestId('items').props.children).toBe('a1,a2');
+      expect(screen.getByTestId('refreshing').props.children).toBe('false');
+    });
   });
 });
 

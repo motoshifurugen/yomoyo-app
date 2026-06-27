@@ -28,7 +28,7 @@ export default function AddFriendButton({ variant = 'icon' }: Props) {
   const styles = useThemedStyles(makeStyles);
 
   const label = t('addFriend.heading');
-  const handlePress = () => navigation.navigate('AddFriend');
+  const handlePress = () => navigation.navigate('AddFriendFlow');
 
   if (variant === 'inline') {
     return (

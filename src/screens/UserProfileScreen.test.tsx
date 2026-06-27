@@ -54,9 +54,22 @@ jest.mock('@/lib/users/follows', () => ({
   unfollowUser: jest.fn(() => Promise.resolve()),
 }));
 
+jest.mock('@/navigation/closeToMainTabs', () => ({
+  closeToMainTabs: jest.fn(),
+}));
+
+jest.mock('@/navigation/dismissRootModal', () => ({
+  dismissRootModal: jest.fn(),
+}));
+
 import { getAvatarIdentity } from '@/lib/users/avatarIdentity';
 import { subscribeToReadingActivities } from '@/lib/books/readingActivity';
 import { isFollowing, followUser, unfollowUser } from '@/lib/users/follows';
+import { closeToMainTabs } from '@/navigation/closeToMainTabs';
+import { dismissRootModal } from '@/navigation/dismissRootModal';
+
+const mockCloseToMainTabs = closeToMainTabs as jest.Mock;
+const mockDismissRootModal = dismissRootModal as jest.Mock;
 
 const mockGetAvatarIdentity = getAvatarIdentity as jest.Mock;
 const mockSubscribe = subscribeToReadingActivities as jest.Mock;
@@ -286,7 +299,27 @@ describe('UserProfileScreen — post-follow success state', () => {
     render(<UserProfileScreen />);
     fireEvent.press(await screen.findByTestId('follow-button'));
     fireEvent.press(await screen.findByTestId('back-to-timeline-button'));
-    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', { screen: 'Timeline' });
+    expect(mockCloseToMainTabs).toHaveBeenCalledWith(
+      expect.objectContaining({ goBack: mockGoBack }),
+      'Timeline',
+    );
+  });
+
+  it('dismisses the AddFriend modal automatically after follow when opened from AddFriend', async () => {
+    jest.mocked(useRoute).mockReturnValue({
+      params: { uid: 'user2', fromAddFriend: true },
+      key: 'UserProfile',
+      name: 'UserProfile',
+    });
+    render(<UserProfileScreen />);
+    fireEvent.press(await screen.findByTestId('follow-button'));
+    await waitFor(() => {
+      expect(mockDismissRootModal).toHaveBeenCalledWith(
+        expect.objectContaining({ goBack: mockGoBack }),
+      );
+    });
+    expect(mockCloseToMainTabs).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('follow-success-block')).toBeNull();
   });
 
   it('keeps the unfollow button accessible underneath the success block', async () => {
@@ -343,12 +376,15 @@ describe('UserProfileScreen — navigation button', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('calls navigate to MainTabs when canGoBack is false and nav button is pressed', async () => {
+  it('closes to MainTabs when canGoBack is false and nav button is pressed', async () => {
     mockCanGoBack.mockReturnValue(false);
     render(<UserProfileScreen />);
     await screen.findByText('Quiet Fox');
     fireEvent.press(screen.getByTestId('nav-back-button'));
-    expect(mockNavigate).toHaveBeenCalledWith('MainTabs', undefined);
+    expect(mockCloseToMainTabs).toHaveBeenCalledWith(
+      expect.objectContaining({ goBack: mockGoBack }),
+      'Timeline',
+    );
     expect(mockGoBack).not.toHaveBeenCalled();
   });
 

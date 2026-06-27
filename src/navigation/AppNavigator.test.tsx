@@ -22,6 +22,8 @@ jest.mock('@react-navigation/native-stack', () => {
         return ReactInner.createElement(View, null, children);
       },
       Screen: () => null,
+      Group: ({ children }: { children: React.ReactNode }) =>
+        ReactInner.createElement(View, null, children),
     }),
   };
 });
@@ -30,7 +32,7 @@ jest.mock('./MainTabNavigator', () => () => null);
 jest.mock('@/screens/BookSearchScreen', () => () => null);
 jest.mock('@/screens/BookDetailScreen', () => () => null);
 jest.mock('@/screens/UserProfileScreen', () => () => null);
-jest.mock('@/screens/AddFriendScreen', () => () => null);
+jest.mock('./AddFriendModalNavigator', () => () => null);
 
 beforeEach(() => {
   capturedScreenOptions = null;

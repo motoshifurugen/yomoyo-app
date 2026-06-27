@@ -1,5 +1,4 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTranslation } from 'react-i18next';
 import FeedScreen from '@/screens/FeedScreen';
@@ -44,6 +43,8 @@ export default function MainTabNavigator() {
           title: t('tabs.timeline'),
           headerLeftContainerStyle: { paddingLeft: 8 },
           headerLeft: () => <BookmarkFilterToggle />,
+          headerRightContainerStyle: { paddingRight: 8 },
+          headerRight: () => <AddFriendButton />,
         }}
       />
       <Tab.Screen
@@ -52,22 +53,10 @@ export default function MainTabNavigator() {
         options={{
           title: t('tabs.shelf'),
           headerRightContainerStyle: { paddingRight: 8 },
-          headerRight: () => (
-            <View style={styles.headerRight}>
-              <AddFriendButton />
-              <SettingsLauncher />
-            </View>
-          ),
+          headerRight: () => <SettingsLauncher />,
         }}
       />
     </Tab.Navigator>
     </BookmarkFilterProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-});

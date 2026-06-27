@@ -33,10 +33,10 @@ describe('AddFriendButton — icon variant (default)', () => {
     expect(button.props.accessibilityLabel).toBe('addFriend.heading');
   });
 
-  it("navigates to AddFriend when pressed", () => {
+  it("navigates to AddFriendFlow when pressed", () => {
     render(<AddFriendButton />);
     fireEvent.press(screen.getByTestId('add-friend-button-icon'));
-    expect(mockNavigate).toHaveBeenCalledWith('AddFriend');
+    expect(mockNavigate).toHaveBeenCalledWith('AddFriendFlow');
   });
 });
 
@@ -47,9 +47,9 @@ describe('AddFriendButton — inline variant', () => {
     expect(screen.getByText('addFriend.heading')).toBeTruthy();
   });
 
-  it("navigates to AddFriend when pressed", () => {
+  it("navigates to AddFriendFlow when pressed", () => {
     render(<AddFriendButton variant="inline" />);
     fireEvent.press(screen.getByTestId('add-friend-button-inline'));
-    expect(mockNavigate).toHaveBeenCalledWith('AddFriend');
+    expect(mockNavigate).toHaveBeenCalledWith('AddFriendFlow');
   });
 });

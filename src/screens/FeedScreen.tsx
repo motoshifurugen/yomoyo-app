@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  RefreshControl,
   StyleSheet,
 } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
@@ -19,8 +20,8 @@ import EmptyState from '@/components/ui/EmptyState';
 import { formatBookDate } from '@/lib/books/formatBookDate';
 import TimelineBannerAd from '@/components/ads/TimelineBannerAd';
 import { useGlassTabBarInset } from '@/components/ui/GlassTabBar';
-import { yomoyoTypography } from '@/constants/yomoyoTheme';
-import { useThemedStyles, type ThemeColors } from '@/lib/theme';
+import { yomoyoTypography, spacing } from '@/constants/yomoyoTheme';
+import { useThemedStyles, useTheme, type ThemeColors } from '@/lib/theme';
 import FeedSkeleton from '@/components/feed/FeedSkeleton';
 import { ANIMAL_ASSETS } from '@/lib/users/avatarIdentity';
 import type { AnimalKey } from '@/lib/users/avatarIdentity';
@@ -130,13 +131,16 @@ export default function FeedScreen() {
   const {
     items,
     isLoading,
+    isRefreshing,
     isLoadingMore,
     hasError,
     bookmarkedIds,
     handleLoadMore,
+    handleRefresh,
     toggleBookmark,
   } = useFeedState();
   const { mode } = useBookmarkFilter();
+  const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
 
   const [selectedActivity, setSelectedActivity] = useState<ReadingActivity | null>(null);
@@ -195,7 +199,16 @@ export default function FeedScreen() {
     [],
   );
 
-  const renderEmpty = () => {
+  const renderEmpty = useCallback(() => {
+    if (hasError) {
+      return (
+        <EmptyState
+          icon="cloud-offline-outline"
+          title={t('timeline.loadErrorTitle')}
+          message={t('timeline.loadErrorBody')}
+        />
+      );
+    }
     if (mode === 'bookmarks') {
       return (
         <EmptyState
@@ -213,29 +226,33 @@ export default function FeedScreen() {
         action={<AddFriendButton variant="inline" />}
       />
     );
-  };
+  }, [hasError, mode, t]);
 
   return (
     <ScreenContainer bottomInset={tabBarInset}>
       {isLoading ? (
         <FeedSkeleton />
-      ) : hasError ? (
-        <EmptyState
-          icon="cloud-offline-outline"
-          title={t('timeline.loadErrorTitle')}
-          message={t('timeline.loadErrorBody')}
-        />
-      ) : items.length === 0 ? (
-        renderEmpty()
       ) : (
         <FlatList
           testID="updates-list"
           data={listData}
           keyExtractor={keyExtractor}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[
+            styles.list,
+            listData.length === 0 && styles.listEmpty,
+          ]}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
           ListFooterComponent={isLoadingMore ? <ActivityIndicator style={styles.loader} /> : null}
+          ListEmptyComponent={renderEmpty}
           renderItem={renderRow}
         />
       )}
@@ -252,7 +269,8 @@ export default function FeedScreen() {
 
 const makeStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    list: { paddingBottom: 16 },
+    list: { paddingTop: spacing.xl, paddingBottom: 16 },
+    listEmpty: { flexGrow: 1 },
     loader: { marginVertical: 16 },
     adSlot: { marginBottom: 12, alignItems: 'center' },
     cardWrapper: {

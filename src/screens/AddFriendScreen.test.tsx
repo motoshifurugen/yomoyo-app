@@ -150,7 +150,7 @@ describe('AddFriendScreen — search behavior', () => {
     expect(await screen.findByText('addFriend.viewProfile')).toBeTruthy();
   });
 
-  it('navigates to UserProfile with the matched uid when View profile is pressed', async () => {
+  it('navigates to UserProfile when View profile is pressed', async () => {
     mockedFindUid.mockResolvedValueOnce('friend-uid');
     mockedGetAvatar.mockResolvedValueOnce({
       animalKey: 'fox',
@@ -164,7 +164,10 @@ describe('AddFriendScreen — search behavior', () => {
     );
     fireEvent.press(screen.getByText('addFriend.search'));
     fireEvent.press(await screen.findByText('addFriend.viewProfile'));
-    expect(mockNavigate).toHaveBeenCalledWith('UserProfile', { uid: 'friend-uid' });
+    expect(mockNavigate).toHaveBeenCalledWith('UserProfile', {
+      uid: 'friend-uid',
+      fromAddFriend: true,
+    });
   });
 
   it('shows not-found when the matched user has no avatar identity', async () => {
