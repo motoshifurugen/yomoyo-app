@@ -34,6 +34,7 @@ const en = {
     close: 'Close',
   },
   bookSearch: {
+    title: 'Search Books',
     placeholder: 'Search by title or author',
     button: 'Search',
     noResults: 'No results found',
@@ -43,6 +44,7 @@ const en = {
     scanBarcode: 'Scan barcode',
   },
   bookScan: {
+    title: 'Scan Barcode',
     hint: 'Point the camera at a book barcode.',
     looking: 'Looking up the book…',
     notFound: 'We couldn’t find this book. Try a title search instead.',
@@ -53,6 +55,7 @@ const en = {
     tryAgain: 'Try again',
   },
   bookDetail: {
+    title: 'Book Detail',
     unknownAuthor: 'Unknown author',
     goToShelf: 'View in shelf',
   },

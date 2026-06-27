@@ -34,6 +34,7 @@ const ja = {
     close: '閉じる',
   },
   bookSearch: {
+    title: '本を検索',
     placeholder: 'タイトルや著者で検索',
     button: '検索',
     noResults: '結果が見つかりませんでした',
@@ -43,6 +44,7 @@ const ja = {
     scanBarcode: 'バーコードを読み取る',
   },
   bookScan: {
+    title: 'バーコード読み取り',
     hint: 'カメラを本のバーコードに向けてください。',
     looking: '本を検索中…',
     notFound: 'この本は見つかりませんでした。タイトル検索をお試しください。',
@@ -53,6 +55,7 @@ const ja = {
     tryAgain: 'もう一度',
   },
   bookDetail: {
+    title: '本の詳細',
     unknownAuthor: '著者不明',
     goToShelf: '本棚で見る',
   },
