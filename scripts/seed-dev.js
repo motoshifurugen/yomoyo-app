@@ -57,12 +57,39 @@ try {
 
 const SERVICE_ACCOUNT_PATH = path.resolve(__dirname, 'service-account.json');
 
+// ─── Production safety guard ─────────────────────────────────────────────────
+// This script writes fake "dev_" data straight into a live Firestore. If the
+// active credentials happen to point at the PRODUCTION project, seeding would
+// pollute real data. Refuse to run unless the resolved project is the known dev
+// project (or the operator explicitly overrides with --force).
+const DEV_PROJECT_ID = 'yomoyo-d9c4a';
+
+let serviceAccount = null;
 if (fs.existsSync(SERVICE_ACCOUNT_PATH)) {
-  const serviceAccount = require(SERVICE_ACCOUNT_PATH);
+  serviceAccount = require(SERVICE_ACCOUNT_PATH);
   admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 } else {
   // Fall back to Application Default Credentials (firebase login / gcloud auth)
   admin.initializeApp();
+}
+
+const resolvedProjectId =
+  (serviceAccount && serviceAccount.project_id) ||
+  process.env.GOOGLE_CLOUD_PROJECT ||
+  process.env.GCLOUD_PROJECT ||
+  process.env.FIREBASE_PROJECT ||
+  admin.app().options.projectId ||
+  null;
+
+const forceSeed = process.argv.includes('--force');
+if (!forceSeed && resolvedProjectId !== DEV_PROJECT_ID) {
+  console.error('\n  ABORTED: seed-dev.js only runs against the dev project.');
+  console.error(`  expected project: ${DEV_PROJECT_ID}`);
+  console.error(`  resolved project: ${resolvedProjectId ?? '(unknown)'}`);
+  console.error('  Point your credentials at the dev project, e.g.:');
+  console.error(`    GOOGLE_CLOUD_PROJECT=${DEV_PROJECT_ID} node scripts/seed-dev.js`);
+  console.error('  or pass --force to override this guard (dangerous).\n');
+  process.exit(1);
 }
 
 const db = admin.firestore();
