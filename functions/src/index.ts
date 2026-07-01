@@ -17,6 +17,24 @@ const REGION = 'asia-northeast1';
 const DEFAULT_TITLE = 'Yomoyo';
 const DEFAULT_BODY = '眠たいキツネが「ノルウェイの森」を読み終えました。';
 
+// ─── Debug callable guard ────────────────────────────────────────────────────
+// sendTestPush / dryRunResolveRecipients are development/debug utilities. They
+// must not be usable against the production project. They stay deployed (so dev
+// keeps them) but refuse to run in prod unless explicitly enabled.
+const PROD_PROJECT_ID = 'yomoyo-prod';
+
+function assertDebugCallablesAllowed(): void {
+  const projectId =
+    process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT;
+  const explicitlyEnabled = process.env.ENABLE_DEBUG_FUNCTIONS === 'true';
+  if (projectId === PROD_PROJECT_ID && !explicitlyEnabled) {
+    throw new HttpsError(
+      'permission-denied',
+      'Debug functions are disabled in production.',
+    );
+  }
+}
+
 interface SendTestPushInput {
   token?: string;
   title?: string;
@@ -26,6 +44,7 @@ interface SendTestPushInput {
 export const sendTestPush = onCall<SendTestPushInput>(
   { region: REGION, invoker: 'public' },
   async (req) => {
+    assertDebugCallablesAllowed();
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Sign-in required.');
     }
@@ -117,6 +136,7 @@ interface DryRunResolveRecipientsResult {
 export const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
   { region: REGION, invoker: 'public' },
   async (req): Promise<DryRunResolveRecipientsResult> => {
+    assertDebugCallablesAllowed();
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Sign-in required.');
     }
