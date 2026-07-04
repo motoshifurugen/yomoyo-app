@@ -89,7 +89,7 @@ Let your reading gently inspire someone else.
 ```
 
 ### Keywords (App Store, ≤100 chars, comma-separated)
-> reading,book,reading log,book tracker,reading tracker,book log,reading list,book lovers,follow,reading habit
+> reading,book,reading log,book tracker,book log,reading list,book lovers,follow,reading habit (92 chars)
 
 ---
 
