@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { finalizeAvatarIdentity } from '@/lib/users/avatarIdentity';
+import { autoFollowAdmin } from '@/lib/users/autoFollow';
 import { registerPushTokenAfterGrant } from '@/lib/notifications/registerPushToken';
 import { useAuth } from '@/hooks/useAuth';
 import OnboardingProgress from '@/components/onboarding/OnboardingProgress';
@@ -42,6 +43,11 @@ export default function OnboardingNotificationScreen() {
       if (user) await finalizeAvatarIdentity(user.uid);
     } catch {
       // finalization failure should not block onboarding progress
+    }
+    if (user) {
+      // Fire-and-forget: seed the new user's timeline by following the admin.
+      // Failure must not block onboarding; the user can add friends manually.
+      autoFollowAdmin(user.uid).catch(() => {});
     }
     navigation.navigate('OnboardingSending');
   };

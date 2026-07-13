@@ -1,10 +1,9 @@
 import { CommonActions } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from './types';
+import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 /** Dismiss a modal overlay downward and show the chosen main tab underneath. */
 export function closeToMainTabs(
-  navigation: NavigationProp<RootStackParamList>,
+  navigation: NavigationProp<ParamListBase>,
   screen: 'Timeline' | 'Shelf' = 'Timeline',
 ) {
   const state = navigation.getState();
