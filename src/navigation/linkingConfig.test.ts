@@ -1,4 +1,4 @@
-import { getStateFromPath } from '@react-navigation/core';
+import { getStateFromPath } from '@react-navigation/native';
 import { linkingConfig } from './linkingConfig';
 
 describe('linkingConfig — prefixes', () => {
