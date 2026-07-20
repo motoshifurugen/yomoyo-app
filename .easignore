@@ -1,0 +1,22 @@
+# EAS upload ignore list (.gitignore + prod Firebase configs for release builds)
+node_modules/
+.expo/
+dist/
+ios/
+android/
+coverage/
+.env
+.env.local
+*.log
+google-services.json
+google-services.*.json
+!google-services.prod.json
+GoogleService-Info.plist
+GoogleService-Info.*.plist
+!GoogleService-Info.prod.plist
+.DS_Store
+.pnpm-store/
+scripts/service-account.json
+.takt/runs/
+.takt/tasks/
+.takt/tasks.yaml
