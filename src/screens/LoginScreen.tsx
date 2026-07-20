@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Platform, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { yomoyoTypography, yomoyoSpacing } from '@/constants/yomoyoTheme';
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/legalLinks';
+import { openExternalUrl } from '@/utils/openExternalUrl';
 import { useThemedStyles, type ThemeColors } from '@/lib/theme';
 import {
   AppleButton,
@@ -22,6 +25,7 @@ const PROVIDER_LABEL: Record<AuthProvider, string> = {
 };
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const styles = useThemedStyles(makeStyles);
   const [signInError, setSignInError] = useState<string | null>(null);
   // 'unknown' until the device's bound provider is read, so we never flash a
@@ -92,6 +96,28 @@ export default function LoginScreen() {
           )}
         </View>
       )}
+
+      <Text style={styles.legalNotice}>
+        {t('login.legalPrefix')}
+        <Text
+          testID="login-legal-terms"
+          style={styles.legalLink}
+          accessibilityRole="link"
+          onPress={() => openExternalUrl(TERMS_OF_SERVICE_URL)}
+        >
+          {t('login.legalTerms')}
+        </Text>
+        {t('login.legalAnd')}
+        <Text
+          testID="login-legal-privacy"
+          style={styles.legalLink}
+          accessibilityRole="link"
+          onPress={() => openExternalUrl(PRIVACY_POLICY_URL)}
+        >
+          {t('login.legalPrivacy')}
+        </Text>
+        {t('login.legalSuffix')}
+      </Text>
     </View>
   );
 }
@@ -117,5 +143,17 @@ const makeStyles = (colors: ThemeColors) =>
     appleButton: {
       width: '100%',
       height: yomoyoSpacing.buttonHeight,
+    },
+    legalNotice: {
+      marginTop: 24,
+      paddingHorizontal: 8,
+      fontSize: 12,
+      lineHeight: 18,
+      color: colors.secondaryText,
+      textAlign: 'center',
+    },
+    legalLink: {
+      color: colors.primary,
+      textDecorationLine: 'underline',
     },
   });

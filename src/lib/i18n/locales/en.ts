@@ -93,6 +93,16 @@ const en = {
     deleteAccountConfirm: 'Delete',
     deleteAccountCancel: 'Cancel',
     deleteAccountError: 'Failed to delete your account. Please try again.',
+    legalTitle: 'Legal',
+    privacyPolicy: 'Privacy Policy',
+    termsOfService: 'Terms of Service',
+  },
+  login: {
+    legalPrefix: 'By continuing, you agree to our ',
+    legalTerms: 'Terms of Service',
+    legalAnd: ' and ',
+    legalPrivacy: 'Privacy Policy',
+    legalSuffix: '.',
   },
   userProfile: {
     follow: 'Receive updates',

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 import PressableSurface from '@/components/ui/PressableSurface';
 import { useTranslation } from 'react-i18next';
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/legalLinks';
+import { openExternalUrl } from '@/utils/openExternalUrl';
 import { signOut } from '@/lib/auth';
 import { deleteAccount } from '@/lib/account/deleteAccount';
 import {
@@ -109,6 +111,33 @@ function LanguageSection({
             </PressableSurface>
           );
         })}
+      </View>
+    </View>
+  );
+}
+
+const LEGAL_LINKS: ReadonlyArray<{ key: string; labelKey: string; url: string }> = [
+  { key: 'terms', labelKey: 'settings.termsOfService', url: TERMS_OF_SERVICE_URL },
+  { key: 'privacy', labelKey: 'settings.privacyPolicy', url: PRIVACY_POLICY_URL },
+];
+
+function LegalSection({ styles, t }: { styles: Styles; t: TFn }) {
+  return (
+    <View>
+      <Text style={styles.sectionLabel}>{t('settings.legalTitle')}</Text>
+      <View style={styles.row}>
+        {LEGAL_LINKS.map(({ key, labelKey, url }) => (
+          <PressableSurface
+            key={key}
+            testID={`settings-dialog-legal-${key}`}
+            style={styles.pillOption}
+            onPress={() => openExternalUrl(url)}
+            accessibilityRole="link"
+            feedback="standard"
+          >
+            <Text style={styles.pillText}>{t(labelKey)}</Text>
+          </PressableSurface>
+        ))}
       </View>
     </View>
   );
@@ -290,6 +319,7 @@ export default function SettingsDialog({ visible, onClose }: Props) {
               current={currentLanguage}
               onSelect={handleLanguageChange}
             />
+            <LegalSection styles={styles} t={t} />
             <LogoutSection styles={styles} t={t} error={logoutError} onLogout={handleLogout} />
             <DeleteAccountSection
               styles={styles}

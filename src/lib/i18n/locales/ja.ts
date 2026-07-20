@@ -93,6 +93,16 @@ const ja = {
     deleteAccountConfirm: '削除する',
     deleteAccountCancel: 'キャンセル',
     deleteAccountError: '削除に失敗しました。もう一度お試しください。',
+    legalTitle: '規約とポリシー',
+    privacyPolicy: 'プライバシーポリシー',
+    termsOfService: '利用規約',
+  },
+  login: {
+    legalPrefix: '続行することで、',
+    legalTerms: '利用規約',
+    legalAnd: 'と',
+    legalPrivacy: 'プライバシーポリシー',
+    legalSuffix: 'に同意したものとみなされます。',
   },
   userProfile: {
     follow: 'おたよりを受け取る',
