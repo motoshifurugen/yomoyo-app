@@ -12,7 +12,9 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "extends": "production",
+      "distribution": "internal",
+      "autoIncrement": false
     },
     "production": {
       "autoIncrement": true,
@@ -26,8 +28,7 @@
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "yomoyo-prod",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "yomoyo-prod.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "519663123719",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:519663123719:web:e7bf783a4171a7614899a2",
-        "EXPO_PUBLIC_ADMIN_UID": ""
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:519663123719:web:e7bf783a4171a7614899a2"
       }
     }
   },

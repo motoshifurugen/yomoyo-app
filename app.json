@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": true,
       "usesAppleSignIn": true,
-      "appleTeamId": "7V3MCCJ4SW"
+      "appleTeamId": "7V3MCCJ4SW",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,7 +43,7 @@
         "expo-build-properties",
         {
           "android": {
-            "minSdkVersion": 21
+            "minSdkVersion": 24
           },
           "ios": {
             "useFrameworks": "static"
