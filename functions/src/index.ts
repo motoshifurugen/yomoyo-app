@@ -4,6 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v2';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
+import { debugCallablesAllowed } from './debugGuard';
 import { deleteUserData } from './deleteAccount';
 import { sendExpoPush } from './expoPush';
 import { resolveRecipients } from './recipients';
@@ -17,20 +18,16 @@ const REGION = 'asia-northeast1';
 const DEFAULT_TITLE = 'Yomoyo';
 const DEFAULT_BODY = '眠たいキツネが「ノルウェイの森」を読み終えました。';
 
-// ─── Debug callable guard ────────────────────────────────────────────────────
-// sendTestPush / dryRunResolveRecipients are development/debug utilities. They
-// must not be usable against the production project. They stay deployed (so dev
-// keeps them) but refuse to run in prod unless explicitly enabled.
-const PROD_PROJECT_ID = 'yomoyo-prod';
-
+// ─── Debug callables ─────────────────────────────────────────────────────────
+// sendTestPush / dryRunResolveRecipients are development/debug utilities.
+// They are exported (and so deployed) only where debugCallablesAllowed() says
+// so; see the bottom of this file. The runtime check below is a second line of
+// defence in case they ever get deployed to production anyway.
 function assertDebugCallablesAllowed(): void {
-  const projectId =
-    process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT;
-  const explicitlyEnabled = process.env.ENABLE_DEBUG_FUNCTIONS === 'true';
-  if (projectId === PROD_PROJECT_ID && !explicitlyEnabled) {
+  if (!debugCallablesAllowed(process.env)) {
     throw new HttpsError(
       'permission-denied',
-      'Debug functions are disabled in production.',
+      'Debug functions are disabled in this environment.',
     );
   }
 }
@@ -41,7 +38,7 @@ interface SendTestPushInput {
   body?: string;
 }
 
-export const sendTestPush = onCall<SendTestPushInput>(
+const sendTestPush = onCall<SendTestPushInput>(
   { region: REGION, invoker: 'public' },
   async (req) => {
     assertDebugCallablesAllowed();
@@ -133,7 +130,7 @@ interface DryRunResolveRecipientsResult {
   recipients: DryRunRecipient[];
 }
 
-export const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
+const dryRunResolveRecipients = onCall<DryRunResolveRecipientsInput>(
   { region: REGION, invoker: 'public' },
   async (req): Promise<DryRunResolveRecipientsResult> => {
     assertDebugCallablesAllowed();
@@ -198,3 +195,10 @@ export const deleteAccount = onCall(
     }
   },
 );
+
+// The Firebase CLI deploys exactly what this module exports, and it loads the
+// module with GCLOUD_PROJECT set to the deploy target. Leaving the debug
+// callables unexported keeps them out of `firebase deploy --project production`.
+if (debugCallablesAllowed(process.env)) {
+  Object.assign(exports, { sendTestPush, dryRunResolveRecipients });
+}
