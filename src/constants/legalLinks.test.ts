@@ -6,8 +6,8 @@ import {
 } from './legalLinks';
 
 describe('legalLinks', () => {
-  it('uses an https base URL', () => {
-    expect(LEGAL_SITE_BASE_URL).toMatch(/^https:\/\//);
+  it('points at the yomoyo pages on my_site', () => {
+    expect(LEGAL_SITE_BASE_URL).toBe('https://furugen-island.com/my_site/yomoyo');
   });
 
   it('does not end the base URL with a slash', () => {
@@ -15,14 +15,14 @@ describe('legalLinks', () => {
   });
 
   it('derives the privacy policy URL from the base URL', () => {
-    expect(PRIVACY_POLICY_URL).toBe(`${LEGAL_SITE_BASE_URL}/privacy-policy.html`);
+    expect(PRIVACY_POLICY_URL).toBe(`${LEGAL_SITE_BASE_URL}/privacy`);
   });
 
   it('derives the terms of service URL from the base URL', () => {
-    expect(TERMS_OF_SERVICE_URL).toBe(`${LEGAL_SITE_BASE_URL}/terms-of-service.html`);
+    expect(TERMS_OF_SERVICE_URL).toBe(`${LEGAL_SITE_BASE_URL}/terms`);
   });
 
   it('derives the account deletion URL from the base URL', () => {
-    expect(ACCOUNT_DELETION_URL).toBe(`${LEGAL_SITE_BASE_URL}/account-deletion.html`);
+    expect(ACCOUNT_DELETION_URL).toBe(`${LEGAL_SITE_BASE_URL}/account-deletion`);
   });
 });
