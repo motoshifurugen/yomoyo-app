@@ -6,6 +6,19 @@ import LoginScreen from '@/screens/LoginScreen';
 import { signInWithGoogle } from '@/lib/auth/google';
 import { signInWithApple } from '@/lib/auth/apple';
 import { getBoundProvider, DeviceAccountMismatchError } from '@/lib/auth/deviceAccount';
+import { openExternalUrl } from '@/utils/openExternalUrl';
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/legalLinks';
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { language: 'en' },
+  }),
+}));
+
+jest.mock('@/utils/openExternalUrl', () => ({
+  openExternalUrl: jest.fn(),
+}));
 
 jest.mock('@/lib/auth/google');
 jest.mock('@/lib/auth/apple');
@@ -143,6 +156,29 @@ describe('LoginScreen', () => {
     await waitFor(() => {
       expect(screen.getByText(/already set up with Google/)).toBeTruthy();
     });
+  });
+
+  it('renders the legal consent notice', () => {
+    render(<LoginScreen />);
+    expect(screen.getByText(/login\.legalPrefix/)).toBeTruthy();
+  });
+
+  it('renders the terms of service and privacy policy links', () => {
+    render(<LoginScreen />);
+    expect(screen.getByTestId('login-legal-terms')).toBeTruthy();
+    expect(screen.getByTestId('login-legal-privacy')).toBeTruthy();
+  });
+
+  it('opens the terms of service URL when the terms link is pressed', () => {
+    render(<LoginScreen />);
+    fireEvent.press(screen.getByTestId('login-legal-terms'));
+    expect(openExternalUrl).toHaveBeenCalledWith(TERMS_OF_SERVICE_URL);
+  });
+
+  it('opens the privacy policy URL when the privacy link is pressed', () => {
+    render(<LoginScreen />);
+    fireEvent.press(screen.getByTestId('login-legal-privacy'));
+    expect(openExternalUrl).toHaveBeenCalledWith(PRIVACY_POLICY_URL);
   });
 
   it('clears the error message when the user retries', async () => {

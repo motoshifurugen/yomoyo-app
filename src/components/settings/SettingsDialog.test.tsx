@@ -8,6 +8,8 @@ import { registerPushTokenIfPermitted } from '@/lib/notifications/registerPushTo
 import { THEME_STORAGE_KEY } from '@/lib/theme/themeStorage';
 import { signOut } from '@/lib/auth';
 import { deleteAccount } from '@/lib/account/deleteAccount';
+import { openExternalUrl } from '@/utils/openExternalUrl';
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '@/constants/legalLinks';
 
 jest.mock('@/lib/i18n', () => ({
   setLanguage: jest.fn().mockResolvedValue(undefined),
@@ -37,6 +39,10 @@ jest.mock('@/lib/auth', () => ({
 
 jest.mock('@/lib/account/deleteAccount', () => ({
   deleteAccount: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/utils/openExternalUrl', () => ({
+  openExternalUrl: jest.fn(),
 }));
 
 const mockedSignOut = signOut as jest.Mock;
@@ -299,6 +305,35 @@ describe('SettingsDialog — delete account', () => {
     await waitFor(() => {
       expect(screen.getByText('settings.deleteAccountError')).toBeTruthy();
     });
+  });
+});
+
+describe('SettingsDialog — legal links', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the legal section title when visible', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByText('settings.legalTitle')).toBeTruthy();
+  });
+
+  it('renders the terms of service and privacy policy links', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    expect(screen.getByTestId('settings-dialog-legal-terms')).toBeTruthy();
+    expect(screen.getByTestId('settings-dialog-legal-privacy')).toBeTruthy();
+  });
+
+  it('opens the terms of service URL when the terms link is pressed', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-legal-terms'));
+    expect(openExternalUrl).toHaveBeenCalledWith(TERMS_OF_SERVICE_URL);
+  });
+
+  it('opens the privacy policy URL when the privacy link is pressed', () => {
+    render(<SettingsDialog visible={true} onClose={jest.fn()} />);
+    fireEvent.press(screen.getByTestId('settings-dialog-legal-privacy'));
+    expect(openExternalUrl).toHaveBeenCalledWith(PRIVACY_POLICY_URL);
   });
 });
 
